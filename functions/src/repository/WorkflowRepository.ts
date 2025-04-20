@@ -1,37 +1,113 @@
 import * as admin from 'firebase-admin';
-import {WorkflowLogType, WorkflowType} from "../Workflow.types";
-import {firestore} from "firebase-admin";
-import UpdateData = firestore.UpdateData;
-
-const db = admin.firestore();
-
-const getWorkflowById = async (workflowId: string):Promise<WorkflowType> => {
-    const doc = await db.collection('workflows').doc(workflowId).get();
-
-    if (!doc.exists) throw 'Workflow not found';
-
-    return {id: doc.id, ...doc.data()} as WorkflowType
+import {WorkflowLogType, WorkflowType} from '../Workflow.types';
+import * as logger from 'firebase-functions/logger';
+// Initialize Firebase Admin if not already initialized
+if (!admin.apps.length) {
+    admin.initializeApp();
 }
 
-const createWorkflow= async (data:WorkflowType) => {
-    const docRef = await db.collection('workflows').add(data);
-    return { id: docRef.id, message: 'Workflow created'};
-}
+// Get Firestore instance
+const firestore = admin.firestore();
+const workflowsCollection = firestore.collection('workflows');
 
-async function updateWorkflow(id:string, data:UpdateData<WorkflowType>) {
-    await db.collection('workflows').doc(id).update(data);
-    return 'Workflow updated';
-}
+/**
+ * Repository for managing Workflow data in Firestore
+ */
+const WorkflowRepository = {
+    /**
+     * Get a workflow by its ID
+     * @param id Workflow ID
+     * @returns Promise with the workflow data
+     */
+    async getWorkflowById(id: string): Promise<WorkflowType> {
+        logger.log("Getting workflow by id fom db", id)
 
-async function deleteWorkflow(id:string) {
-    await db.collection('workflows').doc(id).delete();
-    return 'Workflow deleted';
-}
+        const docRef = workflowsCollection.doc(id);
+        logger.log("Doc ref", docRef)
 
-async function saveWorkflowLog(workflowId:string, logData:WorkflowLogType) {
-    const logRef = db.collection('workflows').doc(workflowId).collection('workflow_logs').doc();
-    await logRef.set(logData);
-    return "Workflow log saved";
-}
 
-export default {getWorkflowById, createWorkflow, updateWorkflow, deleteWorkflow, saveWorkflowLog};
+        const doc = await docRef.get();
+        logger.log("Doc ", doc)
+
+        if (!doc.exists) {
+            logger.log("Workflow not found: ", id)
+            throw 'Workflow not found';
+        } else {
+            logger.log("Workflow found", doc.data())
+        }
+
+        logger.log("Done Getting workflow by id fom db")
+        return {
+            ...doc.data(),
+            id: doc.id,
+        } as WorkflowType;
+    },
+
+    /**
+     * Create a new workflow
+     * @param data Workflow data
+     * @returns Promise with the created workflow ID and confirmation message
+     */
+    async createWorkflow(data: WorkflowType): Promise<{ id: string; message: string }> {
+        await workflowsCollection.doc(data.id).set({
+            ...data,
+            createdAt: (new Date()).toISOString(),
+            updatedAt:  (new Date()).toISOString(),
+            ownerId: data.ownerId,
+            status: 'active'
+        });
+
+        return {
+            id: data.id,
+            message: 'Workflow created',
+        };
+    },
+
+    /**
+     * Update an existing workflow
+     * @param id Workflow ID
+     * @param data Updated workflow data
+     * @returns Promise with confirmation message
+     */
+    async updateWorkflow(id: string, data: Partial<WorkflowType>): Promise<string> {
+        const docRef = workflowsCollection.doc(id);
+        await docRef.update({
+            ...data,
+            updatedAt: Date.now().toString(),
+        });
+
+        return 'Workflow updated';
+    },
+
+    /**
+     * Delete a workflow
+     * @param id Workflow ID
+     * @returns Promise with confirmation message
+     */
+    async deleteWorkflow(id: string): Promise<string> {
+        const docRef = workflowsCollection.doc(id);
+        await docRef.delete();
+
+        return 'Workflow deleted';
+    },
+
+    /**
+     * Save a workflow execution log
+     * @param workflowId Workflow ID
+     * @param logData Log data
+     * @returns Promise with confirmation message
+     */
+    async saveWorkflowLog(workflowId: string, logData: WorkflowLogType): Promise<string> {
+        const workflowRef = workflowsCollection.doc(workflowId);
+        const logsCollection = workflowRef.collection('workflow_logs');
+
+        await logsCollection.doc().set({
+            ...logData,
+            timestamp: logData.timestamp || Date.now().toString(),
+        });
+
+        return 'Workflow log saved';
+    }
+};
+
+export default WorkflowRepository;

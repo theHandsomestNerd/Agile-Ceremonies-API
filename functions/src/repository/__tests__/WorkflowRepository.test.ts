@@ -3,19 +3,28 @@ import * as admin from 'firebase-admin';
 import {WorkflowLogType, WorkflowType} from "../../Workflow.types";
 
 jest.mock('firebase-admin', () => {
+    // Create a document mock that also supports collection method
     const docMock = {
-        get: jest.fn() as jest.Mock, // Cast to jest.Mock
+        get: jest.fn() as jest.Mock,
         update: jest.fn() as jest.Mock,
         delete: jest.fn() as jest.Mock,
         set: jest.fn() as jest.Mock,
+        collection: jest.fn(), // Add collection method to document mock
     };
+
+    // Create a collection mock
     const collectionMock = {
         doc: jest.fn(() => docMock),
         add: jest.fn() as jest.Mock,
     };
+
+    // Make the document's collection method return the collection mock
+    docMock.collection.mockReturnValue(collectionMock);
+
     const firestoreMock = {
         collection: jest.fn(() => collectionMock),
     };
+    
     return {
         firestore: jest.fn(() => firestoreMock),
         initializeApp: jest.fn(), // Mock initializeApp to prevent errors
@@ -47,7 +56,7 @@ describe('WorkflowRepository', () => {
                 exists: false,
             });
 
-            await expect(WorkflowRepository.getWorkflowById('nonexistent-id')).rejects.toEqual('Workflow not found');
+            expect(WorkflowRepository.getWorkflowById('nonexistent-id')).toThrow('Workflow not found');
         });
     });
 
@@ -102,7 +111,8 @@ describe('WorkflowRepository', () => {
                 outputData: { output: "output" },
                 error: null
             };
-            (mockFirestore.collection('workflows').doc().collection('workflows').doc().set as jest.Mock).mockResolvedValueOnce(undefined);
+            // Updated: Use set directly on the document returned by the subcollection's doc method
+            (mockFirestore.collection('workflows').doc().collection('workflow_logs').doc().set as jest.Mock).mockResolvedValueOnce(undefined);
 
             const result = await WorkflowRepository.saveWorkflowLog('123', mockLogData);
             expect(result).toEqual('Workflow log saved');

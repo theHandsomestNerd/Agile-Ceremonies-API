@@ -1,30 +1,40 @@
+/**
+ * Represents a workflow
+ */
 export interface WorkflowType {
-    "id": string,
-    "name": string,
-    "n8nId": string,
-    "description": string,
-    "steps": string [],
-    "status": "active" | "inactive",
-    "lastRun": string | null,
-    "createdAt": string,
-    "updatedAt": string | null,
-    "ownerId": string
+    id: string;
+    name: string;
+    n8nId: string;
+    description: string;
+    steps: any[];
+    createdAt: string;
+    updatedAt: string;
+    status: string;
+    lastRun?: string;
+    ownerId: string;
 }
 
+/**
+ * Represents workflow trigger data
+ */
 export interface WorkflowTriggerType {
-    "workflowId": string,
-    "type": "interval" | "one-time-only",
-    "interval": number,
-    "lastTriggeredAt": string,
-    "active": boolean
+    workflowId: string;
+    type: string;
+    interval?: number;
+    lastTriggeredAt: string;
+    active: boolean;
+    inputData?: any;
 }
 
+/**
+ * Represents a workflow execution log
+ */
 export interface WorkflowLogType {
-    "triggeredBy": string,
-    "message": string,
-    "status": "success" | "error" |"in-progress",
-    "inputData": WorkflowTriggerType,
-    "outputData": { "output": any },
-    "error": null,
-    "timestamp": string
+    message: string;
+    timestamp: string;
+    triggeredBy: string;
+    status: 'success' | 'error' | string;
+    inputData: WorkflowTriggerType;
+    outputData: any;
+    error: any | null;
 }
