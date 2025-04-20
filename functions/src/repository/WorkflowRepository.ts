@@ -31,7 +31,7 @@ const WorkflowRepository = {
         }
 
         return {
-            ...doc.data(),
+            ...(doc.data()),
             id: doc.id,
         } as WorkflowType;
     },

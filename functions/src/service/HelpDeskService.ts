@@ -97,6 +97,7 @@ async function processHelpDeskRequest(helpDeskMessage: string) {
     const openAIRequest = await createHelpDeskRequest(helpDeskMessage);
 
     // Get the workflow ID from environment variables
+    console.log("processHelpDeskRequest: Getting workflow ID from environment variables", process.env);
     const helpDeskWorkflowId = process.env.HELP_DESK_WORKFLOW_ID;
     logger.log("Triggering this workflow", helpDeskWorkflowId);
 

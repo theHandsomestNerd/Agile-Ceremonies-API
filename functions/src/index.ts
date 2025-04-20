@@ -34,7 +34,6 @@ export const handleWorkflowRequest = onRequest(async (req: any, res: any) => {
 
                 switch (action) {
                     case 'create':
-                        logger.log("POST Request data", body.data)
                         return res.status(200).send(WorkflowService.createWorkflow(body.data as WorkflowType));
                     case 'trigger':
                         if (!workflowId) return res.status(400).send({error: "Missing workflow ID."})
@@ -47,11 +46,13 @@ export const handleWorkflowRequest = onRequest(async (req: any, res: any) => {
                 logger.log("GET Request", workflowId)
                 if (!workflowId) return res.status(400).send({error: "Missing workflow ID."})
 
-                const getWorkflowResponse = WorkflowService.getWorkflow(workflowId).catch((e: any) => {
-                    return e.message
-                })
-
-                return res.status(200).send(getWorkflowResponse);
+                await WorkflowService.getWorkflow(workflowId)
+                    .then((getWorkflowResponse) => {
+                        return res.status(200).send(getWorkflowResponse);
+                    }).catch((e: any) => {
+                        return res.status(400).send(e);
+                    })
+                break;
             case 'PUT':
                 if (!workflowId) return res.status(400).send({error: "Missing workflow ID."})
                 return res.status(200).send(WorkflowService.updateWorkflow(workflowId, body))
@@ -81,7 +82,7 @@ export const handleHelpDeskRequest = onRequest(async (req: any, res: any) => {
                 return res.status(405).send({error: 'Method Not Allowed'});
         }
     } catch (err) {
-        logger.error("An error occurred",err);
+        logger.error("An error occurred", err);
         return res.status(500).send({error: 'Internal Server Error'});
     }
 });

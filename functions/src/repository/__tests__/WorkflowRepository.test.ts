@@ -71,7 +71,6 @@ describe('WorkflowRepository', () => {
                 createdAt: Date.now().toString(),
                 updatedAt: Date.now().toString(),
                 status: 'active', 
-                lastRun: null,
                 ownerId: 'user123'
             };
             (mockFirestore.collection('workflows').add as jest.Mock).mockResolvedValueOnce({ id: 'new-id' });
