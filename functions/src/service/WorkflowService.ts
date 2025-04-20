@@ -9,25 +9,29 @@ async function getWorkflow(workflowId:string) {
 }
 
 async function createWorkflow(data: WorkflowType) {
+
     return WorkflowRepository.createWorkflow(data);
 }
 
-export async function triggerWorkflow(workflowId:string, inputData:WorkflowTriggerType) {
+export async function triggerWorkflow(inputData:WorkflowTriggerType) {
     // Fetch the n8n ID and validate
-    const workflow = await WorkflowRepository.getWorkflowById(workflowId);
+    const workflow:WorkflowType = await WorkflowRepository.getWorkflowById(inputData.workflowId);
     if (!workflow) throw 'Workflow not found';
     logger.log("Workflow found", workflow)
 
-    const n8nRes = await fetch(`${process.env.AGENT_COMPASS_WEBHOOK}${workflow.n8nId}`, {
+    const n8nRes = await fetch(`${workflow.workflowTriggerEndpoint}${workflow.n8nId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: 'Bearer YOUR_N8N_TOKEN' },
         body: JSON.stringify(inputData)
     });
 
+
+
     const output = await n8nRes.json();
+    logger.log("n8n response", output)
 
     // Save log to Firestore
-    await saveWorkflowLog(workflowId, {
+    await saveWorkflowLog(inputData.workflowId, {
         inputData,
         triggeredBy: process.env.WHO_AI || "No Agent Id",
         outputData: output,

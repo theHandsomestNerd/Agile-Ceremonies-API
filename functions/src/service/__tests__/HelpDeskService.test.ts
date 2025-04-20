@@ -69,7 +69,7 @@ describe('WorkflowService', () => {
             (WorkflowRepository.getWorkflowById as jest.Mock).mockResolvedValueOnce(mockWorkflow);
             (WorkflowRepository.saveWorkflowLog as jest.Mock).mockResolvedValueOnce('Workflow log saved');
 
-            const result = await WorkflowService.triggerWorkflow('123', mockInputData);
+            const result = await WorkflowService.triggerWorkflow(mockInputData);
 
             // Assertions
             expect(result).toEqual(mockOutput);

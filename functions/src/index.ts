@@ -13,20 +13,27 @@ import WorkflowService from "./service/WorkflowService";
 import HelpDeskService from "./service/HelpDeskService";
 import * as logger from "firebase-functions/logger"
 import {WorkflowType} from "./Workflow.types";
+import {defineString} from "firebase-functions/params";
+const functions = require('firebase-functions/v1');
+
+// Define some parameters
+const helpDeskWorkflow = defineString('HELP_DESK_WORKFLOW_ID');
+// const welcomeMessage = defineString('WELCOME_MESSAGE');
 
 // Initialize admin SDK only once
 if (!admin.apps.length) {
     admin.initializeApp();
 }
 
+
 export const handleWorkflowRequest = onRequest(async (req: any, res: any) => {
     try {
         const {method, body, query} = req;
-        let workflowId: string = query.id as string
+
+        const {action, data} = body;
 
         switch (method) {
             case 'POST':
-                const {action} = body;
 
                 if (!action) {
                     return res.status(400).send({error: 'Missing action in request body'});
@@ -36,13 +43,18 @@ export const handleWorkflowRequest = onRequest(async (req: any, res: any) => {
                     case 'create':
                         return res.status(200).send(WorkflowService.createWorkflow(body.data as WorkflowType));
                     case 'trigger':
-                        if (!workflowId) return res.status(400).send({error: "Missing workflow ID."})
-
-                        return res.status(200).send(WorkflowService.triggerWorkflow(workflowId, body));
+                        if (!data.id) return res.status(400).send({error: "Missing workflow ID."})
+                        const triggerWorkflowResp = WorkflowService.triggerWorkflow(body.data).then((response) => {
+                            return response
+                        }).catch((e) => {
+                            return e.message
+                        })
+                        return res.status(200).send(triggerWorkflowResp);
                     default:
                         return res.status(400).send({error: 'Invalid action specified'});
                 }
             case 'GET':
+                let workflowId: string = query.id as string
                 logger.log("GET Request", workflowId)
                 if (!workflowId) return res.status(400).send({error: "Missing workflow ID."})
 
@@ -54,11 +66,11 @@ export const handleWorkflowRequest = onRequest(async (req: any, res: any) => {
                     })
                 break;
             case 'PUT':
-                if (!workflowId) return res.status(400).send({error: "Missing workflow ID."})
-                return res.status(200).send(WorkflowService.updateWorkflow(workflowId, body))
+                if (!data.id) return res.status(400).send({error: "Missing workflow ID."})
+                return res.status(200).send(WorkflowService.updateWorkflow(data.id, body))
             case 'DELETE':
-                if (!workflowId) return res.status(400).send({error: "Missing workflow ID."})
-                return res.status(200).send(WorkflowService.deleteWorkflow(workflowId));
+                if (!data.id) return res.status(400).send({error: "Missing workflow ID."})
+                return res.status(200).send(WorkflowService.deleteWorkflow(data.id));
             default:
                 return res.status(405).send({error: 'Method Not Allowed'});
         }
@@ -68,7 +80,7 @@ export const handleWorkflowRequest = onRequest(async (req: any, res: any) => {
     }
 });
 
-export const handleHelpDeskRequest = onRequest(async (req: any, res: any) => {
+export const handleHelpDeskRequest = functions.runWith({workflowId: helpDeskWorkflow}).https.onRequest(async (req: any, res: any) => {
     try {
         logger.log("Help Desk Request");
         console.log("", req.body)
@@ -77,7 +89,11 @@ export const handleHelpDeskRequest = onRequest(async (req: any, res: any) => {
         switch (method) {
             case 'POST':
                 console.log("POST Request", req.body)
-                return res.status(200).send(HelpDeskService.processHelpDeskRequest(body.message));
+                return HelpDeskService.processHelpDeskRequest(body.message, helpDeskWorkflow.value() || "no help disk id?").then((helpDeskResp) => {
+                    return res.status(200).send({helpDeskResp})
+                }).catch((e) => {
+                    return res.status(40).send({error: 'Error processing help desk request', details: e});
+                });
             default:
                 return res.status(405).send({error: 'Method Not Allowed'});
         }
@@ -86,3 +102,4 @@ export const handleHelpDeskRequest = onRequest(async (req: any, res: any) => {
         return res.status(500).send({error: 'Internal Server Error'});
     }
 });
+

@@ -12,6 +12,7 @@ export interface WorkflowType {
     status: string;
     lastRun?: string;
     ownerId: string;
+    workflowTriggerEndpoint?: string;
 }
 
 /**
