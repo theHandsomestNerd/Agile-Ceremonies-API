@@ -5,8 +5,9 @@ export interface WorkflowType {
     "description": string,
     "steps": string [],
     "status": "active" | "inactive",
-    "lastRun": string,
-    "created_at": string,
+    "lastRun": string | null,
+    "createdAt": string,
+    "updatedAt": string | null,
     "ownerId": string
 }
 
@@ -20,6 +21,7 @@ export interface WorkflowTriggerType {
 
 export interface WorkflowLogType {
     "triggeredBy": string,
+    "message": string,
     "status": "success" | "error" |"in-progress",
     "inputData": WorkflowTriggerType,
     "outputData": { "output": any },

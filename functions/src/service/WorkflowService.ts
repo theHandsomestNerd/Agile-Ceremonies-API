@@ -31,7 +31,8 @@ export async function triggerWorkflow(workflowId:string, inputData:WorkflowTrigg
         outputData: output,
         status: n8nRes.ok ? 'success' : 'error',
         error: n8nRes.ok ? null : output.error,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        message: 'Workflow triggered'
     });
 
     return output;
