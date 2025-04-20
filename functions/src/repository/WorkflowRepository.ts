@@ -20,23 +20,16 @@ const WorkflowRepository = {
      * @returns Promise with the workflow data
      */
     async getWorkflowById(id: string): Promise<WorkflowType> {
-        logger.log("Getting workflow by id fom db", id)
-
         const docRef = workflowsCollection.doc(id);
-        logger.log("Doc ref", docRef)
-
-
         const doc = await docRef.get();
-        logger.log("Doc ", doc)
 
         if (!doc.exists) {
             logger.log("Workflow not found: ", id)
             throw 'Workflow not found';
         } else {
-            logger.log("Workflow found", doc.data())
+            logger.log("Get Workflow found by id "+ id, doc.data())
         }
 
-        logger.log("Done Getting workflow by id fom db")
         return {
             ...doc.data(),
             id: doc.id,

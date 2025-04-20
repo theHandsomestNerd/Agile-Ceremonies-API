@@ -30,7 +30,7 @@ describe('WorkflowService', () => {
 
     describe('getWorkflow', () => {
         it('should return a workflow by ID', async () => {
-            const mockWorkflow: WorkflowType = { id: '123', name: 'Test Workflow', n8nId: 'n8n123', description: '', steps: [], createdAt: 'now', updatedAt: 'now', status: 'active', lastRun: null, ownerId: 'user123' };
+            const mockWorkflow: WorkflowType = { id: '123', name: 'Test Workflow', n8nId: 'n8n123', description: '', steps: [], createdAt: 'now', updatedAt: 'now', status: 'active', ownerId: 'user123' };
             (WorkflowRepository.getWorkflowById as jest.Mock).mockResolvedValueOnce(mockWorkflow);
 
             const result = await WorkflowService.getWorkflow('123');
@@ -41,7 +41,7 @@ describe('WorkflowService', () => {
 
     describe('createWorkflow', () => {
         it('should create a workflow and return its ID', async () => {
-            const mockWorkflow: WorkflowType = { id: 'temp-id', name: 'New Workflow', n8nId: 'n8n123', description: '', steps: [], createdAt: 'now', updatedAt: 'now', status: 'active', lastRun: null, ownerId: 'user123' };
+            const mockWorkflow: WorkflowType = { id: 'temp-id', name: 'New Workflow', n8nId: 'n8n123', description: '', steps: [], createdAt: 'now', updatedAt: 'now', status: 'active', ownerId: 'user123' };
             const mockResponse = { id: 'new-id', message: 'Workflow created' };
             (WorkflowRepository.createWorkflow as jest.Mock).mockResolvedValueOnce(mockResponse);
 
@@ -53,7 +53,7 @@ describe('WorkflowService', () => {
 
     describe('triggerWorkflow', () => {
         it('should trigger a workflow and save a log', async () => {
-            const mockWorkflow: WorkflowType = { id: '123', name: 'Test Workflow', n8nId: 'n8n123', description: '', steps: [], createdAt: 'now', updatedAt: 'now', status: 'active', lastRun: null, ownerId: 'user123' };
+            const mockWorkflow: WorkflowType = { id: '123', name: 'Test Workflow', n8nId: 'n8n123', description: '', steps: [], createdAt: 'now', updatedAt: 'now', status: 'active', ownerId: 'user123' };
             const mockInputData: WorkflowTriggerType = { workflowId: '123', type: 'interval', interval: 5, lastTriggeredAt: 'now', active: true };
             const mockOutput = { output: 'success' };
 
