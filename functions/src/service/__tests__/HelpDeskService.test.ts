@@ -54,7 +54,7 @@ describe('WorkflowService', () => {
     describe('triggerWorkflow', () => {
         it('should trigger a workflow and save a log', async () => {
             const mockWorkflow: WorkflowType = { id: '123', name: 'Test Workflow', n8nId: 'n8n123', description: '', steps: [], createdAt: 'now', updatedAt: 'now', status: 'active', ownerId: 'user123' };
-            const mockInputData: WorkflowTriggerType = { workflowId: '123', type: 'interval', interval: 5, lastTriggeredAt: 'now', active: true };
+            const mockInputData: WorkflowTriggerType = { workflowId: '123', type: 'interval', interval: 5, lastTriggeredAt: 'now', active: true, triggeredBy: 'ai-agent-compass' };
             const mockOutput = { output: 'success' };
 
             // Mock fetch
@@ -116,7 +116,6 @@ describe('WorkflowService', () => {
             const mockLogData: WorkflowLogType = {
                 message: 'Log entry',
                 timestamp: 'now',
-                triggeredBy: 'user123',
                 status: 'success',
                 inputData: { workflowId: '123', type: 'interval', interval: 5, lastTriggeredAt: 'now', active: true },
                 outputData: { output: 'success' },

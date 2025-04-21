@@ -1,5 +1,5 @@
 import WorkflowService from "../service/WorkflowService";
-import {WorkflowType} from "../Workflow.types";
+import {WorkflowTriggerType, WorkflowType} from "../Workflow.types";
 import * as logger from "firebase-functions/logger"
 
 const handleWorkflowsRequest = async (req: any, res: any) => {
@@ -26,8 +26,18 @@ const handleWorkflowsRequest = async (req: any, res: any) => {
                             })
 
                     case 'trigger':
-                        if (!data.id) return res.status(400).send({error: "Missing workflow ID."})
-                        const triggerWorkflowResp = WorkflowService.triggerWorkflow(body.data).then((response) => {
+                        if (!data.workflowId) return res.status(400).send({error: "Missing workflow ID."})
+
+                        const workFlowTrigger:WorkflowTriggerType = {
+                            workflowId: data.workflowId,
+                            lastTriggeredAt: (new Date()).toISOString(),
+                            triggeredBy: data.ownerId,
+                            active: true,
+                            inputData: { requestQuery:query, requestBody:body},
+                            type: data.type,
+                        }
+
+                        const triggerWorkflowResp = WorkflowService.triggerWorkflow(workFlowTrigger).then((response) => {
                             return response
                         }).catch((e) => {
                             return e.message

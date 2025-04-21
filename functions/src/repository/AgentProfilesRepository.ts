@@ -88,31 +88,31 @@ const agentProfilesGet = async (agentId: string) => {
  * @param filters The filters to apply
  * @returns A promise that resolves to the filtered agent profiles
  */
-const agentProfilesGetAll = async (filters: AgentProfilesFilterType) => {
+const agentProfilesGetAll = async (filters?: AgentProfilesFilterType) => {
     let agentsQuery: admin.firestore.Query<admin.firestore.DocumentData> = agentProfilesCollection;
 
     // Filter by status if provided
-    if (filters.statusFilter) {
+    if (filters?.statusFilter) {
         agentsQuery = agentsQuery.where('status', '==', filters.statusFilter);
     }
 
     // Filter by domain if provided
-    if (filters.domainFilter) {
+    if (filters?.domainFilter) {
         agentsQuery = agentsQuery.where('domains', 'array-contains', filters.domainFilter);
     }
 
     // Filter by role if provided
-    if (filters.roleFilter) {
+    if (filters?.roleFilter) {
         agentsQuery = agentsQuery.where('role', 'in', filters.roleFilter);
     }
 
     // Filter by capability if provided
-    if (filters.capabilityFilter) {
+    if (filters?.capabilityFilter) {
         agentsQuery = agentsQuery.where('capabilities', 'array-contains', filters.capabilityFilter);
     }
 
     // Filter by description if provided
-    if (filters.descriptionFilter) {
+    if (filters?.descriptionFilter) {
         agentsQuery = agentsQuery.where('description', '>=', filters.descriptionFilter);
     }
 
@@ -126,6 +126,8 @@ const agentProfilesGetAll = async (filters: AgentProfilesFilterType) => {
         id: doc.id,
         ...doc.data()
     }));
+
+    logger.log("Agents found: ", agents)
 
     return {
         success: true,

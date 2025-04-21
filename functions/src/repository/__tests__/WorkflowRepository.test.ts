@@ -104,7 +104,6 @@ describe('WorkflowRepository', () => {
             const mockLogData:WorkflowLogType = {
                 message: 'Log entry', 
                 timestamp: Date.now().toString(),
-                triggeredBy: 'user123',
                 status: 'success',
                 inputData: { workflowId: '123', type: 'interval', interval: 5, lastTriggeredAt: Date.now().toString(), active: true },
                 outputData: { output: "output" },

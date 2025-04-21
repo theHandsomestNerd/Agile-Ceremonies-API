@@ -13,35 +13,35 @@ async function createWorkflow(data: WorkflowType) {
     return WorkflowRepository.createWorkflow(data);
 }
 
-export async function triggerWorkflow(inputData:WorkflowTriggerType) {
+export async function triggerWorkflow(workflowTriggerRequest:WorkflowTriggerType):Promise<{output: any}> {
     // Fetch the n8n ID and validate
-    const workflow:WorkflowType = await WorkflowRepository.getWorkflowById(inputData.workflowId);
+    const workflow:WorkflowType = await WorkflowRepository.getWorkflowById(workflowTriggerRequest.workflowId);
     if (!workflow) throw 'Workflow not found';
     logger.log("Workflow found", workflow)
 
+    // TODO: Add Auth to N8N agents When I test i have to enable the workflow for test in n8n so this can wait.
     const n8nRes = await fetch(`${workflow.workflowTriggerEndpoint}${workflow.n8nId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: 'Bearer YOUR_N8N_TOKEN' },
-        body: JSON.stringify(inputData)
+        body: JSON.stringify(workflowTriggerRequest)
     });
-
-
 
     const output = await n8nRes.json();
     logger.log("n8n response", output)
 
     // Save log to Firestore
-    await saveWorkflowLog(inputData.workflowId, {
-        inputData,
-        triggeredBy: process.env.WHO_AI || "No Agent Id",
+    return saveWorkflowLog(workflowTriggerRequest.workflowId, {
+        inputData: workflowTriggerRequest.inputData,
         outputData: output,
         status: n8nRes.ok ? 'success' : 'error',
-        error: n8nRes.ok ? null : output.error,
+        error: n8nRes.ok ? "" : output.error,
         timestamp: new Date().toISOString(),
-        message: 'Workflow triggered'
+        message: 'Workflow triggered.'
+    }).then(()=>{
+        return output;
+    }).catch((e)=>{
+        return new Error('Error saving workflow log: ' + e);
     });
-
-    return output;
 }
 
 async function updateWorkflow(id:string, data:WorkflowType) {

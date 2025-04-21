@@ -23,6 +23,7 @@ export interface WorkflowTriggerType {
     type: string;
     interval?: number;
     lastTriggeredAt: string;
+    triggeredBy: string;
     active: boolean;
     inputData?: any;
 }
@@ -33,9 +34,8 @@ export interface WorkflowTriggerType {
 export interface WorkflowLogType {
     message: string;
     timestamp: string;
-    triggeredBy: string;
     status: 'success' | 'error' | string;
-    inputData: WorkflowTriggerType;
+    inputData: any;
     outputData: any;
     error: any | null;
 }

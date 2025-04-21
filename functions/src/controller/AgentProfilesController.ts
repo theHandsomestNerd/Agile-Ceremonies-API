@@ -1,8 +1,8 @@
 import * as logger from "firebase-functions/logger"
 import agentProfilesRepository from "../repository/AgentProfilesRepository";
+import AgentProfilesRepository from "../repository/AgentProfilesRepository";
 import {AgentProfilesType} from "../AgentProfiles.types";
 import AgentProfilesService from "../service/AgentProfilesService";
-import AgentProfilesRepository from "../repository/AgentProfilesRepository";
 
 const handleAgentProfiles = async (req: any, res: any) => {
     const {method, body, query} = req;
@@ -53,30 +53,18 @@ const handleAgentProfiles = async (req: any, res: any) => {
         case 'GET':
             const getAgentId = query.id;
 
-            try {
-
-                // If an ID is provided, get that specific agent
-                if (getAgentId) {
-                    const getAgentResponse = await agentProfilesRepository.agentProfilesGet(getAgentId);
-                    return res.status(200).send(getAgentResponse);
-                }
-
-                await AgentProfilesService.agentProfilesGet(query as AgentProfilesType)
-                    .then((getAllAgentsResponse) => {
-                        return res.status(200).send(getAllAgentsResponse);
-                    }).catch((error) => {
-                        return res.status(400).send({error: 'Error fetching all agents', details: error});
-                    })
-
-
-            } catch (error) {
-                logger.error("Error fetching agent profile:", error);
-                return res.status(500).send({
-                    success: false,
-                    error: 'Failed to fetch agent profiles'
-                });
+            // If an ID is provided, get that specific agent
+            if (getAgentId) {
+                const getAgentResponse = await agentProfilesRepository.agentProfilesGet(getAgentId);
+                return res.status(200).send(getAgentResponse);
             }
-            break;
+
+            return AgentProfilesService.agentProfilesGet(query)
+                .then((getAllAgentsResponse) => {
+                    return res.status(200).send(getAllAgentsResponse);
+                }).catch((error) => {
+                    return res.status(400).send({error: 'Error fetching all agents', details: error});
+                })
         case 'PUT':
             const putAgentId = query.id || (body.data && body.data.id);
 

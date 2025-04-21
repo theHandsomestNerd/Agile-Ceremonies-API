@@ -30,7 +30,17 @@ describe('WorkflowService', () => {
 
     describe('getWorkflow', () => {
         it('should return a workflow by ID', async () => {
-            const mockWorkflow: WorkflowType = { id: '123', name: 'Test Workflow', n8nId: 'n8n123', description: '', steps: [], createdAt: 'now', updatedAt: 'now', status: 'active', ownerId: 'user123' };
+            const mockWorkflow: WorkflowType = {
+                id: '123',
+                name: 'Test Workflow',
+                n8nId: 'n8n123',
+                description: '',
+                steps: [],
+                createdAt: 'now',
+                updatedAt: 'now',
+                status: 'active',
+                ownerId: 'user123'
+            };
             (WorkflowRepository.getWorkflowById as jest.Mock).mockResolvedValueOnce(mockWorkflow);
 
             const result = await WorkflowService.getWorkflow('123');
@@ -41,8 +51,18 @@ describe('WorkflowService', () => {
 
     describe('createWorkflow', () => {
         it('should create a workflow and return its ID', async () => {
-            const mockWorkflow: WorkflowType = { id: 'temp-id', name: 'New Workflow', n8nId: 'n8n123', description: '', steps: [], createdAt: 'now', updatedAt: 'now', status: 'active', ownerId: 'user123' };
-            const mockResponse = { id: 'new-id', message: 'Workflow created' };
+            const mockWorkflow: WorkflowType = {
+                id: 'temp-id',
+                name: 'New Workflow',
+                n8nId: 'n8n123',
+                description: '',
+                steps: [],
+                createdAt: 'now',
+                updatedAt: 'now',
+                status: 'active',
+                ownerId: 'user123'
+            };
+            const mockResponse = {id: 'new-id', message: 'Workflow created'};
             (WorkflowRepository.createWorkflow as jest.Mock).mockResolvedValueOnce(mockResponse);
 
             const result = await WorkflowService.createWorkflow(mockWorkflow);
@@ -53,9 +73,26 @@ describe('WorkflowService', () => {
 
     describe('triggerWorkflow', () => {
         it('should trigger a workflow and save a log', async () => {
-            const mockWorkflow: WorkflowType = { id: '123', name: 'Test Workflow', n8nId: 'n8n123', description: '', steps: [], createdAt: 'now', updatedAt: 'now', status: 'active', ownerId: 'user123' };
-            const mockInputData: WorkflowTriggerType = { workflowId: '123', type: 'interval', interval: 5, lastTriggeredAt: 'now', active: true };
-            const mockOutput = { output: 'success' };
+            const mockWorkflow: WorkflowType = {
+                id: '123',
+                name: 'Test Workflow',
+                n8nId: 'n8n123',
+                description: '',
+                steps: [],
+                createdAt: 'now',
+                updatedAt: 'now',
+                status: 'active',
+                ownerId: 'user123'
+            };
+            const mockInputData: WorkflowTriggerType = {
+                workflowId: '123',
+                type: 'interval',
+                interval: 5,
+                lastTriggeredAt: 'now',
+                active: true,
+                triggeredBy: "ai-agent-compass"
+            };
+            const mockOutput = {output: 'success'};
 
             // Mock fetch
             global.fetch = jest.fn(() =>
@@ -78,7 +115,7 @@ describe('WorkflowService', () => {
                 `${process.env.AGENT_COMPASS_WEBHOOK}${mockWorkflow.n8nId}`,
                 expect.objectContaining({
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer YOUR_N8N_TOKEN' },
+                    headers: {'Content-Type': 'application/json', Authorization: 'Bearer YOUR_N8N_TOKEN'},
                     body: JSON.stringify(mockInputData),
                 })
             );
@@ -92,7 +129,7 @@ describe('WorkflowService', () => {
 
     describe('updateWorkflow', () => {
         it('should update a workflow and return a success message', async () => {
-            const mockData = { name: 'Updated Workflow' };
+            const mockData = {name: 'Updated Workflow'};
             (WorkflowRepository.updateWorkflow as jest.Mock).mockResolvedValueOnce('Workflow updated');
 
             const result = await WorkflowService.updateWorkflow('123', mockData as WorkflowType);
@@ -116,10 +153,9 @@ describe('WorkflowService', () => {
             const mockLogData: WorkflowLogType = {
                 message: 'Log entry',
                 timestamp: 'now',
-                triggeredBy: 'user123',
                 status: 'success',
-                inputData: { workflowId: '123', type: 'interval', interval: 5, lastTriggeredAt: 'now', active: true },
-                outputData: { output: 'success' },
+                inputData: {workflowId: '123', type: 'interval', interval: 5, lastTriggeredAt: 'now', active: true},
+                outputData: {output: 'success'},
                 error: null,
             };
             (WorkflowRepository.saveWorkflowLog as jest.Mock).mockResolvedValueOnce('Workflow log saved');
