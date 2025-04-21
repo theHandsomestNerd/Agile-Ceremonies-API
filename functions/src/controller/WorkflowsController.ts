@@ -17,7 +17,14 @@ const handleWorkflowsRequest = async (req: any, res: any) => {
 
                 switch (action) {
                     case 'create':
-                        return res.status(200).send(WorkflowService.createWorkflow(body.data as WorkflowType));
+                        return WorkflowService.createWorkflow(body.data as WorkflowType)
+                            .then((createWorkflowResp)=>{
+                                return res.status(200).send(createWorkflowResp);
+                            })
+                            .catch((e)=>{
+                                return res.status(400).send({error: e});
+                            })
+
                     case 'trigger':
                         if (!data.id) return res.status(400).send({error: "Missing workflow ID."})
                         const triggerWorkflowResp = WorkflowService.triggerWorkflow(body.data).then((response) => {
