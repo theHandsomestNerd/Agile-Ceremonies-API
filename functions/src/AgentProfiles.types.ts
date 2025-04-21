@@ -1,7 +1,7 @@
 export interface AgentProfilesType {
     id: string;
     name: string,
-    role: string,
+    role: 'PM' | 'Developer' | 'Graphic Designer' | 'Marketing' | 'Team Member' | 'CEO',
     capabilities: string[],
     description: string,
     domains: string[],
