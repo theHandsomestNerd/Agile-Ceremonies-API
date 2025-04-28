@@ -9,24 +9,50 @@
 
 import {onRequest} from "firebase-functions/v2/https";
 import * as admin from 'firebase-admin';
-import {defineString} from "firebase-functions/params";
 import WorkflowsController from "./controller/WorkflowsController";
 import HelpDeskController from "./controller/HelpDeskController";
 import AgentProfilesController from "./controller/AgentProfilesController";
+import PromptsLibraryController from "./controller/PromptLibraryController";
+import WorkflowTriggerController from "./controller/WorkflowTriggerController";
+import './config'
 
-const functions = require('firebase-functions/v1');
+const cors = require('cors')({
+    origin: [
+        "https://us-central1-youtube-and-other-connections.cloudfunctions.net",
+        "http://localhost:5678"
+        // "https://static.parastorage.com",
+        // 'https://editor.wix.com',
+        // 'https://www.wix.com'
 
-// Define some parameters
-const helpDeskWorkflow = defineString('HELP_DESK_WORKFLOW_ID');
-// const welcomeMessage = defineString('WELCOME_MESSAGE');
+    ],
+    credentials: true,
+    methods: ["POST", "GET", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+});
 
 // Initialize admin SDK only once
 if (!admin.apps.length) {
+
     admin.initializeApp();
 }
 
-export const handleWorkflowsRequest = onRequest(WorkflowsController.handleWorkflowsRequest)
 
-export const handleHelpDeskRequest = functions.runWith({workflowId: helpDeskWorkflow}).https.onRequest((req: Request, res: Response) => HelpDeskController.handleHelpDeskRequest(req, res, helpDeskWorkflow.value()));
+export const handleWorkflowsRequest = onRequest((request, response) => {
+    return cors(request, response, async () => WorkflowsController.handleWorkflowsRequest(request, response));
+});
 
-export const handleAgentProfilesRequest = onRequest(AgentProfilesController.handleAgentProfiles);
+export const handleWorkflowTriggerRequest = onRequest((request, response) => {
+    return cors(request, response, async () => WorkflowTriggerController.handleWorkflowTriggerRequest(request, response))
+})
+
+export const handleHelpDeskRequest = onRequest((req, res) => {
+    return cors(req, res, async () => HelpDeskController.handleHelpDeskRequest(req, res))
+});
+
+export const handleAgentProfilesRequest = onRequest((req, res) => {
+    return cors(req, res, async () => AgentProfilesController.handleAgentProfiles(req, res))
+});
+
+export const handlePromptLibraryRequest = onRequest(async (request, response) => {
+    return cors(request, response, async () => PromptsLibraryController.handlePromptLibrary(request, response))
+});

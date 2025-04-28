@@ -1,6 +1,7 @@
 import * as admin from 'firebase-admin';
 import {WorkflowLogType, WorkflowType} from '../Workflow.types';
 import * as logger from 'firebase-functions/logger';
+import {AgentWorkflows} from "../data/Workflows";
 // Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
     admin.initializeApp();
@@ -46,7 +47,7 @@ const WorkflowRepository = {
             ...data,
             createdAt: (new Date()).toISOString(),
             updatedAt:  (new Date()).toISOString(),
-            ownerId: data.ownerId,
+            ownerAgentId: data.ownerAgentId,
             status: 'active'
         });
 
@@ -100,7 +101,42 @@ const WorkflowRepository = {
         });
 
         return 'Workflow log saved';
+    },
+
+    /**
+     * * Initialize agent profiles in Firestore from agent roster object
+     *  * @returns A promise that resolves with status of updating
+     *  */
+    async agentWorkflowsInitialize(){
+        // Use a batch write for atomicity
+        const batch = firestore.batch();
+
+        // First clear any existing agents if reinitializing
+        const existingWorkflows = await workflowsCollection.get();
+        logger.log("Existing workflows found:", existingWorkflows.size);
+        existingWorkflows.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+        logger.log("Existing workflows purged");
+        // Add all agents from the roster
+        for (const workflow of AgentWorkflows) {
+            const docRef = workflowsCollection.doc(workflow.id);
+            logger.log("Initializing AI Agent Workflow: ", workflow);
+            batch.set(docRef, {
+                ...workflow,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            });
+        }
+
+        await batch.commit();
+        return {
+            success: true,
+            message: `Initialized ${AgentWorkflows.length} agent workflows`
+        };
     }
 };
+
+
 
 export default WorkflowRepository;

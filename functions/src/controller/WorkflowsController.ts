@@ -1,6 +1,8 @@
 import WorkflowService from "../service/WorkflowService";
 import {WorkflowTriggerType, WorkflowType} from "../Workflow.types";
 import * as logger from "firebase-functions/logger"
+import WorkflowTriggerService from "../service/WorkflowTriggerService";
+import {helpDeskWorkflowN8NId} from "../config";
 
 const handleWorkflowsRequest = async (req: any, res: any) => {
     try {
@@ -10,7 +12,6 @@ const handleWorkflowsRequest = async (req: any, res: any) => {
 
         switch (method) {
             case 'POST':
-
                 if (!action) {
                     return res.status(400).send({error: 'Missing action in request body'});
                 }
@@ -24,20 +25,34 @@ const handleWorkflowsRequest = async (req: any, res: any) => {
                             .catch((e)=>{
                                 return res.status(400).send({error: e});
                             })
+                    case 'initialize':
+                        // Initialize the main prompt collection with data from AgentRoster
+                        logger.log("Initializing workflows collection");
 
+                        return WorkflowService.initializeWorkflows()
+                            .then((initializationResponse:any) => {
+                                return res.status(200).send(initializationResponse);
+                            }).catch((error:any) => {
+                                logger.error("Error initializing workflows:", error);
+                                return res.status(500).send({
+                                    success: false,
+                                    error: 'Failed to initialize agent workflows'
+                                });
+                            });
                     case 'trigger':
                         if (!data.workflowId) return res.status(400).send({error: "Missing workflow ID."})
 
                         const workFlowTrigger:WorkflowTriggerType = {
                             workflowId: data.workflowId,
                             lastTriggeredAt: (new Date()).toISOString(),
-                            triggeredBy: data.ownerId,
+                            triggeredBy: 'compass',
                             active: true,
-                            inputData: { requestQuery:query, requestBody:body},
-                            type: data.type,
+                            n8nId: helpDeskWorkflowN8NId.value(),
+                            workflowStatus: {},
+                            createdAt: (new Date()).toISOString()
                         }
 
-                        const triggerWorkflowResp = WorkflowService.triggerWorkflow(workFlowTrigger).then((response) => {
+                        const triggerWorkflowResp = WorkflowTriggerService.executeWorkflowTrigger(workFlowTrigger).then((response) => {
                             return response
                         }).catch((e) => {
                             return e.message

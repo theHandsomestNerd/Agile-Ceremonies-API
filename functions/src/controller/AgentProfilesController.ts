@@ -1,5 +1,4 @@
 import * as logger from "firebase-functions/logger"
-import agentProfilesRepository from "../repository/AgentProfilesRepository";
 import AgentProfilesRepository from "../repository/AgentProfilesRepository";
 import {AgentProfilesType} from "../AgentProfiles.types";
 import AgentProfilesService from "../service/AgentProfilesService";
@@ -20,7 +19,7 @@ const handleAgentProfiles = async (req: any, res: any) => {
                     // Initialize the agent_profiles collection with data from AgentRoster
                     logger.log("Initializing agent profiles collection");
 
-                    return agentProfilesRepository.agentProfilesInitialize()
+                    return AgentProfilesRepository.agentProfilesInitialize()
                         .then((initializationResponse) => {
                             return res.status(200).send(initializationResponse);
                         }).catch((error) => {
@@ -38,7 +37,7 @@ const handleAgentProfiles = async (req: any, res: any) => {
                         return res.status(400).send({error: 'Missing agent id'});
                     }
 
-                    return agentProfilesRepository.agentProfilesCreate(body.data as AgentProfilesType)
+                    return AgentProfilesRepository.agentProfilesCreate(body.data as AgentProfilesType)
                         .then((createAgentResp) => {
                             return res.status(201).send(createAgentResp);
                         })
@@ -55,7 +54,7 @@ const handleAgentProfiles = async (req: any, res: any) => {
 
             // If an ID is provided, get that specific agent
             if (getAgentId) {
-                const getAgentResponse = await agentProfilesRepository.agentProfilesGet(getAgentId);
+                const getAgentResponse = await AgentProfilesRepository.agentProfilesGet(getAgentId);
                 return res.status(200).send(getAgentResponse);
             }
 
