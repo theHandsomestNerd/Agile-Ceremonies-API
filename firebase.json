@@ -1,7 +1,8 @@
 {
   "firestore": {
-    "rules": "multi-agent-network-collections.rules",
-    "indexes": "multi-agent-network-collections.indexes.json"
+    "database": "the-handsomestnerd-multi-agent-network",
+    "rules": "the-handsomestnerd-multi-agent-network.rules",
+    "indexes": "the-handsomestnerd-multi-agent-network.indexes.json"
   },
   "functions": [
     {
@@ -15,13 +16,12 @@
         "*.local"
       ],
       "predeploy": [
-        "npm --prefix \"$RESOURCE_DIR\" run lint",
         "npm --prefix \"$RESOURCE_DIR\" run build"
       ]
     }
   ],
   "storage": {
-    "rules": "storage.rules age.rules"
+    "rules": "storage.rules"
   },
   "emulators": {
     "auth": {

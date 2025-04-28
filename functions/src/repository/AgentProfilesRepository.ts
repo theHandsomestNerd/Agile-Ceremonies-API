@@ -4,8 +4,8 @@ import {agentRoster} from "../data/AgentRoster";
 import {AgentProfilesFilterType, AgentProfilesType} from "../AgentProfiles.types";
 
 const firestore = admin.firestore();
+console.log("FIRESTORE DB", firestore.databaseId)
 const agentProfilesCollection = firestore.collection('agent_profiles');
-
 /**
  * * Initialize agent profiles in Firestore from agent roster object
  *  * @returns A promise that resolves with status of updating
@@ -21,8 +21,22 @@ const agentProfilesInitialize = async () => {
         batch.delete(doc.ref);
     });
     logger.log("Existing agents purged");
+    const agentRosterProcessed = agentRoster({
+        CompassEndpoint: "http://localhost:5678/webhook-test/14da411d-b978-454e-95e4-d4deec0cccdf/",
+        BrianEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844/",
+        NatEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844/",
+        ReqqyEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844/",
+        JoshEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844/",
+        JamesEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844/",
+        TerrellEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844/",
+        JamesTerrellEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844/",
+        AntoshEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844/",
+        ManmanEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844/",
+        LiaEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844/"
+    })
+
     // Add all agents from the roster
-    for (const agent of agentRoster) {
+    for (const agent of agentRosterProcessed) {
         const docRef = agentProfilesCollection.doc(agent.id);
         logger.log("Initializing AI Agent: ", agent);
         batch.set(docRef, {
@@ -35,7 +49,7 @@ const agentProfilesInitialize = async () => {
     await batch.commit();
     return {
         success: true,
-        message: `Initialized ${agentRoster.length} agent profiles`
+        message: `Initialized ${agentRosterProcessed.length} agent profiles`
     };
 }
 

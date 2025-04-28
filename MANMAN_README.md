@@ -92,5 +92,3 @@ The Handsomest Nerd Inc. runs a Multi-Agent Network with specialized AI agents f
 - One interaction: You define the operation, path, and data.
 - Zero hassle: Man-Man ensures compliance, stability, and logs everything for your audit trail.
 - Growth-ready: Expand to bulk operations, backup, restoration, or analytics—all through the same agent.
-
-Would you like to get started, see example input, or explore advanced workflows (like batch updates or transaction safety)?

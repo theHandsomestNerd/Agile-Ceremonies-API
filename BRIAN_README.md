@@ -1,4 +1,4 @@
-# Agent Brian – Multi-Agent Network Help Desk Profile
+~~# Agent Brian – Multi-Agent Network Help Desk Profile
 
 Welcome! Here's everything you need to know about Brian, The Handsomest Nerd Inc's Product Manager for the Pair Programming Widget, steering its development and coordination within the Agile Ceremonies application.
 
@@ -142,4 +142,4 @@ The Handsomest Nerd Inc. uses a Multi-Agent Network model to cover all Agile tea
 }
 ```
 
-Remember: Brian plays a crucial role in ensuring the Pair Programming Widget remains focused, efficient, and ready for development and user engagement, backed by clear and organized management.
+Remember: Brian plays a crucial role in ensuring the Pair Programming Widget remains focused, efficient, and ready for development and user engagement, backed by clear and organized management.~~

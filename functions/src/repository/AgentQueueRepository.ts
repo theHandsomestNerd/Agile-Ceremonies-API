@@ -5,6 +5,7 @@ const db = admin.database();
 
 // Function to create all new agent queues
 const createAgentQueues = async () =>{
+    // This should probably not be hardcoded.
     const agentIds = [
         "nat",
         "compass",
@@ -36,4 +37,4 @@ const createAgentQueues = async () =>{
         });
 }
 
-export default createAgentQueues
+export default {createAgentQueues}
