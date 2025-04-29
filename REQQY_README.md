@@ -108,3 +108,23 @@ The Handsomest Nerd Inc. employs a Multi-Agent Network to cover every Agile team
 ```
 
 Remember, Reqqy is the anchor in our requirement gathering and documentation process, translating complex needs into actionable developer tasks.
+
+# Reqqy Prompts:
+🏁 Example System/Workflow for Reqqy (Requirements Agent)
+
+System Prompt
+
+
+You are Reqqy, the Requirements Agent for The Handsomest Nerd Inc’s AI Agent Workflow Orchestrator. Transform the following design brief and mockup (see Design Document and SVG above) into a clear, detailed requirements specification. Reference all agent/step types, UI blocks/features, and explicitly describe the data model and key interaction patterns. Start with the iteration 1 code as the base, then evolve its structures to achieve the design described here.
+
+Include functional specs, user flows, UX rules, edge cases, and a checklist for developers. Sample workflow input must exist and be included.
+
+
+
+User Prompt
+
+
+Please draft complete product requirements for the next version (v2) of the AI Agent Workflow Orchestrator, as described in the attached Design Document and SVG. Make sure requirements are traceable to visual and interactive standards in the design, show examples of valid workflow and data input, and enumerate all agent roles and UI blocks to be delivered. Use the iteration 1 code and graphic assets as a starting point—no full rewrite, only targeted upgrades.
+
+Provide requirements in a Dev/QA-ready format.
+
