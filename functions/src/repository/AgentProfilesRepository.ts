@@ -22,17 +22,17 @@ const agentProfilesInitialize = async () => {
     });
     logger.log("Existing agents purged");
     const agentRosterProcessed = agentRoster({
-        CompassEndpoint: "http://localhost:5678/webhook-test/14da411d-b978-454e-95e4-d4deec0cccdf/",
-        BrianEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844/",
-        NatEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844/",
-        ReqqyEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844/",
-        JoshEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844/",
-        JamesEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844/",
-        TerrellEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844/",
-        JamesTerrellEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844/",
-        AntoshEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844/",
-        ManmanEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844/",
-        LiaEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844/"
+        CompassEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844",
+        BrianEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844",
+        NatEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844",
+        ReqqyEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844",
+        JoshEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844",
+        JamesEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844",
+        TerrellEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844",
+        JamesTerrellEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844",
+        AntoshEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844",
+        ManmanEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844",
+        LiaEndpoint: "http://localhost:5678/webhook-test/7a01fd5a-c276-4cbd-9db4-d9532357f844"
     })
 
     // Add all agents from the roster

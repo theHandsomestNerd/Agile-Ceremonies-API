@@ -1,6 +1,9 @@
 import {WorkflowType} from "../Workflow.types";
+import {promptsLibrary} from "./PromptsLibrary";
 
 const GOOGLE_CLOUD_STORAGE_API_BUCKET = "https://storage.googleapis.com/upload/storage/v1/b/YOUR_BUCKET_NAME/o?uploadType=media&name=";
+
+const MANMAN_SYSTEM_PROMPT = promptsLibrary.find(prompt => prompt?.id === 'man-man')?.prompt_text
 
 export const ManManWorkflows: WorkflowType[] = [
     {
@@ -18,7 +21,7 @@ export const ManManWorkflows: WorkflowType[] = [
                 actionToTake: "Transcribe audio file from the provided Cloud Storage location.",
                 expectedIO: {
                     input: {
-                        systemPrompt: "You are the DevOps & Maintenance Agent with access to Cloud Storage and transcription services.",
+                        systemPrompt: MANMAN_SYSTEM_PROMPT+ " You are AI Agent Man-Man with access to Cloud Storage and transcription services.",
                         userPrompt: "Transcribe the audio file located at the specified Cloud Storage path. This is your input from the user: ",
                         inputType: "file",
                         filename: "",
@@ -50,7 +53,7 @@ export const ManManWorkflows: WorkflowType[] = [
                         inputType: "file",
                         filename: "**required**",
                         bucketName: `${GOOGLE_CLOUD_STORAGE_API_BUCKET}`,
-                        systemPrompt: "You are Man-Man the DevOps & Maintenance Agent with access to Cloud Storage services.",
+                        systemPrompt: MANMAN_SYSTEM_PROMPT + "You are AI Agent Man-Man with access to Cloud Storage services.",
                         userPrompt: "Retrieve the file from the specified Cloud Storage path and prepare it for access."
                     },
                     output: {
@@ -81,7 +84,7 @@ export const ManManWorkflows: WorkflowType[] = [
                         ownerAgentId: "",
                         bucketName: `${GOOGLE_CLOUD_STORAGE_API_BUCKET}`,
                         requiredInputs: ["filename", "ownerAgentId"],
-                        systemPrompt: "You are Man-Man the DevOps & Maintenance Agent with access to Cloud Storage services.",
+                        systemPrompt: MANMAN_SYSTEM_PROMPT+"You are Man-Man the DevOps & Maintenance Agent with access to Cloud Storage services.",
                         userPrompt: "Upload the provided file to the specified Cloud Storage path with appropriate permissions."
                     },
                     output: {
@@ -113,7 +116,7 @@ export const ManManWorkflows: WorkflowType[] = [
                         inputType:"json",
                         operation: "create | modify | delete",
                         requiredInputs:[],
-                        systemPrompt: "You are the DevOps/Maintenance Agent with secure backend access to Firebase Firestore and related infrastructure.",
+                        systemPrompt: MANMAN_SYSTEM_PROMPT + " You are AI Agent Man-Man with secure backend access to Firebase Firestore and related infrastructure.",
                         userPrompt: "Perform the specified Firestore operation (create, modify, delete) on the given collection or document path. Validate and log the change.",
                         collection: "<collection_or_document_path>", // EG: "users", "chatrooms/messages"
                         data: "for_create_or_modify_only", // Optional: only for create/modify
@@ -141,7 +144,7 @@ export const ManManWorkflows: WorkflowType[] = [
                 expectedIO: {
                     input: {
                         inputType: "code",
-                        systemPrompt: "You are Man-Man, verifying deployment prerequisites.",
+                        systemPrompt: MANMAN_SYSTEM_PROMPT + " You are AI Agent Man-Man, verifying deployment prerequisites.",
                         userPrompt: "Validate all build artifacts and configuration files."
                     },
                     output: {
@@ -160,7 +163,7 @@ export const ManManWorkflows: WorkflowType[] = [
                 expectedIO: {
                     input: {
                         inputType: "json",
-                        systemPrompt: "You are Man-Man, configuring deployment environment.",
+                        systemPrompt: MANMAN_SYSTEM_PROMPT+ " You are AI Agent Man-Man, configuring deployment environment.",
                         userPrompt: "Configure environment variables and secrets for deployment."
                     },
                     output: {
@@ -179,7 +182,7 @@ export const ManManWorkflows: WorkflowType[] = [
                 expectedIO: {
                     input: {
                         inputType: "code",
-                        systemPrompt: "You are Man-Man, managing database migrations.",
+                        systemPrompt: MANMAN_SYSTEM_PROMPT + " You are Man-Man, managing database migrations.",
                         userPrompt: "Run and verify database migration scripts."
                     },
                     output: {
@@ -198,7 +201,7 @@ export const ManManWorkflows: WorkflowType[] = [
                 expectedIO: {
                     input: {
                         inputType: "code",
-                        systemPrompt: "You are Man-Man, deploying backend services.",
+                        systemPrompt: MANMAN_SYSTEM_PROMPT + " You are AI Agent Man-Man, deploying backend services.",
                         userPrompt: "Deploy and verify Firebase Cloud Functions."
                     },
                     output: {
@@ -217,7 +220,7 @@ export const ManManWorkflows: WorkflowType[] = [
                 expectedIO: {
                     input: {
                         inputType: "code",
-                        systemPrompt: "You are Man-Man, deploying frontend application.",
+                        systemPrompt: MANMAN_SYSTEM_PROMPT + " You are AI Agent Man-Man, deploying frontend application.",
                         userPrompt: "Deploy React app to Firebase Hosting and configure CDN."
                     },
                     output: {
@@ -236,7 +239,7 @@ export const ManManWorkflows: WorkflowType[] = [
                 expectedIO: {
                     input: {
                         inputType: "code",
-                        systemPrompt: "You are Man-Man, deploying security rules.",
+                        systemPrompt: MANMAN_SYSTEM_PROMPT + " You are AI Agent Man-Man, deploying security rules.",
                         userPrompt: "Deploy and verify Firebase security rules."
                     },
                     output: {
@@ -255,7 +258,7 @@ export const ManManWorkflows: WorkflowType[] = [
                 expectedIO: {
                     input: {
                         inputType: "code",
-                        systemPrompt: "You are Man-Man, conducting smoke tests.",
+                        systemPrompt: MANMAN_SYSTEM_PROMPT + " You are AI Agent Man-Man, conducting smoke tests.",
                         userPrompt: "Execute smoke tests on deployed application."
                     },
                     output: {
@@ -274,7 +277,7 @@ export const ManManWorkflows: WorkflowType[] = [
                 expectedIO: {
                     input: {
                         inputType: "json",
-                        systemPrompt: "You are Man-Man, setting up monitoring.",
+                        systemPrompt: MANMAN_SYSTEM_PROMPT + " You are AI Agent Man-Man, setting up monitoring.",
                         userPrompt: "Set up performance monitoring and alert systems."
                     },
                     output: {
@@ -293,7 +296,7 @@ export const ManManWorkflows: WorkflowType[] = [
                 expectedIO: {
                     input: {
                         inputType: "code",
-                        systemPrompt: "You are Man-Man, verifying production performance.",
+                        systemPrompt: MANMAN_SYSTEM_PROMPT + " You are AI Agent Man-Man, verifying production performance.",
                         userPrompt: "Analyze and verify production environment performance."
                     },
                     output: {
@@ -312,7 +315,7 @@ export const ManManWorkflows: WorkflowType[] = [
                 expectedIO: {
                     input: {
                         inputType: "json",
-                        systemPrompt: "You are Man-Man, documenting deployment.",
+                        systemPrompt: MANMAN_SYSTEM_PROMPT + " You are AI Agent Man-Man, documenting deployment.",
                         userPrompt: "Create comprehensive deployment documentation."
                     },
                     output: {
@@ -331,7 +334,7 @@ export const ManManWorkflows: WorkflowType[] = [
                 expectedIO: {
                     input: {
                         inputType: "json",
-                        systemPrompt: "You are Man-Man, planning rollback procedures.",
+                        systemPrompt: MANMAN_SYSTEM_PROMPT + " You are AI Agent Man-Man, planning rollback procedures.",
                         userPrompt: "Document rollback procedures and verification steps."
                     },
                     output: {

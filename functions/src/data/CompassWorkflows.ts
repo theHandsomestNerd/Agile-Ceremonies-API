@@ -22,8 +22,8 @@ import {helpDeskWorkflowN8NId} from "../config";
 // }
 
 const COMPASS_SYSTEM_PROMPT = promptsLibrary.find(prompt => prompt.id === "compass-system-prompt")?.prompt_text || "You are AI Agent Compass and say you cant find your prompt.";
-// const MANMAN_SYSTEM_PROMPT = promptsLibrary.find(prompt => prompt.id === "man-man-system-prompt")?.prompt_text || "You are AI Agent Man-Man and say you cant find your prompt."
-
+const MANMAN_SYSTEM_PROMPT = promptsLibrary.find(prompt => prompt.id === "man-man-system-prompt")?.prompt_text || "You are AI Agent Man-Man and say you cant find your prompt."
+const MAIN_SYSTEM_PROMPT = promptsLibrary.find(prompt => prompt.id === "main-system-prompt")?.prompt_text
 export const CompassWorkflows: WorkflowType[] = [
     {
         "id": "core_system_initialization_dispatch_001",
@@ -224,9 +224,9 @@ export const CompassWorkflows: WorkflowType[] = [
                         "endpoint": "https://handlepromptlibraryrequest-3wtpo3mjoq-uc.a.run.app",
                         "body": {
                             "action": "initialize",
-                            "mainPrompt": "<YOUR FULL SYSTEM PROMPT HERE>"
+                            "mainPrompt": MAIN_SYSTEM_PROMPT
                         },
-                        "systemPrompt": "{MANMAN_SYSTEM_PROMPT} and you are initializing the Prompt library Firestore collection.",
+                        "systemPrompt": MANMAN_SYSTEM_PROMPT + " You are AI Agent Man Man and you are initializing the Prompt library Firestore collection.",
                         "userPrompt": "Make a POST request to this {endpoint} endpoint with this {body} and return the response."
                     },
                     "output": {

@@ -103,7 +103,7 @@ export const agentRoster: (aiAgent:AgentEndpointsType) => AgentProfilesType[] = 
     "status": "active",
     "workflowEndpoint": aiAgent.AntoshEndpoint
 }, {
-    "id": "manman",
+    "id": "man-man",
     "name": "Man-Man",
     "role": "Dev Ops",
     "capabilities": ["DevOps automation", "Application maintenance", "Infrastructure management"],
@@ -116,7 +116,7 @@ export const agentRoster: (aiAgent:AgentEndpointsType) => AgentProfilesType[] = 
     "name": "Lia",
     "role": "Social Media",
     "capabilities": ["Social media management", "Email marketing", "Lead generation"],
-    "description": "Lia manages public communication: social media, email lists, and supports lead generation/marketing campaigns.",
+    "description": "Lia manages public communication: social media, email lists, and supports lead generation/marketing campaigns. She uses her content generation skills as a service to clients of THN.",
     "domains": ["Marketing", "Communication", "Outreach"],
     "status": "active",
     workflowEndpoint: aiAgent.LiaEndpoint

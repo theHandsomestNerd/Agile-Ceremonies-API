@@ -7,8 +7,16 @@ import {helpDeskWorkflowN8NId} from "../config";
 const handleWorkflowsRequest = async (req: any, res: any) => {
     try {
         const {method, body, query} = req;
+        logger.log("Workflows Request",method, body, query);
 
         const {action, data} = body;
+        logger.log("action data", action, data);
+
+        let parsedData:any = data;
+
+        if(typeof parsedData === 'string') {
+            parsedData = JSON.parse(data);
+        }
 
         switch (method) {
             case 'POST':
@@ -18,7 +26,7 @@ const handleWorkflowsRequest = async (req: any, res: any) => {
 
                 switch (action) {
                     case 'create':
-                        return WorkflowService.createWorkflow(body.data as WorkflowType)
+                        return WorkflowService.createWorkflow(parsedData as WorkflowType)
                             .then((createWorkflowResp)=>{
                                 return res.status(200).send(createWorkflowResp);
                             })
@@ -40,10 +48,10 @@ const handleWorkflowsRequest = async (req: any, res: any) => {
                                 });
                             });
                     case 'trigger':
-                        if (!data.workflowId) return res.status(400).send({error: "Missing workflow ID."})
+                        if (!parsedData.workflowId) return res.status(400).send({error: "Missing workflow ID."})
 
                         const workFlowTrigger:WorkflowTriggerType = {
-                            workflowId: data.workflowId,
+                            workflowId: parsedData.workflowId,
                             lastTriggeredAt: (new Date()).toISOString(),
                             triggeredBy: 'compass',
                             active: true,
@@ -74,11 +82,11 @@ const handleWorkflowsRequest = async (req: any, res: any) => {
                     })
                 break;
             case 'PUT':
-                if (!data.id) return res.status(400).send({error: "Missing workflow ID."})
-                return res.status(200).send(WorkflowService.updateWorkflow(data.id, body))
+                if (!parsedData.id) return res.status(400).send({error: "Missing workflow ID."})
+                return res.status(200).send(WorkflowService.updateWorkflow(parsedData.id, body))
             case 'DELETE':
-                if (!data.id) return res.status(400).send({error: "Missing workflow ID."})
-                return res.status(200).send(WorkflowService.deleteWorkflow(data.id));
+                if (!parsedData.id) return res.status(400).send({error: "Missing workflow ID."})
+                return res.status(200).send(WorkflowService.deleteWorkflow(parsedData.id));
             default:
                 return res.status(405).send({error: 'Method Not Allowed'});
         }

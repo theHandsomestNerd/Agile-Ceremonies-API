@@ -92,6 +92,9 @@ const WorkflowRepository = {
      * @returns Promise with confirmation message
      */
     async saveWorkflowLog(workflowId: string, logData: WorkflowLogType): Promise<string> {
+        logger.log("Saving workflow log for workflow ID: ", workflowId, logData);
+        try{
+
         const workflowRef = workflowsCollection.doc(workflowId);
         const logsCollection = workflowRef.collection('workflow_logs');
 
@@ -99,6 +102,10 @@ const WorkflowRepository = {
             ...logData,
             timestamp: logData.timestamp || Date.now().toString(),
         });
+        } catch (e){
+            logger.error("Error saving workflow log: ", e);
+            throw 'Error saving workflow log: ' + e;
+        }
 
         return 'Workflow log saved';
     },

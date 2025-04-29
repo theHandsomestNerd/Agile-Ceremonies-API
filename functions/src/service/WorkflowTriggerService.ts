@@ -29,7 +29,7 @@ export async function executeWorkflowTrigger(workflowTriggerRequest: WorkflowTri
         return agentResponse.agent as AgentProfilesType
     });
     if (!agent) throw 'The agent that owns this workflow was not found: '+ workflow.ownerAgentId;
-    const n8nWorkflowEndpoint = `${agent.workflowEndpoint}#${helpDeskWorkflowN8NId.value()}`
+    const n8nWorkflowEndpoint = `${agent.workflowEndpoint}#${helpDeskWorkflowN8NId}`
     logger.log("the url", n8nWorkflowEndpoint)
     logger.log("the trigger", workflowTriggerRequest)
 

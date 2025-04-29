@@ -18,7 +18,7 @@ export const LiasWorkflows: WorkflowType[] = [{
             expectedIO: {
                 input: {
                     inputType: "json",
-                    systemPrompt: LIAS_SYSTEM_PROMPT + " and you are analyzing new features.",
+                    systemPrompt: LIAS_SYSTEM_PROMPT + "You are AI Agent Lia and you are analyzing new features.",
                     userPrompt: "Review and analyze deployed features for communication."
                 },
                 output: {
@@ -37,7 +37,7 @@ export const LiasWorkflows: WorkflowType[] = [{
             expectedIO: {
                 input: {
                     inputType: "json",
-                    systemPrompt: "You are Lia, segmenting the audience.",
+                    systemPrompt: LIAS_SYSTEM_PROMPT + " You are AI Agent Lia, segmenting the audience.",
                     userPrompt: "Define user segments for targeted communication."
                 },
                 output: {
@@ -56,7 +56,7 @@ export const LiasWorkflows: WorkflowType[] = [{
             expectedIO: {
                 input: {
                     inputType: "json",
-                    systemPrompt: "You are Lia, creating communication content.",
+                    systemPrompt: LIAS_SYSTEM_PROMPT + " You are AI Agent Lia, creating communication content.",
                     userPrompt: "Develop user-friendly content for feature announcements."
                 },
                 output: {
@@ -75,7 +75,7 @@ export const LiasWorkflows: WorkflowType[] = [{
             expectedIO: {
                 input: {
                     inputType: "text",
-                    systemPrompt: "You are Lia, preparing email campaigns.",
+                    systemPrompt: LIAS_SYSTEM_PROMPT + " You are AI Agent Lia, preparing email campaigns.",
                     userPrompt: "Create and setup email announcements for new features."
                 },
                 output: {
@@ -94,7 +94,7 @@ export const LiasWorkflows: WorkflowType[] = [{
             expectedIO: {
                 input: {
                     inputType: "text",
-                    systemPrompt: "You are Lia, planning social media content.",
+                    systemPrompt: LIAS_SYSTEM_PROMPT + " You are AI Agent Lia, planning social media content.",
                     userPrompt: "Create social media content plan for feature announcements."
                 },
                 output: {
@@ -113,7 +113,7 @@ export const LiasWorkflows: WorkflowType[] = [{
             expectedIO: {
                 input: {
                     inputType: "json",
-                    systemPrompt: "You are Lia, setting up in-app notifications.",
+                    systemPrompt: LIAS_SYSTEM_PROMPT + " You are AI Agent Lia, setting up in-app notifications.",
                     userPrompt: "Configure and test in-app feature announcements."
                 },
                 output: {
@@ -132,7 +132,7 @@ export const LiasWorkflows: WorkflowType[] = [{
             expectedIO: {
                 input: {
                     inputType: "text",
-                    systemPrompt: "You are Lia, updating documentation.",
+                    systemPrompt: LIAS_SYSTEM_PROMPT + " You are AI Agent Lia, updating documentation.",
                     userPrompt: "Update user guides and documentation with new features."
                 },
                 output: {
@@ -151,7 +151,7 @@ export const LiasWorkflows: WorkflowType[] = [{
             expectedIO: {
                 input: {
                     inputType: "text",
-                    systemPrompt: "You are Lia, briefing support team.",
+                    systemPrompt: LIAS_SYSTEM_PROMPT + " You are AI Agent Lia, briefing support team.",
                     userPrompt: "Prepare and deliver support team briefing materials."
                 },
                 output: {
@@ -170,7 +170,7 @@ export const LiasWorkflows: WorkflowType[] = [{
             expectedIO: {
                 input: {
                     inputType: "json",
-                    systemPrompt: "You are Lia, launching communications.",
+                    systemPrompt: LIAS_SYSTEM_PROMPT + " You are AI Agent Lia, launching communications.",
                     userPrompt: "Execute the planned communication activities."
                 },
                 output: {
@@ -189,7 +189,7 @@ export const LiasWorkflows: WorkflowType[] = [{
             expectedIO: {
                 input: {
                     inputType: "json",
-                    systemPrompt: "You are Lia, monitoring feedback.",
+                    systemPrompt: LIAS_SYSTEM_PROMPT + " You are AI Agent Lia, monitoring feedback.",
                     userPrompt: "Track and analyze user response to communications."
                 },
                 output: {
@@ -210,12 +210,12 @@ export const LiasWorkflows: WorkflowType[] = [{
             "id": "RR001-step-1",
             "ownerAgentId": "lia",
             "serviceName": "Rework Description",
-            "tools": ["Content Editor", "SEO Analyzer", "Gaming Content Optimizer"],
+            "tools": ["OpenAI"],
             "actionToTake": "Craft a refined and engaging description in the Respawn Rants format based on the user-inputted description. If the request is from the client, process accordingly.",
             "expectedIO": {
                 "input": {
                     "inputType": "json",
-                    "systemPrompt": "You are Lia, crafting gaming video descriptions from the perspective of Soldier:76 if it's for Respawn Rants.",
+                    "systemPrompt": LIAS_SYSTEM_PROMPT + "\n You are AI Agent Lia crafting gaming video descriptions from the perspective of Soldier:76 if it's for Respawn Rants.",
                     "userPrompt": "Refine the video description using gameplay details and content summary, following the Respawn Rants format."
                 },
                 "output": {
@@ -229,12 +229,12 @@ export const LiasWorkflows: WorkflowType[] = [{
             "id": "RR001-step-2",
             "ownerAgentId": "lia",
             "serviceName": "Rework Title/New Title Creation",
-            "tools": ["Title Generator", "SEO Keywords Tool", "Gaming Trends Analyzer"],
+            "tools": ["OpenAI"],
             "actionToTake": "Create a compelling and SEO-friendly title or rework the existing title in the Respawn Rants format based on the user-inputted title.",
             "expectedIO": {
                 "input": {
                     "inputType": "json",
-                    "systemPrompt": "You are Lia, creating engaging gaming video titles for Respawn Rants.",
+                    "systemPrompt": LIAS_SYSTEM_PROMPT + "\n You are AI Agent Lia creating engaging gaming video titles for Respawn Rants.",
                     "userPrompt": "Create or optimize title using video theme and strategic keywords."
                 },
                 "output": {
@@ -248,12 +248,12 @@ export const LiasWorkflows: WorkflowType[] = [{
             "id": "RR001-step-3",
             "ownerAgentId": "lia",
             "serviceName": "Generate Hashtags",
-            "tools": ["Hashtag Generator", "Gaming Trends Tool", "SEO Optimizer"],
+            "tools": ["OpenAI"],
             "actionToTake": "Create a list of balanced and effective hashtags in Respawn Rants format.",
             "expectedIO": {
                 "input": {
                     "inputType": "json",
-                    "systemPrompt": "You are Lia, generating gaming-focused hashtags.",
+                    "systemPrompt": LIAS_SYSTEM_PROMPT + "\n You are AI Agent Lia generating gaming-focused hashtags.",
                     "userPrompt": "Create optimized hashtags based on gaming content and SEO analysis."
                 },
                 "output": {
@@ -267,12 +267,12 @@ export const LiasWorkflows: WorkflowType[] = [{
             "id": "RR001-step-4",
             "ownerAgentId": "lia",
             "serviceName": "Generate Tags",
-            "tools": ["Tag Converter", "SEO Tag Optimizer"],
+            "tools": ["OpenAI"],
             "actionToTake": "Transform hashtags into a comma-separated list of tags, ensuring the format is suitable for Respawn Rants.",
             "expectedIO": {
                 "input": {
                     "inputType": "json",
-                    "systemPrompt": "You are Lia, converting hashtags to YouTube tags.",
+                    "systemPrompt": LIAS_SYSTEM_PROMPT + "\nYou are AI Agent Lia converting hashtags to YouTube tags.",
                     "userPrompt": "Convert hashtags into optimized YouTube tags format."
                 },
                 "output": {
@@ -286,25 +286,40 @@ export const LiasWorkflows: WorkflowType[] = [{
             "id": "RR001-step-5",
             "ownerAgentId": "lia",
             "serviceName": "Format Response",
-            "tools": ["Response Formatter", "Template Engine"],
-            "actionToTake": "Format the content into standardized response format with both default and Respawn Rants templates",
+            "tools": ["Response Formatter", "Template Engine", "OpenAI"],
+            "actionToTake": "Format the content into standardized response format with both default template",
             "expectedIO": {
                 "input": {
                     "inputType": "json",
-                    "systemPrompt": "You are Lia, formatting the final response with specific templates.",
-                    "userPrompt": "Format the content into the following structure:\nresponseFormat: {\n    default: {\n  title like \"Soldier:76 Pro Tip – How to handle a Roadhog (And When to Run!) | Overwatch 2\",\n        description like \" 🔥 Soldier:76 GOES ON A RAMPAGE – DOUBLE ANA TAKEDOWN & MERCY DENIED AT OASIS | Overwatch 2 🔥\n" +
-                        "\n" +
-                        "Sometimes, all it takes is the right angle and a quick trigger finger. In this clip, I get the jump on Ana—no hesitation, burst her down, but that Mercy always wants a save! As soon as Ana goes down, Mercy rushes in for the Res… not on my watch. I pressure her, and right as Ana comes back up, I throw down splash damage and pick them BOTH off in rapid succession. Did Ana realize where the heat was coming from? Doesn’t look like it, because I catch her again sprinting for cover—reminder: keep eyes on the target, folks.\n" +
-                        "\n" +
-                        "🎯 In this clip: ✅ Perfect off-angle positioning for the opening kill ✅ Mercy swoops in for a clutch Res—but gets caught ✅ Splash damage finishes the job—no escape for Ana ✅ Team secures the point at Oasis\n" +
-                        "\n" +
-                        "💬 Have you ever denied a Mercy Res at the perfect moment or had a wild double kill on the point? Tell me your best clutch teamfight stories in the comments!\n" +
-                        "\n" +
-                        "🔔 Subscribe for more Overwatch 2 highlights, tactical breakdowns, and no-BS rants from Soldier:76.\n" +
-                        "\n" +
-                        "#Overwatch2 #Soldier76 #FPSGaming #OverwatchPlays #OverwatchClips #RespawnRants #GamingHighlights #ShooterGames #Mercy #Ana #ProPlay #Rampage #PointCapture\n" +
-                        "\n" +
-                        "Youtube Tags: Overwatch 2, Soldier76, FPS Gaming, Overwatch Plays, Overwatch Clips, Respawn Rants, Gaming Highlights, Shooter Games, Mercy, Ana, Pro Play, Rampage, Point Capture\",\n        hashtags: \"#Overwatch2 #Soldier76 #FPSGaming #OverwatchPlays #OverwatchClips #RespawnRants #GamingHighlights #ShooterGames #Roadhog #Hooked #ProTip #WhenToShoot #CompetitiveGaming\",\n        youtubeTags: \"<tags from above except optimized for youtube>\"\n    }\n}"
+                    "systemPrompt": LIAS_SYSTEM_PROMPT + "\nYou are AI Agent Lia formatting the final response with specific templates.",
+                    "userPrompt": `Format the content into the following structure:
+                                   responseFormat: {
+                                       default: {
+                                        title: Soldier:76 Pro Tip – How to handle a Roadhog (And When to Run!) | Overwatch 2,
+                                        description: 🔥 Soldier:76 GOES ON A RAMPAGE – DOUBLE ANA TAKEDOWN & MERCY DENIED AT OASIS | Overwatch 2 🔥
+                                        Sometimes, all it takes is the right angle and a quick trigger finger. In this clip, 
+                                        I get the jump on Ana—no hesitation, burst her down, but that Mercy always wants a 
+                                        save! As soon as Ana goes down, Mercy rushes in for the Res… not on my watch. 
+                                        I pressure her, and right as Ana comes back up, I throw down splash damage 
+                                        and pick them BOTH off in rapid succession. Did Ana realize where the heat 
+                                        was coming from? Doesn’t look like it, because I catch her again sprinting 
+                                        for cover—reminder: keep eyes on the target, folks.
+                                        
+                                        🎯 In this clip: 
+                                            ✅ Perfect off-angle positioning for the opening kill 
+                                            ✅ Mercy swoops in for a clutch Res—but gets caught 
+                                            ✅ Splash damage finishes the job—no escape for Ana 
+                                            ✅ Team secures the point at Oasis
+                                            
+                                        💬 Have you ever denied a Mercy Res at the perfect moment or had a wild double kill on the point? Tell me your best clutch teamfight stories in the comments!
+                                        
+                                        🔔 Subscribe for more Overwatch 2 highlights, tactical breakdowns, and no-BS rants from Soldier:76.
+                                        
+                                        #Overwatch2 #Soldier76 #FPSGaming #OverwatchPlays #OverwatchClips #RespawnRants #GamingHighlights #ShooterGames #Mercy #Ana #ProPlay #Rampage #PointCapture
+                                        
+                                        Youtube Tags: Overwatch 2, Soldier76, FPS Gaming, Overwatch Plays, Overwatch Clips, Respawn Rants, Gaming Highlights, Shooter Games, Mercy, Ana, Pro Play, Rampage, Point Capture
+                                        }
+                                   }`
                 },
                 "output": {
                     "output": "Formatted response object",
