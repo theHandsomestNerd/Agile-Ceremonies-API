@@ -86,29 +86,33 @@ const WorkflowRepository = {
     },
 
     /**
-     * Save a workflow execution log
-     * @param workflowId Workflow ID
-     * @param logData Log data
-     * @returns Promise with confirmation message
-     */
-    async saveWorkflowLog(workflowId: string, logData: WorkflowLogType): Promise<string> {
-        logger.log("Saving workflow log for workflow ID: ", workflowId, logData);
-        try{
+ * Save a workflow execution log
+ * @param workflowId Workflow ID
+ * @param logData Log data
+ * @returns Promise with confirmation message
+ */
+async saveWorkflowLog(workflowId: string, logData: WorkflowLogType): Promise<string> {
+    logger.log("Saving workflow log for workflow ID: ", workflowId, logData);
 
+    if (!workflowId) {
+        throw new Error('Invalid workflowId: workflowId is required');
+    }
+
+    try {
         const workflowRef = workflowsCollection.doc(workflowId);
         const logsCollection = workflowRef.collection('workflow_logs');
 
         await logsCollection.doc().set({
             ...logData,
-            timestamp: logData.timestamp || Date.now().toString(),
+            timestamp: logData.timestamp || new Date(), // Use native Date object
         });
-        } catch (e){
-            logger.error("Error saving workflow log: ", e);
-            throw 'Error saving workflow log: ' + e;
-        }
+    } catch (e) {
+        logger.error("Error saving workflow log: ", e);
+        throw new Error('Error saving workflow log: ' + e.message);
+    }
 
-        return 'Workflow log saved';
-    },
+    return 'Workflow log saved';
+},
 
     /**
      * * Initialize agent profiles in Firestore from agent roster object
