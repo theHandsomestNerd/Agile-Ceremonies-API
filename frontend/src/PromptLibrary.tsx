@@ -12,6 +12,10 @@ import styled, {
     ThemeProvider,
 } from "styled-components";
 
+interface PromptLibraryProps {
+    onBackToWorkflow: () => void;
+}
+
 // ==================== THEME: AI, GLASS, ACCENT =======================
 const thnTheme = {
     // Core BG/Surface
@@ -244,7 +248,7 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 // ================== APP ===========================
-const PromptLibrary: React.FC = () => {
+const PromptLibrary: React.FC<PromptLibraryProps> = ({ onBackToWorkflow }) => {
     const [modal, setModal] = useState<{
         mode: "new" | "edit" | "view";
         prompt?: Prompt;
