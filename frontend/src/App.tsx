@@ -1,4 +1,4 @@
-import React, {KeyboardEvent, useEffect, useMemo, useRef, useState,} from "react";
+import React, {useMemo, useState,} from "react";
 import ReactJson from "react-json-view";
 import {GlobalStyles} from "./styles/globalStyles";
 import {Agent, AgentKey, StatusType, Step} from "./types/App.types";
@@ -50,48 +50,20 @@ import {
     StepStatusDot,
     StepValue,
 } from "./styles/Steps.styled"
-import {N8nCollapsibleToggle, N8nJsonBody, N8nJsonHeader, N8nPanelBtn, N8nPanelFooter, N8nWrapper,} from "./styles/N8N.styled";
+import {
+    N8nCollapsibleToggle,
+    N8nJsonBody,
+    N8nJsonHeader,
+    N8nPanelBtn,
+    N8nPanelFooter,
+    N8nWrapper,
+} from "./styles/N8N.styled";
 import {VizBuilderWrap, VizNode, VizNodeInitial, VizNodeStatusBadge,} from "./styles/Viz.styled";
 import {Agents} from "./data/Agents";
 import {Steps} from "./data/steps";
 import {ChevronDownIcon, ChevronUpIcon, CopyIcon, EditIcon} from "./components/CustomIcons";
+import {useArrowKeyNav} from "./hooks/useArrowKeyNav";
 
-
-/**
- * =========================
- * UTILS: KEY NAVIGATION (Focus)
- * =========================
- */
-function useArrowKeyNav(count: number, initial = 0) {
-    // Gives arrow up/down navigation across focusable elements.
-    const [focusIdx, setFocusIdx] = useState(initial);
-    const rowRefs = useRef<Array<HTMLDivElement | null>>([]);
-    useEffect(() => {
-        if (rowRefs.current[focusIdx]) rowRefs.current[focusIdx]?.focus();
-        // No-op on blur
-    }, [focusIdx, count]);
-
-    function onKeyDown(e: KeyboardEvent) {
-        if (e.key === "ArrowDown") {
-            setFocusIdx((prev) => (prev + 1) % count);
-            e.preventDefault();
-        }
-        if (e.key === "ArrowUp") {
-            setFocusIdx((prev) => (prev - 1 + count) % count);
-            e.preventDefault();
-        }
-        if (e.key === "Home") {
-            setFocusIdx(0);
-            e.preventDefault();
-        }
-        if (e.key === "End") {
-            setFocusIdx(count - 1);
-            e.preventDefault();
-        }
-    }
-
-    return {focusIdx, setFocusIdx, rowRefs, onKeyDown};
-}
 
 function getAgentColor(agent: AgentKey) {
     return Agents[agent].color;
@@ -193,34 +165,41 @@ export default function App() {
         if (e.key === "Enter") sendChatMessage();
     }
 
+    const AppHeader = () =>{
+        return <HeaderBar role="banner" aria-label="Header">
+            <HeaderIcon/>
+            AI Agent Workflow Orchestrator v3.9.5
+            {currentView === "workflow" && (
+                <button
+                    onClick={() => setCurrentView("promptLibrary")}
+                    style={{
+                        marginLeft: "auto",
+                        background: "var(--color-accent-josh)",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: "4px",
+                        padding: "8px 12px",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px"
+                    }}
+                >
+                    <span style={{fontSize: "18px"}}>📚</span>
+                    Open Prompt Library
+                </button>
+            )}
+        </HeaderBar>
+    }
+
     return (
-        <><GlobalStyles/>
+        <div style={{width: "100vw", height: "100vh", boxSizing: "border-box", overflowY: "scroll"}}>
+            <GlobalStyles/>
             {currentView === "workflow" ? (
-                <><HeaderBar role="banner" aria-label="Header">
-                    <HeaderIcon/>
-                    AI Agent Workflow Orchestrator v3.9.5
-                    {currentView === "workflow" && (
-                        <button
-                            onClick={() => setCurrentView("promptLibrary")}
-                            style={{
-                                marginLeft: "auto",
-                                background: "var(--color-accent-josh)",
-                                color: "#fff",
-                                border: "none",
-                                borderRadius: "4px",
-                                padding: "8px 12px",
-                                fontWeight: 600,
-                                cursor: "pointer",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "6px"
-                            }}
-                        >
-                            <span style={{fontSize: "18px"}}>📚</span>
-                            Open Prompt Library
-                        </button>
-                    )}
-                </HeaderBar><RootLayout>
+                <>
+                    <AppHeader/>
+                    <RootLayout>
                     {/* ==== SIDEBAR: Agent filter avatars ==== */}
                     <Sidebar
                         role="navigation"
@@ -616,6 +595,6 @@ export default function App() {
             ) : (
                 <PromptLibrary onBackToWorkflow={() => setCurrentView("workflow")}/>
             )}
-        </>
+        </div>
     );
 }
