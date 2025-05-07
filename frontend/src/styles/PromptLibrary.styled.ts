@@ -161,8 +161,9 @@ export const SearchInputWrapper = styled.label`
   flex: 1 1 300px;
   width: 100%;
   max-width: 100%;
-  height: 70px; /* Fixed height to prevent UI shifts */
-  overflow-y: auto;
+  height: auto;
+  min-height: 50px;
+  overflow-y: hidden;
   padding: 0.25rem;
   border-radius: 0.5rem;
   
@@ -217,11 +218,21 @@ export const FilterLabel = styled.label`
   font-size: 1em;
   color: #fff;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   flex-wrap: wrap;
   gap: 0.4em;
   min-width: 40px;
   user-select: none;
+  
+  /* Domains filter should be full width to prevent shifts */
+  &[style*="flex-grow: 1"] {
+    width: 100%;
+    height: auto;
+    min-height: 200px; /* Fixed height for domains section */
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(139, 92, 246, 0.2);
+  }
   
   @media (max-width: 768px) {
     width: 100%;
@@ -410,14 +421,19 @@ export const ViewBtn = styled.button<{ active: boolean }>`
 `;
 
 export const CreateBtn = styled.button`
-  font-size: 1.1em;
+  font-size: 0.95rem;
   font-weight: 700;
+  line-height: 1;
   background: ${thnTheme.gradientMain};
   color: #fff;
   border: none;
-  border-radius: 8.5px;
-  min-height: 38px;
-  min-width: 142px;
+  border-radius: 8px;
+  height: 38px;
+  padding: 0 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
   box-shadow: 0 1px 14px #06d6a044;
   transition: transform 0.11s, box-shadow 0.12s;
   cursor: pointer;
@@ -433,7 +449,7 @@ export const CreateBtn = styled.button`
   }
   
   @media (max-width: 991px) {
-    min-width: 130px;
+    padding: 0 1rem;
   }
   
   @media (max-width: 768px) {
@@ -443,9 +459,9 @@ export const CreateBtn = styled.button`
   }
   
   @media (max-width: 480px) {
-    min-width: 110px;
-    min-height: 34px;
-    font-size: 0.95em;
+    height: 34px;
+    padding: 0 0.85rem;
+    font-size: 0.85rem;
   }
 `;
 

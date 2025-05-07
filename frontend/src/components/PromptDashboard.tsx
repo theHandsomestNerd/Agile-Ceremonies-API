@@ -53,8 +53,8 @@ export const PromptDashboard: React.FC<{
         "all"
     );
     const [agentFilter, setAgentFilter] = useState("all");
-    const [domainFilters, setDomainFilters] = useState<string[]>([]);
-    const [domainLogic, setDomainLogic] = useState<"AND" | "OR">("OR");
+    const [andDomainFilters, setAndDomainFilters] = useState<string[]>([]);
+    const [orDomainFilters, setOrDomainFilters] = useState<string[]>([]);
     
     // Grid scrolling controls
     const handleScroll = (direction: 'left' | 'right') => {
@@ -67,22 +67,13 @@ export const PromptDashboard: React.FC<{
         }
     };
 
-    // --- FILTERED PROMPTS (Multi-domain AND/OR logic) ---
+    // --- FILTERED PROMPTS (Compound AND/OR logic) ---
     const filtered = prompts.filter((p: any) => {
+        // Basic filters
         if (statusFilter !== "all" && p.status !== statusFilter) return false;
         if (agentFilter !== "all" && p.agentId !== agentFilter) return false;
-        if (domainFilters.length > 0) {
-            if (
-                domainLogic === "AND" &&
-                !domainFilters.every((df) => p.domains.includes(df))
-            )
-                return false;
-            if (
-                domainLogic === "OR" &&
-                !domainFilters.some((df) => p.domains.includes(df))
-            )
-                return false;
-        }
+        
+        // Text search
         if (
             search &&
             ![p.name, p.description, p.prompt_text]
@@ -91,18 +82,27 @@ export const PromptDashboard: React.FC<{
                 .includes(search.toLowerCase())
         )
             return false;
+        
+        // Domain filters - compound logic
+        // If AND filter is not empty, all domains must be present
+        if (andDomainFilters.length > 0 && 
+            !andDomainFilters.every((df) => p.domains.includes(df))) {
+            return false;
+        }
+        
+        // If OR filter is not empty, at least one domain must be present
+        if (orDomainFilters.length > 0 && 
+            !orDomainFilters.some((df) => p.domains.includes(df))) {
+            return false;
+        }
+        
         return true;
     });
 
-    // -- Chip-filter selection logic
-    const handleDomainSelect = (d: string) => {
-        setDomainFilters((prev) =>
-            prev.includes(d)
-                ? prev.filter((x) => x !== d)
-                : prev.length < 5
-                    ? [...prev, d]
-                    : prev
-        );
+    // -- Handle compound domain filter changes
+    const handleCompoundDomainChange = (andDomains: string[], orDomains: string[]) => {
+        setAndDomainFilters(andDomains);
+        setOrDomainFilters(orDomains);
     };
 
     return (
@@ -146,16 +146,11 @@ export const PromptDashboard: React.FC<{
                     Domains:
                     <DragDropDomainFilter 
                         domains={PromptLibraryData.DOMAIN_LIST}
-                        andDomains={domainLogic === "AND" ? domainFilters : []}
-                        orDomains={domainLogic === "OR" ? domainFilters : []}
-                        onAndDomainsChange={(domains) => {
-                            setDomainLogic("AND");
-                            setDomainFilters(domains);
-                        }}
-                        onOrDomainsChange={(domains) => {
-                            setDomainLogic("OR");
-                            setDomainFilters(domains);
-                        }}
+                        andDomains={andDomainFilters}
+                        orDomains={orDomainFilters}
+                        onAndDomainsChange={(domains) => setAndDomainFilters(domains)}
+                        onOrDomainsChange={(domains) => setOrDomainFilters(domains)}
+                        onCompoundFilterChange={handleCompoundDomainChange}
                     />
                 </FilterLabel>
                             </FilterBar>
