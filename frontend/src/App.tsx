@@ -5,14 +5,18 @@ import {Agent, AgentKey, StatusType, Step} from "./App.types";
 import {statusMeta} from "./data/statusMeta";
 import PromptLibrary from "./PromptLibrary";
 import {
+    ChatBubble,
+    ChatHeader,
+    ChatInput,
+    ChatInputBar,
+    ChatMessagesPanel,
+    ChatPanelSidebar,
+    ChatSendBtn,
+} from "./Chat.styled"
+import {
     AgentInitial,
     AgentNameInline,
     AvatarCircle,
-    ChatBubble,
-    ChatHeader, ChatInput,
-    ChatInputBar,
-    ChatMessagesPanel, ChatPanelSidebar,
-    ChatSendBtn,
     GlobalJsonBody,
     GlobalJsonFooter,
     GlobalJsonHeader,
@@ -21,18 +25,22 @@ import {
     HeaderIcon,
     LiveRegion,
     MainPanelLayout,
-    N8nCollapsibleToggle,
-    N8nJsonBody,
-    N8nJsonHeader,
-    N8nPanelBtn,
-    N8nPanelFooter,
-    N8nWrapper,
     PresenceAgent,
     PresenceBar,
     RootLayout,
     SectionLabel,
     Sidebar,
     SidebarAgentWrap,
+    TableGrid,
+    TableRow,
+    TableRows,
+    TableWrap,
+    TH,
+    WorkflowCard,
+    WorkflowListCardWrap
+} from "./App.styled";
+
+import {
     StepDesc,
     StepDetailHint,
     StepDetailsPanelWrap,
@@ -41,18 +49,9 @@ import {
     StepLabel,
     StepStatusDot,
     StepValue,
-    TableGrid,
-    TableRow,
-    TableRows,
-    TableWrap,
-    TH,
-    VizBuilderWrap,
-    VizNode,
-    VizNodeInitial,
-    VizNodeStatusBadge,
-    WorkflowCard,
-    WorkflowListCardWrap
-} from "./App.styled";
+} from "./Steps.styled"
+import {N8nCollapsibleToggle, N8nJsonBody, N8nJsonHeader, N8nPanelBtn, N8nPanelFooter, N8nWrapper,} from "./N8N.styled";
+import {VizBuilderWrap, VizNode, VizNodeInitial, VizNodeStatusBadge,} from "./Viz.styled";
 import {Agents} from "./data/Agents";
 import {Steps} from "./data/steps";
 import {ChevronDownIcon, ChevronUpIcon, CopyIcon, EditIcon} from "./components/CustomIcons";
@@ -133,7 +132,7 @@ export default function App() {
         steps.length,
         Math.max(
             0,
-            steps.findIndex((s:any) => s.id === selectedStep)
+            steps.findIndex((s: any) => s.id === selectedStep)
         )
     );
 
@@ -195,7 +194,7 @@ export default function App() {
     }
 
     return (
-        <><GlobalStyles />
+        <><GlobalStyles/>
             {currentView === "workflow" ? (
                 <><HeaderBar role="banner" aria-label="Header">
                     <HeaderIcon/>
@@ -609,9 +608,9 @@ export default function App() {
                     {/* ==== Status ARIA live region for copy/cues ==== */}
                     <LiveRegion aria-live="polite">{ariaStatus}</LiveRegion>
                 </RootLayout></>
-                            ) : (
-                <PromptLibrary onBackToWorkflow={() => setCurrentView("workflow")} />
-                            )}
+            ) : (
+                <PromptLibrary onBackToWorkflow={() => setCurrentView("workflow")}/>
+            )}
         </>
     );
 }
