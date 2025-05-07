@@ -195,9 +195,9 @@ export default function App() {
     }
 
     return (
-        <>
+        <><GlobalStyles />
             {currentView === "workflow" ? (
-                <><GlobalStyles/><HeaderBar role="banner" aria-label="Header">
+                <><HeaderBar role="banner" aria-label="Header">
                     <HeaderIcon/>
                     AI Agent Workflow Orchestrator v3.9.5
                     {currentView === "workflow" && (

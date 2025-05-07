@@ -7,6 +7,7 @@ export type AgentKey =
     | "Josh"
     | "Reqqy"
     | "Nat"
+    | "Brian"
     | "Lia"
     | "Man-Man"
     | "Twin"
@@ -19,6 +20,19 @@ export type Step = {
     assigned: AgentKey;
     devNotes: string;
     description: string;
+    priority?: "low" | "medium" | "high";
+    styleProps?: {
+        cardBg?: string;
+        accentColor?: string;
+        textColor?: string; 
+        iconBg?: string;
+        borderColor?: string;
+    };
+    visualProps?: {
+        icon?: string;
+        order?: number;
+        dependencies?: number[];
+    };
     n8nJson: object;
 };
 export type Agent = {
