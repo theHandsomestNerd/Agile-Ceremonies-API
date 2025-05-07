@@ -229,7 +229,7 @@ export default function App() {
                     </Sidebar>
 
                     {/* ==== MAIN PANEL ==== */}
-                        <Workflow></Workflow>
+
                     <MainPanelLayout role="main" aria-label="Main Workflow Panel">
                         {/* ==== Workflow Cards ==== */}
                         <WorkflowListCardWrap>
@@ -293,56 +293,7 @@ export default function App() {
                             })}
                         </PresenceBar>
                         {/* ==== Step Table ==== */}
-                        <SectionLabel>Standard Blog Generation</SectionLabel>
-                        <TableWrap role="region" aria-label="Workflow Step List">
-                            <TableGrid>
-                                <TH>Step</TH>
-                                <TH>Agent</TH>
-                                <TH>Status</TH>
-                            </TableGrid>
-                            <TableRows>
-                                {steps.map((s: Step, idx: number) => (
-                                    <TableRow
-                                        key={s.id}
-                                        ref={(el: any) => (rowRefs.current[idx] = el)}
-                                        role="row"
-                                        tabIndex={0}
-                                        selected={s.id === step?.id}
-                                        aria-selected={s.id === step?.id}
-                                        data-testid={`tablerow-${s.id}`}
-                                        onClick={() => {
-                                            setSelectedStep(s.id);
-                                            setFocusIdx(idx);
-                                        }}
-                                        onFocus={() => setSelectedStep(s.id)}
-                                        onKeyDown={(e: any) => {
-                                            onKeyDown(e);
-                                            if (e.key === "Enter" || e.key === " ")
-                                                setSelectedStep(s.id);
-                                        }}
-                                    >
-                                        <span>{s.name}</span>
-                                        <span>
-                                                <AvatarCircle
-                                                    color={getAgentColor(s.assigned)}
-                                                    style={{width: "34px", height: "34px"}}
-                                                >
-                                                    <AgentInitial>{Agents[s.assigned].short}</AgentInitial>
-                                                </AvatarCircle>
-                                                <AgentNameInline style={{fontSize: ".99rem"}}>
-                                                    {(Agents[s.assigned]).name}
-                                                </AgentNameInline>
-                                            </span>
-                                        <StepStatusDot
-                                            color={statusMeta[s.status as StatusType].color}
-                                            error={s.status === "error"}
-                                        >
-                                            {statusMeta[s.status as StatusType].icon}
-                                        </StepStatusDot>
-                                    </TableRow>
-                                ))}
-                            </TableRows>
-                        </TableWrap>
+                        <Workflow></Workflow>
                         {/* ==== Step Details & n8n JSON ==== */}
                         <div
                             style={{

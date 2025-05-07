@@ -56,8 +56,7 @@ const handleWorkflowsRequest = async (req: any, res: any) => {
                             triggeredBy: 'compass',
                             active: true,
                             n8nId: n8nWorkflowId.value(),
-                            workflowStatus: {},
-                            createdAt: (new Date()).toISOString()
+                            createdAt: (new Date()).toISOString(),
                         }
 
                         const triggerWorkflowResp = WorkflowTriggerService.executeWorkflowTrigger(workFlowTrigger).then((response) => {

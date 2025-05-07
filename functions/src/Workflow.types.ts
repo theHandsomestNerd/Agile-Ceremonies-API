@@ -51,9 +51,9 @@ export interface WorkflowType {
  */
 export interface WorkflowTriggerType {
     n8nId: string,
-    workflowEndpoint: string,
+    workflowEndpoint?: string,
     workflowId: string,
-    stepId: string,
+    stepId?: string,
     ownerAgentId: string,
     triggeredBy: string,
     active: boolean,
