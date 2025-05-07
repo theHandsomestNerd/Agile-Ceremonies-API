@@ -271,8 +271,13 @@ export default function App() {
                                 >
                                     <SectionLabel
                                         style={{
-                                            fontSize: ".97rem",
-                                            color: idx === workflowIdx ? "var(--color-accent-josh)" : "#232",
+                                            fontSize: "var(--font-size-base)",
+                                            color: idx !== workflowIdx
+                                                ? "var(--color-josh-primary)"
+                                                : "var(--color-text-dark)",
+                                            fontWeight: idx === workflowIdx
+                                                ? "var(--font-weight-bold)"
+                                                : "var(--font-weight-medium)"
                                         }}
                                     >
                                         {wf}

@@ -9,6 +9,17 @@ import styled, {
     keyframes,
     css,
 } from "styled-components";
+import {
+    AppMain,
+    AppOuter, CloseBtn, Field, FieldError, FieldHint, FieldInput, FieldLabel, FieldSelect, FieldTextarea,
+    LogoSvg, ModalActionBtn, ModalActions,
+    ModalContent,
+    ModalOverlay, ModalTitle, ModalTop,
+    Nav,
+    NavAvatar,
+    NavBrand,
+    NavTitle
+} from "./PromptLibrary.styled";
 import thnTheme from "./thnTheme";
 interface PromptLibraryProps {
     onBackToWorkflow: () => void;
@@ -301,67 +312,6 @@ const TopNav: React.FC = () => (
         </NavAvatar>
     </Nav>
 );
-
-const Nav = styled.nav`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 62px;
-  height: 4.5rem;
-  padding: 0 ${appTheme.spacingLg};
-  background: ${appTheme.surfaceDark};
-  box-shadow: ${appTheme.shadowMd};
-  border-bottom: 2px solid ${appTheme.neutral200};
-  z-index: 30;
-`;
-
-const LogoSvg = styled.svg`
-  width: 44px; 
-  height: 44px; 
-  margin-right: ${appTheme.spacingMd}; 
-  user-select: none;
-`;
-
-const NavBrand = styled.div`
-  display: flex; 
-  align-items: center; 
-  gap: ${appTheme.spacingBase};
-`;
-
-const NavTitle = styled.span`
-  font-size: 1.55rem;
-  font-weight: 700;
-  color: ${appTheme.joshPrimary};
-  letter-spacing: -0.03em;
-`;
-
-const NavAvatar = styled.div`
-  min-width: 44px;
-  min-height: 44px;
-  background: ${appTheme.neutral200};
-  border-radius: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  font-weight: bold;
-  color: ${appTheme.textLight};
-  border: 2px solid ${appTheme.joshPrimary};
-  box-shadow: ${appTheme.shadowXs};
-`;
-
-// ================== APP LAYOUT ===============
-const AppOuter = styled.div`
-  width: 100vw; min-height: 100vh;
-  display: flex; flex-direction: column;
-`;
-const AppMain = styled.main`
-  width: 100vw; flex: 1 1 0;
-  display: flex; flex-direction: column; align-items: center;
-  background: ${thnTheme.darkBG};
-  padding-bottom: 8rem;
-`;
 
 // =============== DASHBOARD ===============
 const PromptDashboard: React.FC<{
@@ -1424,102 +1374,5 @@ const PromptModal: React.FC<{
         </ModalOverlay>
     );
 };
-
-const ModalOverlay = styled.div`
-  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-  background: rgba(25,18,40,0.85); z-index: 99;
-  display: flex; align-items: center; justify-content: center;
-  animation: ${fadeIn} 0.22s;
-`;
-
-const ModalContent = styled.div`
-  background: ${thnTheme.glassMain};
-  border-radius: 2.2em;
-  max-width: 420px; width: 96vw;
-  min-height: 13.5em;
-  box-shadow: 0 10px 64px #8b5cf6bb;
-  border: 1.8px solid #8b5cf6;
-  padding: 2.2em 2em 1.6em 2.05em;
-  animation: ${fadeIn} 0.15s;
-`;
-const ModalTop = styled.div`
-  display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.3em;
-`;
-
-const ModalTitle = styled.h2`
-  font-size: 1.31em; font-weight: 900;
-  background: ${thnTheme.gradientMain};
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: -0.02em;
-`;
-const CloseBtn = styled.button`
-  border: none; background: transparent; color: #fff;
-  font-size: 2.2em; font-weight: bold;
-  opacity: 0.88; cursor: pointer; line-height: 1;
-  transition: color 0.12s;
-  &:hover { color: #ff00cc; }
-`;
-
-const Field = styled.div`
-  margin-bottom: 1.25em; display: flex; flex-direction: column;
-`;
-
-const FieldLabel = styled.label`
-  font-size: 1.045em; font-weight: 600; color: #fff;
-  margin-bottom: 0.22em; text-shadow: 0 2px 22px #06d6a062;
-`;
-const FieldInput = styled.input`
-  border-radius: 6px; border: none;
-  font-size: 1em; font-weight: 600;
-  padding: 0.67em 0.82em;
-  background: #161223;
-  color: #fff;
-  margin-bottom: 0.23em;
-  &:focus {box-shadow:${thnTheme.focusBox}; border:2px solid #06d6a0;}
-`;
-const FieldError = styled.span`
-  color: #ff00cc; font-size: 0.9em; margin-left: 0.2em;
-`;
-const FieldHint = styled.span`
-  color: #8b5cf6cc; font-size: 0.92em; margin-top: 0.12em; margin-left: 0.12em;
-`;
-const FieldSelect = styled.select`
-  background: #181929;
-  border-radius: 0.57em;
-  color: #05f0a4; font-weight: 600;
-  border: none; outline: none;
-  padding: 0.38em 0.82em;
-`;
-const FieldTextarea = styled.textarea`
-  background: #181211;
-  border-radius: 7.8px;
-  font-family: 'JetBrains Mono','Monaco',monospace !important;
-  font-size: 1em; color: #fff;
-  border: 1.3px solid #322161;
-  padding: 0.71em 0.96em;
-  margin-top: 0.11em;
-  resize: vertical; min-height: 5em; line-height: 1.44;
-  transition: box-shadow 0.12s;
-  &:focus {box-shadow: 0 0 0 3.5px #8b5cf6cc;}
-`;
-
-const ModalActions = styled.div`
-  display: flex; flex-direction: row;
-  width: 100%; align-items: center; margin-top: 2.1em;
-`;
-
-const ModalActionBtn = styled.button`
-  background: ${thnTheme.gradientMain};
-  color: #fff;
-  border-radius: 8px; border: none;
-  font-weight: 700; font-size: 1.08em;
-  padding: 0.47em 2.1em;
-  box-shadow: 0 0 18px #06d6a055;
-  transition: background 0.16s, box-shadow 0.13s, color 0.13s;
-  cursor: pointer;
-  &:focus {box-shadow: 0 0 0 3px #06d6a099;}
-`;
-
 
 export default PromptLibrary;
