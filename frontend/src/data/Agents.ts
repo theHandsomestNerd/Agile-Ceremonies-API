@@ -1,4 +1,4 @@
-import {Agent, AgentKey} from "../App.types";
+import {Agent, AgentKey} from "../types/App.types";
 
 export const Agents: Record<AgentKey, Agent> = {
     Josh: {

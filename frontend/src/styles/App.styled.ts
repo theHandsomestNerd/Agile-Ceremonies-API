@@ -6,7 +6,7 @@
  */
 
 import styled, {css} from "styled-components";
-import CustomAvatar from "./components/CustomAvatar";
+import CustomAvatar from "../components/CustomAvatar";
 
 // ---------- Layout Shell ----------
 export const RootLayout = styled.div`

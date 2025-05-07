@@ -1,5 +1,5 @@
 // Business-invariant canonical step array
-import {Step} from "../App.types";
+import {Step} from "../types/App.types";
 
 export const Steps: Step[] = [
     {

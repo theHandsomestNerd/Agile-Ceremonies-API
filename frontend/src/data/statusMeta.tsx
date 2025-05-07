@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { StatusType } from "../App.types";
+import { StatusType } from "../types/App.types";
 import { 
   AlertCircleIcon, 
   CheckIcon, 

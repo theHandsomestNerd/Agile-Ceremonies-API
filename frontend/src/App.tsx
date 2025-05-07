@@ -1,7 +1,7 @@
 import React, {KeyboardEvent, useEffect, useMemo, useRef, useState,} from "react";
 import ReactJson from "react-json-view";
-import {GlobalStyles} from "./globalStyles";
-import {Agent, AgentKey, StatusType, Step} from "./App.types";
+import {GlobalStyles} from "./styles/globalStyles";
+import {Agent, AgentKey, StatusType, Step} from "./types/App.types";
 import {statusMeta} from "./data/statusMeta";
 import PromptLibrary from "./PromptLibrary";
 import {
@@ -12,7 +12,7 @@ import {
     ChatMessagesPanel,
     ChatPanelSidebar,
     ChatSendBtn,
-} from "./Chat.styled"
+} from "./styles/Chat.styled"
 import {
     AgentInitial,
     AgentNameInline,
@@ -38,7 +38,7 @@ import {
     TH,
     WorkflowCard,
     WorkflowListCardWrap
-} from "./App.styled";
+} from "./styles/App.styled";
 
 import {
     StepDesc,
@@ -49,9 +49,9 @@ import {
     StepLabel,
     StepStatusDot,
     StepValue,
-} from "./Steps.styled"
-import {N8nCollapsibleToggle, N8nJsonBody, N8nJsonHeader, N8nPanelBtn, N8nPanelFooter, N8nWrapper,} from "./N8N.styled";
-import {VizBuilderWrap, VizNode, VizNodeInitial, VizNodeStatusBadge,} from "./Viz.styled";
+} from "./styles/Steps.styled"
+import {N8nCollapsibleToggle, N8nJsonBody, N8nJsonHeader, N8nPanelBtn, N8nPanelFooter, N8nWrapper,} from "./styles/N8N.styled";
+import {VizBuilderWrap, VizNode, VizNodeInitial, VizNodeStatusBadge,} from "./styles/Viz.styled";
 import {Agents} from "./data/Agents";
 import {Steps} from "./data/steps";
 import {ChevronDownIcon, ChevronUpIcon, CopyIcon, EditIcon} from "./components/CustomIcons";
