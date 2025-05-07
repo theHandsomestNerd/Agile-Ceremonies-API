@@ -1,10 +1,11 @@
 // =============== DASHBOARD ===============
-import React, {useState} from "react";
+import React, {useRef, useState} from "react";
 import {Prompt} from "../types/PromptLibrary.types";
 import {usePrompts} from "./Prompt.ctx";
 import {
     CreateBtn,
     DashOuter,
+    DashContent,
     DomainChip,
     DomainLogicHint,
     DomainLogicToggle,
@@ -14,16 +15,23 @@ import {
     FilterLabel,
     FilterSearch,
     NoResults,
+    PromptContainer,
     PromptGrid,
+    PromptGridWrapper,
+    ScrollArrow,
     SearchInputWrapper,
     ToggleViewBtns,
-    ViewBtn
+    ViewBtn,
+    ViewControls,
+    ViewControlsLeft,
+    ViewControlsRight
 } from "../styles/PromptLibrary.styled";
 import {SearchSVGIcon} from "./SearchSVGIcon";
 import PromptLibraryData from "../data/PromptLibraryData";
 import {GridIcon, TableIcon} from "./PromptLibraryIcons";
 import PromptCard from "./PromptCard";
 import PromptTableView from "./PromptTableView";
+import DragDropDomainFilter from "./DragDropDomainFilter";
 
 export const PromptDashboard: React.FC<{
     viewMode: "grid" | "table";
@@ -37,6 +45,7 @@ export const PromptDashboard: React.FC<{
     >;
 }> = ({viewMode, setViewMode, openModal}) => {
     const {prompts} = usePrompts();
+    const gridWrapperRef = useRef<HTMLDivElement>(null);
 
     // -- Multi-domain filter logic
     const [search, setSearch] = useState("");
@@ -46,6 +55,17 @@ export const PromptDashboard: React.FC<{
     const [agentFilter, setAgentFilter] = useState("all");
     const [domainFilters, setDomainFilters] = useState<string[]>([]);
     const [domainLogic, setDomainLogic] = useState<"AND" | "OR">("OR");
+    
+    // Grid scrolling controls
+    const handleScroll = (direction: 'left' | 'right') => {
+        if (gridWrapperRef.current) {
+            const scrollAmount = direction === 'left' ? -600 : 600;
+            gridWrapperRef.current.scrollBy({
+                left: scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    };
 
     // --- FILTERED PROMPTS (Multi-domain AND/OR logic) ---
     const filtered = prompts.filter((p: any) => {
@@ -122,92 +142,85 @@ export const PromptDashboard: React.FC<{
                         ))}
                     </FilterDropdown>
                 </FilterLabel>
-                <FilterLabel>
+                <FilterLabel style={{ flexGrow: 1 }}>
                     Domains:
-                    <DomainMulti>
-                        {PromptLibraryData.DOMAIN_LIST.map((d) => (
-                            <DomainChip
-                                key={d}
-                                selected={domainFilters.includes(d)}
-                                tabIndex={0}
-                                aria-pressed={domainFilters.includes(d)}
-                                onClick={() => handleDomainSelect(d)}
-                                onKeyDown={(e: any) => {
-                                    if (e.key === "Enter" || e.key === " ") handleDomainSelect(d);
-                                }}
-                            >
-                                {d}
-                                {domainFilters.includes(d) && <span>&nbsp;✓</span>}
-                            </DomainChip>
-                        ))}
-                    </DomainMulti>
-                    <DomainLogicToggle
-                        onClick={() => setDomainLogic((l) => (l === "AND" ? "OR" : "AND"))}
-                        tabIndex={0}
-                        aria-label="Toggle Domain Filter Logic AND/OR"
-                        onKeyDown={(e: any) => {
-                            if (e.key === "Enter" || e.key === " ")
-                                setDomainLogic((l) => (l === "AND" ? "OR" : "AND"));
+                    <DragDropDomainFilter 
+                        domains={PromptLibraryData.DOMAIN_LIST}
+                        andDomains={domainLogic === "AND" ? domainFilters : []}
+                        orDomains={domainLogic === "OR" ? domainFilters : []}
+                        onAndDomainsChange={(domains) => {
+                            setDomainLogic("AND");
+                            setDomainFilters(domains);
                         }}
-                        selected={domainLogic === "AND"}
-                    >
-                        {domainFilters.length >= 2 ? domainLogic : "OR"}
-                    </DomainLogicToggle>
-                    <DomainLogicHint>
-                        {domainFilters.length >= 2
-                            ? domainLogic === "AND"
-                                ? "All selected"
-                                : "Any selected"
-                            : "Select domains"}
-                    </DomainLogicHint>
+                        onOrDomainsChange={(domains) => {
+                            setDomainLogic("OR");
+                            setDomainFilters(domains);
+                        }}
+                    />
                 </FilterLabel>
-                <ToggleViewBtns>
-                    <ViewBtn
-                        aria-label="Grid View"
-                        active={viewMode === "grid"}
-                        onClick={() => setViewMode("grid")}
-                    >
-                        <GridIcon/>
-                    </ViewBtn>
-                    <ViewBtn
-                        aria-label="Table View"
-                        active={viewMode === "table"}
-                        onClick={() => setViewMode("table")}
-                    >
-                        <TableIcon/>
-                    </ViewBtn>
-                </ToggleViewBtns>
-                <CreateBtn
-                    aria-label="Add New Prompt"
-                    onClick={() =>
-                        openModal({
-                            mode: "new",
-                            prompt: undefined,
-                            open: true,
-                        })
-                    }
-                >
-                    + New Prompt
-                </CreateBtn>
-            </FilterBar>
-            {filtered.length === 0 ? (
-                <NoResults>Sorry, no prompts match these filters.</NoResults>
-            ) : viewMode === "grid" ? (
-                <PromptGrid>
-                    {filtered.map((prompt) => (
-                        <PromptCard
-                            key={prompt.id}
-                            prompt={prompt}
-                            openModal={openModal}
-                        />
-                    ))}
-                </PromptGrid>
-            ) : (
-                <PromptTableView
-                    prompts={filtered}
-                    openModal={openModal}
-                />
-            )}
+                            </FilterBar>
+                            
+                            <DashContent>
+                <ViewControls>
+                    <ViewControlsLeft>
+                        {filtered.length} {filtered.length === 1 ? 'prompt' : 'prompts'} found
+                        
+                        <CreateBtn
+                            aria-label="Add New Prompt"
+                            onClick={() =>
+                                openModal({
+                                    mode: "new",
+                                    prompt: undefined,
+                                    open: true,
+                                })
+                            }
+                        >
+                            + New Prompt
+                        </CreateBtn>
+                    </ViewControlsLeft>
+                    <ViewControlsRight>
+                        <ToggleViewBtns>
+                            <ViewBtn
+                                aria-label="Grid View"
+                                active={viewMode === "grid"}
+                                onClick={() => setViewMode("grid")}
+                            >
+                                <GridIcon/>
+                            </ViewBtn>
+                            <ViewBtn
+                                aria-label="Table View"
+                                active={viewMode === "table"}
+                                onClick={() => setViewMode("table")}
+                            >
+                                <TableIcon/>
+                            </ViewBtn>
+                        </ToggleViewBtns>
+                    </ViewControlsRight>
+                </ViewControls>
+                
+                {filtered.length === 0 ? (
+                    <NoResults>Sorry, no prompts match these filters.</NoResults>
+                ) : viewMode === "grid" ? (
+                    <PromptContainer>
+                        <PromptGridWrapper>
+                            <PromptGrid>
+                                {filtered.map((prompt) => (
+                                    <PromptCard
+                                        key={prompt.id}
+                                        prompt={prompt}
+                                        openModal={openModal}
+                                    />
+                                ))}
+                            </PromptGrid>
+                        </PromptGridWrapper>
+                    </PromptContainer>
+                ) : (
+                    <PromptTableView
+                        prompts={filtered}
+                        openModal={openModal}
+                    />
+                )}
+            </DashContent>
         </DashOuter>
     );
 };

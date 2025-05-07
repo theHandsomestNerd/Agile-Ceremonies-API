@@ -3,10 +3,8 @@
 import React, {useState} from "react";
 import {Prompt} from "../types/PromptLibrary.types";
 import {usePrompts} from "./Prompt.ctx";
-import {
-    StatusBadge
-} from "../styles/PromptLibrary.styled";
 import {DomainCellChip, PromptTable, PromptTableRow, TableActionBtn, TableScroll} from "../styles/PromptTable.styled";
+import {StatusBadge} from "../styles/PromptCard.styled";
 
 const PromptTableView: React.FC<{
     prompts: Prompt[];

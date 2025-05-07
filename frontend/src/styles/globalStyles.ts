@@ -411,7 +411,7 @@ export const thnTheme: ThnTheme = {
 
     // Backgrounds
     darkBG: '#131125',
-    cardGlass: 'rgba(40, 33, 77, 0.82)',
+    cardGlass: 'rgba(40, 33, 77, 0.965)',
     glassMain: 'rgba(42, 33, 89, 0.92)',
 
     // Gradients

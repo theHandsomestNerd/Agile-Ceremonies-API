@@ -194,7 +194,7 @@ export default function App() {
     }
 
     return (
-        <div style={{width: "100vw", height: "100vh", boxSizing: "border-box", overflowY: "scroll"}}>
+        <div style={{width: "100vw", height: "100vh", boxSizing: "border-box", overflow: "hidden"}}>
             <GlobalStyles/>
             {currentView === "workflow" ? (
                 <>

@@ -10,13 +10,15 @@ import CustomAvatar from "../components/CustomAvatar";
 
 // ---------- Layout Shell ----------
 export const RootLayout = styled.div`
-    min-height: 100vh;
+    height: calc(100vh - 61px); /* Account for header height */
     width: 100vw;
     display: flex;
     flex-direction: row;
     background: var(--color-neutral-100);
     font-family: var(--font-family);
     color: var(--color-neutral-900);
+    box-sizing: border-box;
+    overflow: hidden; /* Prevent outer scrolling */
 `;
 
 // ---------- Header ----------
@@ -31,8 +33,11 @@ export const HeaderBar = styled.header`
     box-shadow: var(--shadow-md);
     display: flex;
     align-items: center;
-    position: relative;
+    position: sticky;
+    top: 0;
     z-index: var(--z-index-sticky);
+    height: 61px;
+    box-sizing: border-box;
 `;
 
 // Inline svg icon for app
@@ -67,6 +72,7 @@ export const HeaderIcon = styled.div`
 export const Sidebar = styled.nav`
     width: 82px;
     min-width: 82px;
+    height: 100%;
     padding: var(--spacing-xl) var(--spacing-xs) 0 var(--spacing-xs);
     background: var(--color-neutral-100);
     border-right: var(--border-width-medium) solid var(--color-neutral-200);
@@ -76,6 +82,8 @@ export const Sidebar = styled.nav`
     display: flex;
     flex-direction: column;
     gap: var(--spacing-xs);
+    box-sizing: border-box;
+    overflow-y: auto;
 `;
 
 export const SidebarAgentWrap = styled.div<{ selected: boolean }>`
@@ -108,7 +116,7 @@ export const AvatarCircle = styled(CustomAvatar.Root)<{ color: string }>`
     width: 43px;
     height: 43px;
     border-radius: var(--border-radius-full);
-    background: ${(p) => p.color};
+    background: ${(p:any) => p.color};
     border: var(--border-width-medium) solid var(--color-neutral-100);
     box-shadow: var(--shadow-xs);
     transition: transform var(--transition-fast);
@@ -131,11 +139,14 @@ export const AgentInitial = styled.span`
 export const MainPanelLayout = styled.main`
     flex: 1 1 auto;
     max-width: 1150px;
+    height: 100%;
     margin: 0 auto;
     padding: var(--spacing-sm);
     display: flex;
     flex-direction: column;
     position: relative;
+    box-sizing: border-box;
+    overflow-y: auto; /* Make this container scrollable */
 `;
 
 // ---------- Workflow List Cards ----------
@@ -200,6 +211,9 @@ export const TableWrap = styled.div`
     margin: 0 0 var(--spacing-md) 0;
     padding: 0 0 var(--spacing-base) 0;
     overflow: hidden;
+    max-height: 300px; /* Limit height to ensure main panel scrolls */
+    display: flex;
+    flex-direction: column;
 `;
 
 export const TableGrid = styled.div`
@@ -216,7 +230,10 @@ export const TH = styled.div`
     color: var(--color-neutral-800);
 `;
 
-export const TableRows = styled.div``;
+export const TableRows = styled.div`
+    overflow-y: auto;
+    max-height: 250px;
+`;
 
 export const TableRow = styled.div<{
     selected?: boolean;

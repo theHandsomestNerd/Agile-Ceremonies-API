@@ -1,0 +1,14 @@
+/* Prevent page scrolling when a prompt card is expanded */
+body.prompt-modal-open {
+  overflow: hidden;
+}
+
+/* Add smooth scrolling to all elements */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Improve animation performance */
+.prompt-card-animating {
+  will-change: transform, opacity;
+}
