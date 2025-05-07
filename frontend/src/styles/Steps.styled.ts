@@ -3,7 +3,6 @@ import styled, {css} from "styled-components";
 
 export const StepDetailsPanelWrap = styled.div`
     min-width: 320px;
-    max-width: 330px;
     background: var(--color-surface-light);
     border-radius: var(--border-radius-large);
     box-shadow: var(--shadow-md);

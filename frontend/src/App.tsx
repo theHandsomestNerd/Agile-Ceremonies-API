@@ -304,62 +304,6 @@ export default function App() {
                                 minHeight: "190px",
                             }}
                         >
-                            {step ? (
-                                <StepDetailsPanelWrap
-                                    role="region"
-                                    aria-label="Step Details Panel"
-                                >
-                                    <StepLabel>Step Details</StepLabel>
-                                    <StepField>
-                                        Name:
-                                        <StepValue data-testid="stepdetails-value-name">
-                                            {step.name}
-                                        </StepValue>
-                                    </StepField>
-                                    <StepField>
-                                        Assigned Agent:
-                                        <AvatarCircle
-                                            color={getAgentColor(step.assigned)}
-                                            style={{
-                                                width: "28px",
-                                                height: "28px",
-                                                marginLeft: "14px",
-                                            }}
-                                        >
-                                            <AgentInitial
-                                                style={{fontSize: "1.07rem", top: "5px", left: "8px"}}
-                                            >
-                                                {Agents[step.assigned].short}
-                                            </AgentInitial>
-                                        </AvatarCircle>
-                                        <AgentNameInline>
-                                            {Agents[step.assigned].name}
-                                        </AgentNameInline>
-                                    </StepField>
-                                    <StepField>
-                                        Status: <StepValue>{statusMeta[step.status].label}</StepValue>
-                                    </StepField>
-                                    <StepField style={{fontWeight: 600}}>
-                                        Developer Notes:
-                                    </StepField>
-                                    <StepDevNotes data-testid="stepdetails-devnotes">
-                                        {step.devNotes}
-                                    </StepDevNotes>
-                                    <StepField style={{fontWeight: 600}}>Description:</StepField>
-                                    <StepDesc data-testid="stepdetails-desc">
-                                        {step.description}
-                                    </StepDesc>
-                                </StepDetailsPanelWrap>
-                            ) : (
-                                <StepDetailsPanelWrap
-                                    role="region"
-                                    aria-label="Step Details Panel (no selection)"
-                                >
-                                    <StepDetailHint>
-                                        Select a workflow step to view details.
-                                    </StepDetailHint>
-                                </StepDetailsPanelWrap>
-                            )}
                             <N8nWrapper
                                 tabIndex={0}
                                 aria-label="n8n Node JSON Viewer"

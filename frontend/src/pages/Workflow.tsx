@@ -26,6 +26,29 @@ import {
   ActivityIcon
 } from '../components/WorkflowIcons';
 import WorkflowStepTable from '../components/WorkflowStepTable';
+import {
+  StepDesc,
+  StepDetailHint,
+  StepDetailsPanelWrap,
+  StepDevNotes,
+  StepField,
+  StepLabel,
+  StepValue
+} from "../styles/Steps.styled";
+import {AgentInitial, AgentNameInline, AvatarCircle} from "../styles/App.styled";
+import {Agents} from "../data/Agents";
+import {statusMeta} from "../data/statusMeta";
+import {
+  N8nCollapsibleToggle,
+  N8nJsonBody,
+  N8nJsonHeader,
+  N8nPanelBtn,
+  N8nPanelFooter,
+  N8nWrapper
+} from "../styles/N8N.styled";
+import {ChevronDownIcon, ChevronUpIcon, CopyIcon, EditIcon} from "../components/CustomIcons";
+import ReactJson from "react-json-view";
+import N8NJsonViewer from "../components/N8NJsonViewer";
 
 // Agile Pair Programming with TDD Workflow data
 const agilePairTDDWorkflow = {
@@ -336,9 +359,20 @@ const Workflow: React.FC = () => {
             title="Agile Pair Programming with TDD Steps"
           />
         </WorkflowSection>
+        <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              gap: "25px",
+              width: "100%",
+              minHeight: "190px",
+            }}
+        >
+        </div>
       </WorkflowContent>
     </WorkflowContainer>
   );
 };
+
 
 export default Workflow;

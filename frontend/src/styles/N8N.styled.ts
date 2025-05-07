@@ -3,7 +3,6 @@ import styled from "styled-components";
 
 export const N8nWrapper = styled.section`
     min-width: 385px;
-    max-width: 535px;
     background: var(--color-surface-light);
     border-radius: var(--border-radius-large);
     margin: 17px 0 0 0;

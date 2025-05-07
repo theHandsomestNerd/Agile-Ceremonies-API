@@ -11,6 +11,7 @@ export const WorkflowContainer = styled.div`
   width: 100%;
   background-color: #121225;
   color: #ffffff;
+  min-height: fit-content;
   
   @media (max-width: 768px) {
     padding: 1.5rem;
