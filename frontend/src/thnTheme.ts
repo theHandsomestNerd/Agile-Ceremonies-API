@@ -60,6 +60,30 @@ export interface ThnTheme {
     // Utilities
     neonTeal: string;
     focusBox: string;
+    
+    // Flat aliases (for backward compatibility)
+    surfaceLight: string;
+    surfaceDark: string;
+    neutral100: string;
+    neutral200: string;
+    textDark: string;
+    textLight: string;
+    textMuted: string;
+    textHint: string;
+    joshPrimary: string;
+    joshMuted: string;
+    spacingXs: string;
+    spacingBase: string;
+    spacingMd: string;
+    spacingLg: string;
+    borderRadiusSmall: string;
+    borderRadiusMd: string;
+    borderRadiusLarge: string;
+    shadowXs: string;
+    shadowMd: string;
+    shadowCard: string;
+    active: string;
+    archived: string;
 }
 
 export const thnTheme: ThnTheme = {
@@ -122,7 +146,31 @@ export const thnTheme: ThnTheme = {
     
     // Utilities
     neonTeal: '#06d6a0',
-    focusBox: '0 0 0 3.3px #8b5cf6aa'
+    focusBox: '0 0 0 3.3px #8b5cf6aa',
+    
+    // Flat aliases (for backward compatibility)
+    surfaceLight: 'var(--color-surface-light)',
+    surfaceDark: 'var(--color-surface-dark)',
+    neutral100: 'var(--color-neutral-100)',
+    neutral200: 'var(--color-neutral-200)',
+    textDark: 'var(--color-text-dark)',
+    textLight: 'var(--color-text-light)',
+    textMuted: 'var(--color-text-muted)',
+    textHint: 'var(--color-text-hint)',
+    joshPrimary: 'var(--color-josh-primary)',
+    joshMuted: 'var(--color-josh-muted)',
+    spacingXs: 'var(--spacing-xs)',
+    spacingBase: 'var(--spacing-base)',
+    spacingMd: 'var(--spacing-md)',
+    spacingLg: 'var(--spacing-lg)',
+    borderRadiusSmall: 'var(--border-radius-small)',
+    borderRadiusMd: 'var(--border-radius-md)',
+    borderRadiusLarge: 'var(--border-radius-large)',
+    shadowXs: 'var(--shadow-xs)',
+    shadowMd: 'var(--shadow-md)',
+    shadowCard: 'var(--shadow-card)',
+    active: '#22C55E',
+    archived: '#EF4444'
 };
 
 export default thnTheme;

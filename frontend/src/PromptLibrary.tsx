@@ -1,64 +1,67 @@
-import React, {
-    useState,
-    useEffect,
-    useContext,
-    createContext,
-    useRef,
-} from "react";
-import styled, {
-    keyframes,
-    css,
-} from "styled-components";
+import React, {createContext, useContext, useEffect, useRef, useState,} from "react";
+import thnTheme from "./thnTheme";
 import {
+    ActionButton,
     AppMain,
-    AppOuter, CloseBtn, Field, FieldError, FieldHint, FieldInput, FieldLabel, FieldSelect, FieldTextarea,
-    LogoSvg, ModalActionBtn, ModalActions,
+    AppOuter,
+    CardActions,
+    CardAgent,
+    CardDesc,
+    CardDomains,
+    CardShell,
+    CardTitle,
+    CardTop,
+    CardUsage,
+    CloseBtn,
+    CopyGlow,
+    CreateBtn,
+    DashOuter,
+    DomainCardChip,
+    DomainCellChip,
+    DomainChip,
+    DomainLogicHint,
+    DomainLogicToggle,
+    DomainMulti,
+    Field,
+    FieldError,
+    FieldHint,
+    FieldInput,
+    FieldLabel,
+    FieldSelect,
+    FieldTextarea,
+    FilterBar,
+    FilterDropdown,
+    FilterLabel,
+    FilterSearch,
+    LogoSvg,
+    ModalActionBtn,
+    ModalActions,
     ModalContent,
-    ModalOverlay, ModalTitle, ModalTop,
+    ModalOverlay,
+    ModalTitle,
+    ModalTop,
     Nav,
     NavAvatar,
     NavBrand,
-    NavTitle
+    NavTitle,
+    NoResults,
+    PromptGrid,
+    PromptTable,
+    PromptTableRow,
+    SearchInputWrapper,
+    SearchSVG,
+    StatusBadge,
+    TableActionBtn,
+    TableScroll,
+    ToggleViewBtns,
+    UsageSvg,
+    ViewBtn
 } from "./PromptLibrary.styled";
-import thnTheme from "./thnTheme";
+import {GridIcon, TableIcon} from "./components/PromptLibraryIcons";
+
 interface PromptLibraryProps {
     onBackToWorkflow: () => void;
 }
-
-// Global theme styles from App variable system
-const appTheme = {
-    // Colors
-    surfaceLight: "var(--color-surface-light)",
-    surfaceDark: "var(--color-surface-dark)",
-    neutral100: "var(--color-neutral-100)",
-    neutral200: "var(--color-neutral-200)",
-    textDark: "var(--color-text-dark)",
-    textLight: "var(--color-text-light)",
-    textMuted: "var(--color-text-muted)",
-    textHint: "var(--color-text-hint)",
-    joshPrimary: "var(--color-josh-primary)",
-    joshMuted: "var(--color-josh-muted)",
-    
-    // Spacing
-    spacingXs: "var(--spacing-xs)",
-    spacingBase: "var(--spacing-base)",
-    spacingMd: "var(--spacing-md)",
-    spacingLg: "var(--spacing-lg)",
-    
-    // Borders
-    borderRadiusSmall: "var(--border-radius-small)",
-    borderRadiusMd: "var(--border-radius-md)",
-    borderRadiusLarge: "var(--border-radius-large)",
-    
-    // Shadows
-    shadowXs: "var(--shadow-xs)",
-    shadowMd: "var(--shadow-md)",
-    shadowCard: "var(--shadow-card)",
-    
-    // Status colors
-    active: "#22C55E",
-    archived: "#EF4444"
-};
 
 // ================== DATA MODEL/TYPES ===================
 export type Prompt = {
@@ -101,7 +104,7 @@ const DOMAIN_LIST = [
 ];
 
 // --------- MOCK DATA (for local/first use) --------------
-const initialPrompts: Prompt[] = Array.from({ length: 50 }, (_, i) => ({
+const initialPrompts: Prompt[] = Array.from({length: 50}, (_, i) => ({
     id: String(i + 1),
     name: `Prompt #${i + 1}`,
     description: `Test prompt example for domain features #${i + 1}`,
@@ -195,7 +198,7 @@ const PromptProvider: React.FC<{ children: React.ReactNode }> = ({
         setPrompts((prev) =>
             prev.map((p) =>
                 p.id === id
-                    ? { ...p, ...updates, updated_at: new Date().toISOString() }
+                    ? {...p, ...updates, updated_at: new Date().toISOString()}
                     : p
             )
         );
@@ -235,6 +238,7 @@ const PromptProvider: React.FC<{ children: React.ReactNode }> = ({
         </PromptContext.Provider>
     );
 };
+
 function usePrompts() {
     const c = useContext(PromptContext);
     if (!c) throw new Error("PromptProvider not initialized");
@@ -242,17 +246,17 @@ function usePrompts() {
 }
 
 // ================ MAIN COMPONENT ===================
-const PromptLibrary: React.FC<PromptLibraryProps> = ({ onBackToWorkflow }) => {
+const PromptLibrary: React.FC<PromptLibraryProps> = ({onBackToWorkflow}) => {
     const [modal, setModal] = useState<{
         mode: "new" | "edit" | "view";
         prompt?: Prompt;
         open: boolean;
-    }>({ mode: "new", prompt: undefined, open: false });
+    }>({mode: "new", prompt: undefined, open: false});
     const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
     return (
         <PromptProvider>
             <AppOuter>
-                <TopNav />
+                <TopNav/>
                 <AppMain>
                     <PromptDashboard
                         viewMode={viewMode}
@@ -264,7 +268,7 @@ const PromptLibrary: React.FC<PromptLibraryProps> = ({ onBackToWorkflow }) => {
                     <PromptModal
                         mode={modal.mode}
                         prompt={modal.prompt}
-                        closeModal={() => setModal((m) => ({ ...m, open: false }))}
+                        closeModal={() => setModal((m) => ({...m, open: false}))}
                     />
                 )}
             </AppOuter>
@@ -285,11 +289,11 @@ const TopNav: React.FC = () => (
             >
                 <defs>
                     <linearGradient id="logograd" x1="0" x2="1" y1="0" y2="1">
-                        <stop stopColor={appTheme.joshPrimary} />
-                        <stop offset="1" stopColor="#06d6a0" />
+                        <stop stopColor={thnTheme.joshPrimary}/>
+                        <stop offset="1" stopColor="#06d6a0"/>
                     </linearGradient>
                 </defs>
-                <circle cx={22} cy={22} r={21} fill="url(#logograd)" />
+                <circle cx={22} cy={22} r={21} fill="url(#logograd)"/>
                 <text
                     x="22"
                     y="30"
@@ -304,7 +308,7 @@ const TopNav: React.FC = () => (
             </LogoSvg>
             <NavTitle>Prompt Library Manager</NavTitle>
         </NavBrand>
-        <span style={{ color: appTheme.joshPrimary, fontWeight: 700, fontSize: 18 }}>
+        <span style={{color: thnTheme.joshPrimary, fontWeight: 700, fontSize: 18}}>
       v1.0
     </span>
         <NavAvatar>
@@ -324,8 +328,8 @@ const PromptDashboard: React.FC<{
             open: boolean;
         }>
     >;
-}> = ({ viewMode, setViewMode, openModal }) => {
-    const { prompts } = usePrompts();
+}> = ({viewMode, setViewMode, openModal}) => {
+    const {prompts} = usePrompts();
 
     // -- Multi-domain filter logic
     const [search, setSearch] = useState("");
@@ -403,14 +407,14 @@ const PromptDashboard: React.FC<{
                         aria-label="Search Prompts"
                         placeholder="Search prompts..."
                         value={search}
-                        onChange={(e:any) => setSearch(e.target.value)}
+                        onChange={(e: any) => setSearch(e.target.value)}
                     />
                 </SearchInputWrapper>
                 <FilterLabel>
                     Status:
                     <FilterDropdown
                         value={statusFilter}
-                        onChange={(e:any) => setStatusFilter(e.target.value as any)}
+                        onChange={(e: any) => setStatusFilter(e.target.value as any)}
                     >
                         <option value="all">All</option>
                         <option value="active">Active</option>
@@ -421,7 +425,7 @@ const PromptDashboard: React.FC<{
                     Agent:
                     <FilterDropdown
                         value={agentFilter}
-                        onChange={(e:any) => setAgentFilter(e.target.value)}
+                        onChange={(e: any) => setAgentFilter(e.target.value)}
                     >
                         <option value="all">All</option>
                         {AGENT_LIST.map((a) => (
@@ -441,7 +445,7 @@ const PromptDashboard: React.FC<{
                                 tabIndex={0}
                                 aria-pressed={domainFilters.includes(d)}
                                 onClick={() => handleDomainSelect(d)}
-                                onKeyDown={(e:any) => {
+                                onKeyDown={(e: any) => {
                                     if (e.key === "Enter" || e.key === " ") handleDomainSelect(d);
                                 }}
                             >
@@ -454,7 +458,7 @@ const PromptDashboard: React.FC<{
                         onClick={() => setDomainLogic((l) => (l === "AND" ? "OR" : "AND"))}
                         tabIndex={0}
                         aria-label="Toggle Domain Filter Logic AND/OR"
-                        onKeyDown={(e:any) => {
+                        onKeyDown={(e: any) => {
                             if (e.key === "Enter" || e.key === " ")
                                 setDomainLogic((l) => (l === "AND" ? "OR" : "AND"));
                         }}
@@ -476,14 +480,14 @@ const PromptDashboard: React.FC<{
                         active={viewMode === "grid"}
                         onClick={() => setViewMode("grid")}
                     >
-                        <GridIcon />
+                        <GridIcon/>
                     </ViewBtn>
                     <ViewBtn
                         aria-label="Table View"
                         active={viewMode === "table"}
                         onClick={() => setViewMode("table")}
                     >
-                        <TableIcon />
+                        <TableIcon/>
                     </ViewBtn>
                 </ToggleViewBtns>
                 <CreateBtn
@@ -521,164 +525,6 @@ const PromptDashboard: React.FC<{
     );
 };
 
-const DashOuter = styled.section`
-  width: 98vw; max-width: 112em;
-  margin-top: 2.7rem;
-  display: flex; flex-direction: column; align-items: stretch;
-  padding: 0 1.5vw;
-`;
-
-const FilterBar = styled.div`
-  display: flex; flex-wrap: wrap;
-  gap: 1.2rem 2.2rem;
-  align-items: center;
-  justify-content: flex-start;
-  background: ${thnTheme.cardGlass};
-  border-radius: 16px;
-  min-height: 56px;
-  margin-bottom: 2.3rem;
-  box-shadow: 0 0 9px 1.5px #8b5cf655;
-  padding: 14px 12px 14px 2.2vw;
-`;
-
-const SearchSVG = styled.svg`display: block; position: absolute; left: 13px; top: 8px; pointer-events: none;`;
-const SearchInputWrapper = styled.label`
-  position: relative;
-  display: flex; align-items: center;
-  width: 246px; max-width: 99vw;
-`;
-const FilterSearch = styled.input`
-  width: 100%; padding: 7.5px 13px 7.5px 33px;
-  border-radius: 9px; border: none;
-  background: #222244;
-  font-size: 1.1rem; color: #fff;
-  outline: none;
-  transition: border 0.13s, box-shadow 0.13s;
-  &:focus {
-    box-shadow: ${thnTheme.focusBox};
-    border: 2px solid ${thnTheme.neonTeal};
-  }
-`;
-
-const FilterLabel = styled.label`
-  font-size: 1.02em; color: #fff;
-  display: flex; align-items: center;
-  gap: 0.4em;
-  min-width: 40px; user-select: none;
-`;
-
-const FilterDropdown = styled.select`
-  background: #181929;
-  border-radius: 0.57em;
-  color: #05f0a4; font-weight: 600;
-  border: none; outline: none;
-  padding: 0.38em 0.82em;
-  margin-left: 0.5em;
-  transition: box-shadow 0.11s;
-  &:focus {
-    box-shadow: ${thnTheme.focusBox};
-    border: 2.5px solid ${thnTheme.neonTeal};
-  }
-`;
-
-const DomainMulti = styled.div`
-  display: flex; flex-wrap: wrap; gap: 0.25em;
-  margin-left: 0.51em; max-width: 270px; user-select: none;
-`;
-const DomainChip = styled.button<{ selected: boolean }>`
-  background: ${(p) =>
-    p.selected
-        ? thnTheme.gradientMain
-        : thnTheme.cardGlass};
-  color: ${(p) => (p.selected ? "#11151f" : "#fff")};
-  border: none;
-  border-radius: 33px;
-  padding: 0.25em 0.87em;
-  font-size: 0.98em; font-weight: 600;
-  margin-bottom: 1.3px;
-  box-shadow: ${(p) =>
-    p.selected
-        ? "0 1.5px 9px #06d6a044"
-        : "none"};
-  outline: none;
-  transition: box-shadow 0.13s, background 0.13s;
-  cursor: pointer;
-  &:focus {
-    box-shadow: 0 0 0 2.7px #ff00cc99;
-    z-index: 1;
-  }
-`;
-const DomainLogicToggle = styled.button<{ selected: boolean }>`
-  margin-left: 0.95em;
-  font-weight: 900; font-size: 1.05em;
-  background: ${(p) =>
-    p.selected
-        ? thnTheme.gradientAlt
-        : thnTheme.cardGlass};
-  color: ${(p) => (p.selected ? "#15151e" : "#fff")};
-  padding: 2.5px 17px; border-radius: 19px; border: none; cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-  &:focus {box-shadow:0 0 0 2.8px #9333EA99;}
-`;
-const DomainLogicHint = styled.span`
-  display: block; font-size: 0.91em; margin-left: 0.7em;
-  color: #8b5cf6cc; font-weight: 500;
-`;
-
-const ToggleViewBtns = styled.div`
-  display: flex; gap: 0.32em; align-items: center; margin-left: 1.9em;
-`;
-const ViewBtn = styled.button<{ active: boolean }>`
-  background: ${(p) => (p.active ? thnTheme.gradientAlt : thnTheme.glassMain)};
-  color: ${(p) => (p.active ? "#fff" : "#9b8cff")};
-  border: none; outline: none;
-  border-radius: 7px;
-  min-width: 36px; min-height: 36px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.2em;
-  box-shadow: ${(p) =>
-    p.active ? "0 0 11px #ff00cc77" : "none"};
-  transition: box-shadow 0.11s, background 0.13s;
-  cursor: pointer;
-  &:focus { box-shadow: 0 0 0 2.2px #9333EA88; }
-`;
-
-const CreateBtn = styled.button`
-  margin-left: 2.2em;
-  font-size: 1.13em;
-  font-weight: 700;
-  background: ${thnTheme.gradientMain};
-  color: #fff;
-  border: none; border-radius: 8.5px; min-height: 38px; min-width: 142px;
-  box-shadow: 0 1px 14px #06d6a044;
-  transition: transform 0.11s, box-shadow 0.12s;
-  cursor: pointer;
-  &:hover {transform: scale(1.038); box-shadow: 0 0 24px #9333EA66;}
-  &:focus {box-shadow: 0 0 0 3px #06d6a099;}
-`;
-
-const NoResults = styled.div`
-  padding: 4rem 2rem;
-  text-align: center;
-  color: #fff; font-size: 1.24em; font-weight: 500;
-`;
-
-// =============== PROMPT GRID & CARD ==========================
-const PromptGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(292px, 1fr));
-  gap: 2.4rem 1.5rem;
-  margin-top: 1.95rem;
-  padding-bottom: 3rem;
-`;
-
-// ---- Card Glow Animation (for copy/active states) ------------
-const glowPulse = keyframes`
-  0% { box-shadow: 0 0 0 0 #06d6a0,0 0 17px 4px #9333EA66;}
-  47%{box-shadow:0 0 0 7px #06d6a077,0 0 27px 10px #8b5cf688;}
-  98%,100%{box-shadow:0 0 0 0 #06d6a0,0 0 20px 7px #9333EA55;}
-`;
-
 const PromptCard: React.FC<{
     prompt: Prompt;
     openModal: React.Dispatch<
@@ -688,8 +534,8 @@ const PromptCard: React.FC<{
             open: boolean;
         }>
     >;
-}> = ({ prompt, openModal }) => {
-    const { deletePrompt, incrementUsage, updatePrompt } = usePrompts();
+}> = ({prompt, openModal}) => {
+    const {deletePrompt, incrementUsage, updatePrompt} = usePrompts();
     const [copied, setCopied] = useState(false);
 
     const handleCopy = async () => {
@@ -771,193 +617,6 @@ const PromptCard: React.FC<{
     );
 };
 
-const CardShell = styled.div<{ $copied: boolean }>`
-  background: ${thnTheme.cardGlass};
-  border-radius: 1.45rem;
-  box-shadow: 0 0 24px 4px #8b5cf655;
-  border: 1px solid #271666;
-  padding: 2rem 1.22rem 1.18rem 1.48rem;
-  display: flex; flex-direction: column;
-  position: relative;
-  overflow: hidden;
-  min-height: 285px;
-  user-select: text;
-  transition: box-shadow 0.18s, border 0.18s;
-  ${(p) =>
-    p.$copied &&
-    css`
-      animation: ${glowPulse} 1.015s 1;
-      border: 2.5px solid ${thnTheme.neonTeal};
-    `}
-  &:hover {
-    box-shadow: 0 0 44px 8px #06d6a066;
-    border-color: #06d6a0;
-  }
-`;
-
-const CardTop = styled.div`
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 0.45em;
-`;
-const StatusBadge = styled.span<{ status: "active" | "archived" }>`
-  background: ${(p) =>
-    p.status === "active"
-        ? thnTheme.gradientMain
-        : "linear-gradient(90deg,#48445a,#a90042)"};
-  color: #fff;
-  border-radius: 2em;
-  font-weight: bold;
-  font-size: 0.8rem;
-  padding: 0.22em 1.05em;
-  letter-spacing: 0.06em;
-`;
-const CardUsage = styled.span`
-  display: flex;
-  align-items: center; gap: 0.24em;
-  font-size: 0.98em;
-`;
-const UsageSvg = styled.svg`
-  display: inline-block; vertical-align: middle;
-`;
-
-const CardTitle = styled.h2`
-  font-size: 1.24rem;
-  font-weight: bold;
-  background: ${thnTheme.gradientMain};
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin: 0.18em 0 0.6em 0;
-  line-height: 1.14em;
-  letter-spacing: -0.025em;
-  user-select: text;
-`;
-
-const CardDesc = styled.p`
-  color: #e3e9ff;
-  font-size: 0.98em;
-  margin: 0 0 0.51em 0;
-  user-select: text;
-`;
-
-const CardDomains = styled.div`
-  margin-bottom: 0.61em; display: flex; flex-wrap: wrap; gap: 0.3em;
-`;
-const DomainCardChip = styled.span`
-  background: linear-gradient(90deg,#06d6a0,#8b5cf6);
-  color: #15151e;
-  border-radius: 19px;
-  font-size: 0.8em;
-  font-weight: 700;
-  padding: 0.3em 0.7em;
-  margin-bottom: 0.07em;
-  display: inline-block;
-`;
-
-const CardAgent = styled.div`
-  color: #8b5cf6;
-  font-size: 0.91em;
-  font-weight: 600;
-  margin-top: -0.11em; margin-bottom: 1.19em;
-  letter-spacing: 0.02em;
-`;
-
-const CardActions = styled.div`
-  display: flex; gap: 1.2rem; margin-top: 0.93rem;
-`;
-
-const ActionButton = styled.button<{ $copied?: boolean }>`
-  background: ${(p) =>
-    p.$copied
-        ? thnTheme.gradientMain
-        : thnTheme.gradientAlt};
-  color: #fff; border: none; border-radius: 5.5px;
-  font-weight: 700; font-size: 1em;
-  padding: 0.38em 1.16em;
-  box-shadow: 0 0 8px #8b5cf644;
-  transition: transform 0.08s, box-shadow 0.12s, background 0.09s;
-  cursor: pointer;
-  &:hover,&:focus {transform: scale(1.049);}
-  ${(p) =>
-    p.$copied &&
-    css`
-      background: ${thnTheme.gradientMain};
-      box-shadow: 0 0 20px #06d6a0cc;
-    `}
-`;
-const CopyGlow = styled.span`
-  color: #06d6a0; font-weight: 900; font-size: 1.27em;
-  text-shadow: 0 0 10px #06d6a0,0 0 4px #fff;
-`;
-
-const GridIcon = () => (
-    <svg
-        width={18}
-        height={18}
-        aria-hidden
-        style={{ display: "block" }}
-        viewBox="0 0 18 18"
-    >
-        <rect x="2.5" y="2.5" width="5" height="5" rx="1.5" fill="#fff"></rect>
-        <rect
-            x="10.5"
-            y="2.5"
-            width="5"
-            height="5"
-            rx="1.5"
-            fill="#8b5cf6"
-        ></rect>
-        <rect
-            x="2.5"
-            y="10.5"
-            width="5"
-            height="5"
-            rx="1.5"
-            fill="#06d6a0"
-        ></rect>
-        <rect
-            x="10.5"
-            y="10.5"
-            width="5"
-            height="5"
-            rx="1.5"
-            fill="#ff00cc"
-        ></rect>
-    </svg>
-);
-const TableIcon = () => (
-    <svg
-        width={18}
-        height={18}
-        aria-hidden
-        style={{ display: "block" }}
-        viewBox="0 0 18 18"
-    >
-        <rect
-            x="2.5"
-            y="4.83"
-            width="13"
-            height="2.5"
-            rx="1.1"
-            fill="#9333ea"
-        ></rect>
-        <rect
-            x="2.6"
-            y="9.13"
-            width="13"
-            height="2.53"
-            rx="1.09"
-            fill="#fff"
-        ></rect>
-        <rect
-            x="2.45"
-            y="13.3"
-            width="13.08"
-            height="2.05"
-            rx="1.01"
-            fill="#06d6a0"
-        ></rect>
-    </svg>
-);
 
 // ======= TABLE VIEW =======
 const PromptTableView: React.FC<{
@@ -969,8 +628,8 @@ const PromptTableView: React.FC<{
             open: boolean;
         }>
     >;
-}> = ({ prompts, openModal }) => {
-    const { deletePrompt, incrementUsage } = usePrompts();
+}> = ({prompts, openModal}) => {
+    const {deletePrompt, incrementUsage} = usePrompts();
     const [copiedId, setCopiedId] = useState<string | null>(null);
     return (
         <TableScroll>
@@ -1058,72 +717,13 @@ const PromptTableView: React.FC<{
     );
 };
 
-const TableScroll = styled.div`
-  overflow-x: auto;
-  width: 100%; min-width: 920px; border-radius: 1.2rem;
-  background: ${thnTheme.cardGlass};
-  box-shadow: 0px 5px 38px #8b5cf644;
-`;
-
-const PromptTable = styled.table`
-  width: 100%; border-collapse: collapse;
-  th, td {
-    font-size: 0.94em; padding: 0.61em 0.4em 0.55em 0.8em;
-    text-align: left; vertical-align: top;
-    font-family: inherit; color: #fff;
-  }
-  th {
-    background: #201945; position: sticky; top: 0; font-weight: 700;
-    letter-spacing: 0.03em; z-index: 2;
-    border-top-left-radius: 1.2em; border-top-right-radius: 1.2em;
-  }
-`;
-
-const PromptTableRow = styled.tr<{ $active: boolean }>`
-  background: ${(p) =>
-    p.$active ? "#15151ee6" : "#232349cc"};
-  &:hover { background: #28254a; }
-`;
-
-const DomainCellChip = styled.span`
-  background: linear-gradient(90deg,#06d6a0,#8b5cf6);
-  color: #15151e;
-  border-radius: 11px;
-  font-size: 0.87em;
-  font-weight: 700;
-  padding: 0.16em 0.58em;
-  margin-right: 0.18em;
-`;
-
-const TableActionBtn = styled.button<{ $copied?: boolean }>`
-  background: ${(p) =>
-    p.$copied ? thnTheme.gradientMain : thnTheme.cardGlass};
-  color: ${(p) => (p.$copied ? "#15151e" : "#fff")};
-  border-radius: 7px; border: none;
-  font-weight: 700; font-size: 1.01em;
-  padding: 0.28em 0.87em;
-  margin-right: 0.38em;
-  min-width: 56px; cursor: pointer;
-  &:hover, &:focus {
-    background: ${thnTheme.gradientAlt};
-    color: #15151e;
-    box-shadow: 0 0 9px #ff00cc99;
-  }
-  transition: background 0.12s, color 0.13s;
-`;
-
 // ============ MODAL/DRAWER w/ "code editor" ============
-const fadeIn = keyframes`
-  0%{transform:translateY(60px) scale(.96);opacity:0;}
-  100%{transform:translateY(0) scale(1);opacity:1;}
-`;
-
 const PromptModal: React.FC<{
     mode: "new" | "edit" | "view";
     prompt?: Prompt;
     closeModal: () => void;
-}> = ({ mode, prompt, closeModal }) => {
-    const { addPrompt, updatePrompt, loading } = usePrompts();
+}> = ({mode, prompt, closeModal}) => {
+    const {addPrompt, updatePrompt, loading} = usePrompts();
     const [name, setName] = useState(prompt?.name || "");
     const [description, setDescription] = useState(prompt?.description || "");
     const [domains, setDomains] = useState<string[]>(prompt?.domains || []);
@@ -1214,6 +814,7 @@ const PromptModal: React.FC<{
                 }
             }
         }
+
         window.addEventListener("keydown", handleKey);
         return () => window.removeEventListener("keydown", handleKey);
     }, [closeModal]);
@@ -1239,7 +840,7 @@ const PromptModal: React.FC<{
                         <FieldInput
                             id="pn"
                             value={name}
-                            onChange={(e:any) => setName(e.target.value)}
+                            onChange={(e: any) => setName(e.target.value)}
                             placeholder="Prompt title"
                             aria-invalid={!!errors.name}
                             required
@@ -1253,7 +854,7 @@ const PromptModal: React.FC<{
                         <FieldInput
                             id="pd"
                             value={description}
-                            onChange={(e:any) => setDescription(e.target.value)}
+                            onChange={(e: any) => setDescription(e.target.value)}
                             placeholder="Short description"
                             aria-invalid={!!errors.description}
                             required
@@ -1273,7 +874,7 @@ const PromptModal: React.FC<{
                                     tabIndex={0}
                                     aria-pressed={domains.includes(d)}
                                     onClick={() => toggleDomain(d)}
-                                    onKeyDown={(e:any) => {
+                                    onKeyDown={(e: any) => {
                                         if (e.key === "Enter" || e.key === " ")
                                             toggleDomain(d);
                                     }}
@@ -1295,7 +896,7 @@ const PromptModal: React.FC<{
                         <FieldSelect
                             id="agent"
                             value={agentId}
-                            onChange={(e:any) => setAgentId(e.target.value)}
+                            onChange={(e: any) => setAgentId(e.target.value)}
                         >
                             {AGENT_LIST.map((a) => (
                                 <option key={a} value={a}>
@@ -1309,7 +910,7 @@ const PromptModal: React.FC<{
                         <FieldSelect
                             id="status"
                             value={status}
-                            onChange={(e:any) =>
+                            onChange={(e: any) =>
                                 setStatus(e.target.value as "active" | "archived")
                             }
                         >
@@ -1327,7 +928,7 @@ const PromptModal: React.FC<{
                             spellCheck={false}
                             minLength={10}
                             aria-invalid={!!errors.prompt_text}
-                            onChange={(e:any) => setPromptText(e.target.value)}
+                            onChange={(e: any) => setPromptText(e.target.value)}
                             style={{
                                 fontFamily: "'JetBrains Mono','SF Pro',monospace",
                                 background: "#161234",
