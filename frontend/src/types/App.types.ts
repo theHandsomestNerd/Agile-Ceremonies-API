@@ -11,6 +11,8 @@ export type AgentKey =
     | "Lia"
     | "Man-Man"
     | "Twin"
+    | "Terrell"
+    | "James"
     | "Antosh";
 export type StatusType = "complete" | "active" | "todo" | "error";
 export type Step = {

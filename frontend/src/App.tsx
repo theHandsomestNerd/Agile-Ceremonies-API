@@ -63,6 +63,7 @@ import {Agents} from "./data/Agents";
 import {Steps} from "./data/steps";
 import {ChevronDownIcon, ChevronUpIcon, CopyIcon, EditIcon} from "./components/CustomIcons";
 import {useArrowKeyNav} from "./hooks/useArrowKeyNav";
+import Workflow from "./pages/Workflow";
 
 
 function getAgentColor(agent: AgentKey) {
@@ -228,6 +229,7 @@ export default function App() {
                     </Sidebar>
 
                     {/* ==== MAIN PANEL ==== */}
+                        <Workflow></Workflow>
                     <MainPanelLayout role="main" aria-label="Main Workflow Panel">
                         {/* ==== Workflow Cards ==== */}
                         <WorkflowListCardWrap>
