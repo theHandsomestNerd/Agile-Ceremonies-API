@@ -6,47 +6,47 @@ import React, {
     useRef,
 } from "react";
 import styled, {
-    createGlobalStyle,
     keyframes,
     css,
-    ThemeProvider,
 } from "styled-components";
-
+import thnTheme from "./thnTheme";
 interface PromptLibraryProps {
     onBackToWorkflow: () => void;
 }
 
-// ==================== THEME: AI, GLASS, ACCENT =======================
-const thnTheme = {
-    // Core BG/Surface
-    darkBG: "#15151e",
-    darkSurface: "#1a2236",
-    darkAccent: "#201945",
-    glassMain: "rgba(255,255,255,0.07)",
-    glassStrong: "rgba(34,39,50,0.92)",
-
-    // Gradient Accents
-    gradientMain: "linear-gradient(90deg,#8b5cf6,#06d6a0)",
-    gradientAlt: "linear-gradient(90deg,#ff00cc,#333399)",
-    neonTeal: "#06d6a0",
-    cyberPink: "#ff00cc",
-    electricPurple: "#9333EA",
-
-    // State Colors
-    status_active: "#22C55E",
-    status_archived: "#EF4444",
-    divider: "#252464",
-    tableStripe: "#222244",
-
-    // Disabled, focus
-    disabled: "#8b5cf644",
-    focusBox: "0 0 0 3px #9333EA99",
-    focusBtn: "0 0 6px #9333EAaa",
-
-    // Shadows, cards
-    cardGlow:
-        "0 0 16px 4px #8b5cf688,0 4px 32px 0 #06d6a055",
-    cardGlass: "rgba(255,255,255,0.088)",
+// Global theme styles from App variable system
+const appTheme = {
+    // Colors
+    surfaceLight: "var(--color-surface-light)",
+    surfaceDark: "var(--color-surface-dark)",
+    neutral100: "var(--color-neutral-100)",
+    neutral200: "var(--color-neutral-200)",
+    textDark: "var(--color-text-dark)",
+    textLight: "var(--color-text-light)",
+    textMuted: "var(--color-text-muted)",
+    textHint: "var(--color-text-hint)",
+    joshPrimary: "var(--color-josh-primary)",
+    joshMuted: "var(--color-josh-muted)",
+    
+    // Spacing
+    spacingXs: "var(--spacing-xs)",
+    spacingBase: "var(--spacing-base)",
+    spacingMd: "var(--spacing-md)",
+    spacingLg: "var(--spacing-lg)",
+    
+    // Borders
+    borderRadiusSmall: "var(--border-radius-small)",
+    borderRadiusMd: "var(--border-radius-md)",
+    borderRadiusLarge: "var(--border-radius-large)",
+    
+    // Shadows
+    shadowXs: "var(--shadow-xs)",
+    shadowMd: "var(--shadow-md)",
+    shadowCard: "var(--shadow-card)",
+    
+    // Status colors
+    active: "#22C55E",
+    archived: "#EF4444"
 };
 
 // ================== DATA MODEL/TYPES ===================
@@ -230,24 +230,7 @@ function usePrompts() {
     return c;
 }
 
-// ==================== GLOBAL STYLES ==================
-const GlobalStyle = createGlobalStyle`
-  html, body, #root {
-    background: ${thnTheme.darkBG};
-    min-height: 100vh;
-    color: #fff;
-    letter-spacing: -0.01em;
-    font-family: 'Inter','JetBrains Mono','SF Pro',system-ui;
-    margin: 0; padding: 0;
-  }
-  * { box-sizing: border-box; }
-  :root { color-scheme: dark; }
-  ::selection { background: ${thnTheme.cyberPink}33; }
-  button, input, select, textarea { font-family: inherit; }
-  .sr-only {position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);border:0;}
-`;
-
-// ================== APP ===========================
+// ================ MAIN COMPONENT ===================
 const PromptLibrary: React.FC<PromptLibraryProps> = ({ onBackToWorkflow }) => {
     const [modal, setModal] = useState<{
         mode: "new" | "edit" | "view";
@@ -256,28 +239,25 @@ const PromptLibrary: React.FC<PromptLibraryProps> = ({ onBackToWorkflow }) => {
     }>({ mode: "new", prompt: undefined, open: false });
     const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
     return (
-        <ThemeProvider theme={thnTheme}>
-            <PromptProvider>
-                <GlobalStyle />
-                <AppOuter>
-                    <TopNav />
-                    <AppMain>
-                        <PromptDashboard
-                            viewMode={viewMode}
-                            setViewMode={setViewMode}
-                            openModal={setModal}
-                        />
-                    </AppMain>
-                    {modal.open && (
-                        <PromptModal
-                            mode={modal.mode}
-                            prompt={modal.prompt}
-                            closeModal={() => setModal((m) => ({ ...m, open: false }))}
-                        />
-                    )}
-                </AppOuter>
-            </PromptProvider>
-        </ThemeProvider>
+        <PromptProvider>
+            <AppOuter>
+                <TopNav />
+                <AppMain>
+                    <PromptDashboard
+                        viewMode={viewMode}
+                        setViewMode={setViewMode}
+                        openModal={setModal}
+                    />
+                </AppMain>
+                {modal.open && (
+                    <PromptModal
+                        mode={modal.mode}
+                        prompt={modal.prompt}
+                        closeModal={() => setModal((m) => ({ ...m, open: false }))}
+                    />
+                )}
+            </AppOuter>
+        </PromptProvider>
     );
 };
 
@@ -294,7 +274,7 @@ const TopNav: React.FC = () => (
             >
                 <defs>
                     <linearGradient id="logograd" x1="0" x2="1" y1="0" y2="1">
-                        <stop stopColor="#8b5cf6" />
+                        <stop stopColor={appTheme.joshPrimary} />
                         <stop offset="1" stopColor="#06d6a0" />
                     </linearGradient>
                 </defs>
@@ -313,7 +293,7 @@ const TopNav: React.FC = () => (
             </LogoSvg>
             <NavTitle>Prompt Library Manager</NavTitle>
         </NavBrand>
-        <span style={{ color: thnTheme.neonTeal, fontWeight: 700, fontSize: 18 }}>
+        <span style={{ color: appTheme.joshPrimary, fontWeight: 700, fontSize: 18 }}>
       v1.0
     </span>
         <NavAvatar>
@@ -323,47 +303,52 @@ const TopNav: React.FC = () => (
 );
 
 const Nav = styled.nav`
-  width: 100vw;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   min-height: 62px;
   height: 4.5rem;
-  padding: 0 2rem;
-  background: rgba(24, 15, 41, 0.88);
-  box-shadow: 0 4px 24px #8b5cf633;
-  backdrop-filter: blur(6px);
-  border-bottom: 2px solid #271666;
+  padding: 0 ${appTheme.spacingLg};
+  background: ${appTheme.surfaceDark};
+  box-shadow: ${appTheme.shadowMd};
+  border-bottom: 2px solid ${appTheme.neutral200};
   z-index: 30;
 `;
 
 const LogoSvg = styled.svg`
-  width: 44px; height: 44px; margin-right: 1.5rem; user-select: none;
+  width: 44px; 
+  height: 44px; 
+  margin-right: ${appTheme.spacingMd}; 
+  user-select: none;
 `;
+
 const NavBrand = styled.div`
-  display: flex; align-items: center; gap: 1rem;
+  display: flex; 
+  align-items: center; 
+  gap: ${appTheme.spacingBase};
 `;
+
 const NavTitle = styled.span`
   font-size: 1.55rem;
-  font-weight: 900;
-  background: ${thnTheme.gradientMain};
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+  color: ${appTheme.joshPrimary};
   letter-spacing: -0.03em;
 `;
+
 const NavAvatar = styled.div`
   min-width: 44px;
   min-height: 44px;
-  background: ${thnTheme.glassMain};
+  background: ${appTheme.neutral200};
   border-radius: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.25rem;
   font-weight: bold;
-  color: #fff;
-  border: 2.5px solid #8b5cf6;
-  box-shadow: 0 0 12px ${thnTheme.electricPurple}77;
+  color: ${appTheme.textLight};
+  border: 2px solid ${appTheme.joshPrimary};
+  box-shadow: ${appTheme.shadowXs};
 `;
 
 // ================== APP LAYOUT ===============
