@@ -81,6 +81,12 @@ export const DashOuter = styled.section`
   height: calc(100vh - 62px - 2rem); /* Subtract header height and top margin */
   box-sizing: border-box;
   overflow: hidden; /* Prevent outer scrolling */
+  background: transparent;
+  
+  /* Create gentle gradient fade from top of dashboard to bottom */
+  background: linear-gradient(to bottom, 
+    rgba(30, 30, 50, 0.1) 0%, 
+    transparent 100%);
   
   @media (max-width: 768px) {
     padding: 0 1rem;
@@ -96,12 +102,19 @@ export const DashOuter = styled.section`
 
 export const DashContent = styled.div`
   flex: 1;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
   position: relative;
-  padding-right: 0.5rem;
+  overflow: hidden;
+  height: calc(100% - 6rem); /* Account for FilterBar height */
+  padding-right: 0;
+  background: transparent;
+  
+  /* Create seamless transition to page background */
+  border-radius: 0 0 16px 16px;
   
   @media (max-width: 768px) {
-    padding-right: 0.25rem;
+    padding-right: 0;
   }
 `;
 
@@ -367,6 +380,14 @@ export const ViewControls = styled.div`
   justify-content: space-between;
   width: 100%;
   margin-bottom: 1rem;
+  padding: 0.75rem 0.5rem;
+  position: relative;
+  z-index: 2;
+  
+  /* Vertical gradient background that fades to transparent */
+  background: linear-gradient(to bottom, 
+    rgba(20, 20, 40, 0.3) 0%, 
+    transparent 100%);
   
   @media (max-width: 480px) {
     flex-wrap: wrap;
@@ -381,6 +402,11 @@ export const ViewControlsLeft = styled.div`
   font-size: 1.1rem;
   font-weight: 500;
   color: #fff;
+  position: relative;
+  z-index: 2;
+  
+  /* Subtle glow effect for the text */
+  text-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
   
   @media (max-width: 480px) {
     font-size: 1rem;
@@ -486,11 +512,12 @@ export const NoResults = styled.div`
 // =============== PROMPT GRID & CARD ==========================
 export const PromptContainer = styled.div`
   width: 100%;
+  height: calc(100% - 3rem); /* Account for the header space */
   overflow: hidden;
-  padding-bottom: 1rem;
   box-sizing: border-box;
   position: relative;
-  margin-top: 1rem;
+  margin-top: 0;
+  background: transparent;
 `;
 
 export const PromptGridWrapper = styled.div`
@@ -498,14 +525,18 @@ export const PromptGridWrapper = styled.div`
   width: 100%;
   height: 100%;
   overflow-y: auto;
-  padding: 1rem;
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding: 0.5rem 1rem 2rem 1rem;
   box-sizing: border-box;
   
   /* Smooth scrolling */
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   
-  /* Hide scrollbar */
+  /* Make background match the page background for seamless transition */
+  background: transparent;
+  
+  /* Scrollbar styling */
   &::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -525,76 +556,59 @@ export const PromptGridWrapper = styled.div`
     }
   }
   
+  /* Fade in from the ViewControls gradient */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 30px;
+    background: linear-gradient(to bottom, transparent, ${thnTheme.darkBG});
+    z-index: -1;
+    pointer-events: none;
+  }
+  
   @media (max-width: 768px) {
-    padding: 0.75rem;
+    padding: 0.5rem 0.75rem 2rem 0.75rem;
   }
   
   @media (max-width: 480px) {
-    padding: 0.5rem;
+    padding: 0.5rem 0.5rem 2rem 0.5rem;
   }
 `;
 
 export const PromptGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(304px, 1fr)); /* Increased to account for card margins */
-  gap: 0.5rem; /* Reduced gap since cards have their own margin */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-auto-rows: min-content;
+  grid-gap: 1.25rem;
   width: 100%;
+  padding-top: 0.5rem;
+  
+  /* Add some padding at the bottom for smoother scrolling experience */
+  padding-bottom: 2rem;
   
   @media (min-width: 1400px) {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   }
   
   @media (max-width: 991px) {
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1.25rem;
   }
   
   @media (max-width: 768px) {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 1rem;
+    grid-gap: 1rem;
   }
   
   @media (max-width: 480px) {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    grid-gap: 0.75rem;
   }
 `;
 
-export const ScrollArrow = styled.button<{ direction: 'left' | 'right' }>`
-  position: fixed;
-  top: 50%;
-  ${props => props.direction === 'left' ? 'left: 10px;' : 'right: 10px;'}
-  transform: translateY(-50%);
-  width: 40px;
-  height: 40px;
-  background: ${thnTheme.gradientMain};
-  border: none;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  color: white;
-  cursor: pointer;
-  z-index: 4;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  
-  &:hover {
-    transform: translateY(-50%) scale(1.1);
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
-  }
-  
-  @media (max-width: 768px) {
-    width: 35px;
-    height: 35px;
-    font-size: 1.25rem;
-  }
-  
-  @media (max-width: 480px) {
-    display: none;
-  }
-`;
+// ScrollArrow component removed as we're now using vertical scrolling
 
 export const PromptCard = styled.div`
   flex: 0 0 auto;

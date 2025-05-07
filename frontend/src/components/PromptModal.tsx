@@ -16,10 +16,11 @@ import {
     ModalTop
 } from "../styles/PLModal.styled";
 import {Prompt} from "../types/PromptLibrary.types";
-import {DomainChip, DomainMulti} from "../styles/PromptLibrary.styled";
+import {DomainMulti} from "../styles/PromptLibrary.styled";
 import PromptLibraryData from "../data/PromptLibraryData";
 import {useEffect, useRef, useState} from "react";
 import {usePrompts} from "./Prompt.ctx";
+import {ModalDomainChip} from "../styles/PromptModal.styled";
 
 // ============ MODAL/DRAWER w/ "code editor" ============
 const PromptModal: React.FC<{
@@ -172,7 +173,7 @@ const PromptModal: React.FC<{
                         <FieldLabel>Domains</FieldLabel>
                         <DomainMulti>
                             {PromptLibraryData.DOMAIN_LIST.map((d) => (
-                                <DomainChip
+                                <ModalDomainChip
                                     key={d}
                                     selected={domains.includes(d)}
                                     tabIndex={0}
@@ -185,7 +186,7 @@ const PromptModal: React.FC<{
                                 >
                                     {d}
                                     {domains.includes(d) && <span>&nbsp;✓</span>}
-                                </DomainChip>
+                                </ModalDomainChip>
                             ))}
                         </DomainMulti>
                         <FieldHint>

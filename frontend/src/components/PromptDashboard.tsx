@@ -18,7 +18,6 @@ import {
     PromptContainer,
     PromptGrid,
     PromptGridWrapper,
-    ScrollArrow,
     SearchInputWrapper,
     ToggleViewBtns,
     ViewBtn,
@@ -56,16 +55,6 @@ export const PromptDashboard: React.FC<{
     const [andDomainFilters, setAndDomainFilters] = useState<string[]>([]);
     const [orDomainFilters, setOrDomainFilters] = useState<string[]>([]);
     
-    // Grid scrolling controls
-    const handleScroll = (direction: 'left' | 'right') => {
-        if (gridWrapperRef.current) {
-            const scrollAmount = direction === 'left' ? -600 : 600;
-            gridWrapperRef.current.scrollBy({
-                left: scrollAmount,
-                behavior: 'smooth'
-            });
-        }
-    };
 
     // --- FILTERED PROMPTS (Compound AND/OR logic) ---
     const filtered = prompts.filter((p: any) => {
@@ -197,7 +186,7 @@ export const PromptDashboard: React.FC<{
                     <NoResults>Sorry, no prompts match these filters.</NoResults>
                 ) : viewMode === "grid" ? (
                     <PromptContainer>
-                        <PromptGridWrapper>
+                        <PromptGridWrapper ref={gridWrapperRef}>
                             <PromptGrid>
                                 {filtered.map((prompt) => (
                                     <PromptCard
