@@ -2,7 +2,7 @@ import WorkflowService from "../service/WorkflowService";
 import {WorkflowTriggerType, WorkflowType} from "../Workflow.types";
 import * as logger from "firebase-functions/logger"
 import WorkflowTriggerService from "../service/WorkflowTriggerService";
-import {helpDeskWorkflowN8NId} from "../config";
+import {n8nWorkflowId} from "../config";
 
 const handleWorkflowsRequest = async (req: any, res: any) => {
     try {
@@ -52,10 +52,10 @@ const handleWorkflowsRequest = async (req: any, res: any) => {
 
                         const workFlowTrigger:WorkflowTriggerType = {
                             workflowId: parsedData.workflowId,
-                            lastTriggeredAt: (new Date()).toISOString(),
+                            ownerAgentId: 'compass',
                             triggeredBy: 'compass',
                             active: true,
-                            n8nId: helpDeskWorkflowN8NId.value(),
+                            n8nId: n8nWorkflowId.value(),
                             workflowStatus: {},
                             createdAt: (new Date()).toISOString()
                         }

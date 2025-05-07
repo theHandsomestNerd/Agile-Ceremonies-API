@@ -106,7 +106,7 @@ async saveWorkflowLog(workflowId: string, logData: WorkflowLogType): Promise<str
             ...logData,
             timestamp: logData.timestamp || new Date(), // Use native Date object
         });
-    } catch (e) {
+    } catch (e:any) {
         logger.error("Error saving workflow log: ", e);
         throw new Error('Error saving workflow log: ' + e.message);
     }

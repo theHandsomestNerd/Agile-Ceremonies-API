@@ -1,10 +1,11 @@
 import {OpenAIRequest} from "../HelpDesk.types";
-import {WorkflowTriggerType} from "../Workflow.types";
+// import {WorkflowTriggerType} from "../Workflow.types";
 import * as logger from "firebase-functions/logger";
 import {promptsLibrary} from "../data/PromptsLibrary";
 import {PromptsLibraryType} from "../PromptsLibrary.types";
-import WorkflowTriggerService from "./WorkflowTriggerService";
-import {helpDeskWorkflowId} from "../config";
+// import WorkflowTriggerService from "./WorkflowTriggerService";
+// import {helpDeskWorkflowId} from "../config";
+// import WorkflowService from "./WorkflowService";
 
 /**
  * Creates an OpenAI request formatted for the help desk workflow
@@ -65,46 +66,34 @@ async function createHelpDeskRequest(message: string): Promise<{ systemPrompt: s
 async function processHelpDeskRequest(helpDeskMessage: string) {
     try {
         // Create the OpenAI psuedo request
-        const openAIRequest = await createHelpDeskRequest(helpDeskMessage);
-        logger.log("processHelpDeskRequest: Creating OpenAI request for help desk message:", helpDeskMessage, helpDeskWorkflowId.value());
-        logger.log("openAIRequest", openAIRequest);
-        // Get the workflow ID from environment variables
-        logger.log("Triggering this workflow", helpDeskWorkflowId.value());
-
-        if (!helpDeskWorkflowId) {
-            return new Error('Help desk workflow ID not configured in environment variables');
-        }
-
-        const workflowTrigger:WorkflowTriggerType = {
-            active: true,
-            triggeredBy: 'compass',
-            lastTriggeredAt: (new Date()).toISOString(),
-            n8nId: helpDeskWorkflowId.value(),
-            workflowId: helpDeskWorkflowId.value(),
-            workflowIO: {
-                input:{
-                    inputType: 'json', // Type of input data
-                    systemPrompt: openAIRequest.systemPrompt, // System prompt for the OpenAI request
-                    userPrompt: openAIRequest.userPrompt, // User prompt for the OpenAI request
-                    requiredInputs: ['systemPrompt', 'userPrompt'] // Specifies which inputs are required for step execution
-                },
-                output: {
-                    outputType: 'markdown' // Determines how the next step interprets the output
-                }
-            },
-            createdAt: (new Date()).toISOString(),
-        }
-
-        // Trigger the workflow with the OpenAI request as input data
-        logger.log('Triggering workflow with ID:', workflowTrigger);
-        return WorkflowTriggerService.executeWorkflowTrigger(workflowTrigger).then((executionResp)=>{
-            console.log('wheres the response? ',executionResp);
-            return executionResp
-
-        }).catch((error) => {
-            logger.error('Error triggering workflow:', error);
-            throw new Error('Error triggering workflow: ' + error);
-        });
+        // const openAIRequest = await createHelpDeskRequest(helpDeskMessage);
+        // logger.log("processHelpDeskRequest: Creating OpenAI request for help desk message:", helpDeskMessage, helpDeskWorkflowId.value());
+        // logger.log("openAIRequest", openAIRequest);
+        // // Get the workflow ID from environment variables
+        // logger.log("Triggering this workflow", helpDeskWorkflowId.value());
+        //
+        // if (!helpDeskWorkflowId) {
+        //     return new Error('Help desk workflow ID not configured in environment variables');
+        // }
+        //
+        // const workflowTrigger:WorkflowTriggerType = {
+        //     active: true,
+        //     triggeredBy: 'compass',
+        //     n8nId: helpDeskWorkflowId.value(),
+        //     workflowId: helpDeskWorkflowId.value(),
+        //     createdAt: (new Date()).toISOString(),
+        // }
+        //
+        // // Trigger the workflow with the OpenAI request as input data
+        // logger.log('Triggering workflow with ID:', workflowTrigger);
+        // return WorkflowService.executeWorkflowTrigger(workflowTrigger).then((executionResp)=>{
+        //     console.log('wheres the response? ',executionResp);
+        //     return executionResp
+        //
+        // }).catch((error) => {
+        //     logger.error('Error triggering workflow:', error);
+        //     throw new Error('Error triggering workflow: ' + error);
+        // });
     } catch (error) {
         logger.error('Error processing help desk request:', error);
         throw error;

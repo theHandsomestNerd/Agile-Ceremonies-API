@@ -6,7 +6,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /workflows/{workflowId}/workflow_logs/{logId} {
-      allow read, write: true;
+      allow read, write: if true;
     }
 
     match /{document=**} {

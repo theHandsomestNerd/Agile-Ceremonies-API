@@ -1,6 +1,6 @@
 import {WorkflowType} from "../Workflow.types";
 import {promptsLibrary} from "./PromptsLibrary";
-import {helpDeskWorkflowN8NId} from "../config";
+import {n8nWorkflowId} from "../config";
 
 // const AGENT_INITIALIZATION_API_ENDPOINT = "http://127.0.0.1:5001/youtube-and-other-connections/us-central1/handleAgentProfilesRequest";
 
@@ -957,7 +957,7 @@ export const CompassWorkflows: WorkflowType[] = [
                         workflow_owner_id: "Workflow details ownerId",
                         workflowEndpoint: "Workflow details workflowEndpoint",
                         systemPrompt: COMPASS_SYSTEM_PROMPT,
-                        userPrompt: `If the workflow belongs to Compass then take the action immediately if not route it to the correct agent by sending the {workflow_trigger} as the body in an http POST request to the agents endpoint {agent_profile_workflow_endpoint + ${helpDeskWorkflowN8NId}}`,
+                        userPrompt: `If the workflow belongs to Compass then take the action immediately if not route it to the correct agent by sending the {workflow_trigger} as the body in an http POST request to the agents endpoint {agent_profile_workflow_endpoint + ${n8nWorkflowId}}`,
                         output: {outputType: "json", result: "Execution success/fail"}
                     },
                 }

@@ -14,6 +14,7 @@ export interface WorkflowIOType {
         output?: any, // Output data from the step
         outputType: 'text' | 'json' | 'file' | 'code' | 'markdown' | 'binary' | 'none' | 'best' // Determines how the next step interprets the output
         intent?: string, // The intent of the output
+        status?: 'success' | 'error' | 'waiting' | 'execute',
         [data:string]:any,
     }
 }
@@ -40,7 +41,6 @@ export interface WorkflowType {
     description: string,
     steps: WorkflowStepType[],
     ownerAgentId: string,
-    lastRun?: string,
     isDisabled?: boolean,    // Indicates if the workflow is currently active
     createdAt?: string,
     updatedAt?: string,
@@ -50,27 +50,25 @@ export interface WorkflowType {
  * Represents data for triggering a workflow, with updates during execution.
  */
 export interface WorkflowTriggerType {
-    workflowId: string,
     n8nId: string,
-    createdAt: string,
-    lastTriggeredAt?: string,
+    workflowEndpoint: string,
+    workflowId: string,
+    stepId: string,
+    ownerAgentId: string,
     triggeredBy: string,
     active: boolean,
-    workflowStatus?: {
-        [stepId: string]: {
-            status: 'success' | 'error' | 'waiting' | 'execute',
-        }
-    },
-    workflowIO?: WorkflowIOType
+    createdAt: string,
 }
 
 /**
  * Represents logs generated during workflow execution.
  */
 export interface WorkflowLogType {
-    message: string | WorkflowTriggerType,
-    workflow: WorkflowType,
+    message: string,
+    workflowId: string,
+    triggeredBy: string,
     timestamp: string,
-    status: string,
-    io: WorkflowIOType,
+    workflowStatus: {
+        [stepId: string]: WorkflowIOType
+    },
 }
