@@ -2,52 +2,38 @@ import React, {useEffect, useRef, useState} from 'react';
 import styled, {keyframes} from 'styled-components';
 import SvgIcon from './SvgIcon';
 import {ChatInput as StyledChatInput, ChatInputBar, ChatMessagesPanel} from '../styles/Chat.styled';
-import {AgentProfile, AgentProfiles} from '../data/AgentProfiles';
 import ChatHeader from './ChatHeader';
 import ChatBubble from './ChatBubble';
 import {AgentKey} from '../types/App.types';
 import {Agents} from "../data/Agents";
 
-const agents = [
-    {key: 'Compass' as AgentKey, name: 'Compass', role: 'HR/Router'},
-    {key: 'Nat' as AgentKey, name: 'Nat', role: 'CEO/AI PM'},
-    {key: 'Brian' as AgentKey, name: 'Brian', role: 'Product Manager'},
-    {key: 'Reqqy' as AgentKey, name: 'Reqqy', role: 'Requirements Agent'},
-    {key: 'Josh' as AgentKey, name: 'Josh', role: 'Graphic Designer'},
-    {key: 'James' as AgentKey, name: 'James', role: 'Backend Developer'},
-    {key: 'Terrell' as AgentKey, name: 'Terrell', role: 'Frontend Developer'},
-    {key: 'Antosh' as AgentKey, name: 'Antosh', role: 'Testing & Analytics'},
-    {key: 'Manman' as AgentKey, name: 'Man-Man', role: 'Maintenance'},
-    {key: 'Lia' as AgentKey, name: 'Lia', role: 'Social Media'},
-];
-
 // Example messages for each agent
 const agentMessages = {
-    Nat: [{text: "Welcome! I'm Nat, your AI Project Manager. How can I help you today?", isUser: false}],
-    Brian: [{
+    nat: [{text: "Welcome! I'm Nat, your AI Project Manager. How can I help you today?", isUser: false}],
+    brian: [{
         text: "Hi there! Brian here, Product Manager. What product features are you interested in?",
         isUser: false
     }],
-    Reqqy: [{
+    reqqy: [{
         text: "Hello! I'm Reqqy, your Requirements Agent. Let's gather your project specifications.",
         isUser: false
     }],
-    Josh: [{text: "Hey! Josh here. Need help with design? I'm your graphic design expert!", isUser: false}],
-    James: [{
+    josh: [{text: "Hey! Josh here. Need help with design? I'm your graphic design expert!", isUser: false}],
+    james: [{
         text: "Greetings! I'm James, backend developer. How can I assist with your server-side needs?",
         isUser: false
     }],
-    Terrell: [{
+    terrell: [{
         text: "Hi! I'm Terrell, your frontend developer. Let's create amazing user interfaces together!",
         isUser: false
     }],
-    Antosh: [{text: "Hello! Antosh at your service. Need help with testing or analytics?", isUser: false}],
-    Manman: [{
+    antosh: [{text: "Hello! Antosh at your service. Need help with testing or analytics?", isUser: false}],
+    "man-man": [{
         text: "Hey there! Man-Man here. I'll help maintain your systems and keep everything running smoothly.",
         isUser: false
     }],
-    Lia: [{text: "Hi! I'm Lia, your social media specialist. Let's boost your online presence!", isUser: false}],
-    Compass: [{
+    lia: [{text: "Hi! I'm Lia, your social media specialist. Let's boost your online presence!", isUser: false}],
+    compass: [{
         text: "Greetings! I'm Compass, here to help route your requests and assist with team coordination.",
         isUser: false
     }],
@@ -141,7 +127,6 @@ const ThinkingDotsComponent = (props:{dotColor:string}) => (
 
 interface ChatPanelProps {
     agentId?: string;
-    agentProfile?: AgentProfile;
 }
 
 // Styled components
@@ -236,42 +221,6 @@ const TimeStamp = styled.span<{ isHuman?: boolean }>`
     text-align: right;
 `;
 
-// Custom chat bubble with gradient styling for agent messages and different shape for human/agent
-// const CustomChatBubble = styled(ChatBubble)<{ you: boolean; isStreaming?: boolean }>`
-//     background: ${(p) =>
-//             !p.you
-//                     ? "linear-gradient(90deg, var(--color-josh-primary) 35%, var(--color-josh-secondary) 100%)"
-//                     : "var(--color-neutral-200)"};
-//     color: ${(p) => (!p.you ? "var(--color-neutral-100)" : "var(--color-neutral-900)")};
-//     border: 1px solid ${props => props.you
-//             ? 'rgba(230, 230, 240, 0.7)'
-//             : 'rgba(139, 92, 246, 0.3)'};
-//     /* Different shapes for human vs agent */
-//     border-radius: ${props => props.you
-//             ? '18px 18px 4px 18px' /* Human: rounded with sharp bottom-right */
-//             : '18px 18px 18px 4px' /* Agent: rounded with sharp bottom-left */};
-//
-//     /* Streaming text animation fixed to wrap properly */
-//     ${props => props.isStreaming && css`
-//         .streaming-text {
-//             display: inline-block;
-//             max-width: 100%;
-//             overflow-wrap: break-word;
-//             word-wrap: break-word;
-//             word-break: break-word;
-//             position: relative;
-//
-//             &:after {
-//                 content: '|';
-//                 display: inline-block;
-//                 animation: ${dotPulse} 0.8s infinite;
-//                 font-weight: normal;
-//                 opacity: 0.7;
-//             }
-//         }
-//     `}
-// `;
-
 // Custom input styling with medium text color
 const ChatInput = styled(StyledChatInput)`
     color: var(--color-neutral-600);
@@ -280,7 +229,6 @@ const ChatInput = styled(StyledChatInput)`
         color: var(--color-neutral-400);
     }
 `;
-
 
 const PanelContainer = styled.div`
     display: flex;
@@ -350,8 +298,8 @@ const SendButton = styled.button`
 `;
 
 
-const ChatPanel: React.FC = () => {
-    const [selectedAgent, setSelectedAgent] = useState<AgentKey>('Nat');
+const ChatPanel: React.FC<ChatPanelProps> = ({ agentId }) => {
+    const [selectedAgent, setSelectedAgent] = useState<AgentKey>(agentId as AgentKey || 'nat');
     const [messages, setMessages] = useState<{
         [key in AgentKey]?: Array<{
             text: string;
@@ -361,9 +309,16 @@ const ChatPanel: React.FC = () => {
     const [inputValue, setInputValue] = useState('');
     const messagesContainerRef = useRef<HTMLDivElement>(null);
 
-    // Get current agent color and data for styling
-    const currentAgentData = Agents[selectedAgent] || Agents.Nat;
+    // Get current agent color and data from dictionary
+    const currentAgentData = Agents[selectedAgent] || Agents.nat;
     const currentAgentColor = currentAgentData.color || 'var(--color-primary)';
+
+    // Update selected agent when prop changes
+    useEffect(() => {
+        if (agentId && Agents[agentId as AgentKey]) {
+            setSelectedAgent(agentId as AgentKey);
+        }
+    }, [agentId]);
 
     // Scroll to bottom when messages change
     useEffect(() => {
@@ -373,7 +328,7 @@ const ChatPanel: React.FC = () => {
     }, [messages, selectedAgent]);
 
     const handleAgentChange = (agentKey: AgentKey) => {
-        if (agentKey && agentKey !== selectedAgent) {
+        if (agentKey && agentKey !== selectedAgent && Agents[agentKey]) {
             setSelectedAgent(agentKey);
             // You could add other actions here when agent changes
         }
@@ -383,13 +338,15 @@ const ChatPanel: React.FC = () => {
         if (inputValue.trim()) {
             // Update messages for the current agent
             const currentAgentMessages = messages[selectedAgent] || [];
+            const agentName = Agents[selectedAgent]?.name || selectedAgent;
+            
             const updatedMessages = {
                 ...messages,
                 [selectedAgent]: [
                     ...currentAgentMessages,
                     {text: inputValue, isUser: true},
                     {
-                        text: `This is a response from ${selectedAgent.charAt(0).toUpperCase() + selectedAgent.slice(1)}`,
+                        text: `This is a response from ${agentName}`,
                         isUser: false
                     }
                 ]
@@ -411,11 +368,9 @@ const ChatPanel: React.FC = () => {
     return (
         <PanelContainer style={{borderColor: `${currentAgentColor}30`}}>
             <ChatHeader
-                agents={agents}
                 selectedAgent={selectedAgent}
                 onAgentChange={handleAgentChange}
             />
-
             <MessagesContainer ref={messagesContainerRef}>
                 {currentMessages.map((message, index) => (
                     <ChatBubble
@@ -433,7 +388,7 @@ const ChatPanel: React.FC = () => {
             <InputContainer>
                 <MessageInput
                     type="text"
-                    placeholder="Type your message..."
+                    placeholder={`Message ${Agents[selectedAgent]?.name || selectedAgent}...`}
                     value={inputValue}
                     onChange={(e: any) => setInputValue(e.target.value)}
                     onKeyDown={handleKeyDown}
@@ -489,13 +444,9 @@ interface Message {
 
 const ChatPanelComponent: React.FC<ChatPanelProps> = ({
                                                           agentId = 'Assistant',
-                                                          agentProfile
                                                       }) => {
 
-    const agentName = agentProfile?.name || agentId.charAt(0).toUpperCase() + agentId.slice(1);
-    const agentColor = agentProfile?.color;
     const agentAccentColor = `var(--color-${agentId.toLowerCase()}-secondary)`;
-    const agentInitial = agentProfile?.short || "?";
     const [isOpen, setIsOpen] = useState(false);
     const [message, setMessage] = useState('');
     const [isThinking, setIsThinking] = useState(false);
@@ -616,13 +567,13 @@ issue.`;
         }
     };
 
-    const [selectedAgent, setSelectedAgent] = useState<AgentKey>('Compass')
+    const [selectedAgent, setSelectedAgent] = useState<AgentKey>('compass')
 
     const handleAgentChange = (agentKey: AgentKey) => {
         if (agentKey)
             setSelectedAgent(agentKey)
         else
-            setSelectedAgent('Compass')
+            setSelectedAgent('compass')
     }
 
     const formatTime = (date: Date) => {
@@ -641,7 +592,6 @@ issue.`;
 
             <ChatPanelStyled isOpen={isOpen}>
                 <ChatHeader
-                    agents={agents}
                     selectedAgent={selectedAgent}
                     onAgentChange={handleAgentChange}
                 />

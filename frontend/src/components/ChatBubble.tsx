@@ -54,25 +54,25 @@ const Bubble = styled.div<StyledBubbleProps>`
     
     // Use the agent's gradient if an agent key is provided
     switch(props.agentKey) {
-      case 'Nat':
+      case 'nat':
         return 'var(--color-nat-gradient)';
-      case 'Brian':
+      case 'brian':
         return 'var(--color-brian-gradient)';
-      case 'Reqqy':
+      case 'reqqy':
         return 'var(--color-reqqy-gradient)';
-      case 'Josh':
+      case 'josh':
         return 'linear-gradient(90deg, var(--color-josh-primary) 35%, var(--color-josh-secondary) 100%)';
-      case 'James':
+      case 'james':
         return 'var(--color-james-gradient)';
-      case 'Terrell':
+      case 'terrell':
         return 'var(--color-terrell-gradient)';
-      case 'Antosh':
+      case 'antosh':
         return 'var(--color-antosh-gradient)';
-      case 'Man-Man':
+      case 'man-man':
         return 'var(--color-manman-gradient)';
-      case 'Lia':
+      case 'lia':
         return 'var(--color-lia-gradient)';
-      case 'Compass':
+      case 'compass':
         return 'var(--color-compass-gradient)';
       default:
         return 'linear-gradient(90deg, var(--color-josh-primary) 35%, var(--color-josh-secondary) 100%)';
@@ -125,10 +125,10 @@ const ChatBubble: React.FC<PropsWithChildren<ChatBubbleProps>> = ({
   const isUserMessage = isUser || you;
   
   return (
-    <BubbleWrapper isUser={!isUserMessage}>
+    <BubbleWrapper isUser={!!isUserMessage}>
       <Bubble 
-        isUser={!isUserMessage}
-        you={isUserMessage}
+        isUser={!!isUserMessage}
+        you={!!isUserMessage}
         agentKey={agentKey}
         isStreaming={isStreaming}
       >

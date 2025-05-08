@@ -4,17 +4,17 @@
  * =========================
  */
 export type AgentKey =
-    | "Josh"
-    | "Reqqy"
-    | "Nat"
-    | "Brian"
-    | "Lia"
-    | "Man-Man"
-    | "Twin"
-    | "Terrell"
-    | "James"
-    | "Antosh"
-    | "Compass";
+    | "josh"
+    | "reqqy"
+    | "nat"
+    | "brian"
+    | "lia"
+    | "man-man"
+    | "twin"
+    | "terrell"
+    | "james"
+    | "antosh"
+    | "compass";
 
 
 export type StatusType = "complete" | "active" | "todo" | "error" | "pending";
@@ -49,4 +49,5 @@ export type Agent = {
     color: string;
     accent: string;
     avatarBg: string;
+    description: string;
 };

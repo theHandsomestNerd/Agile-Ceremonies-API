@@ -15,11 +15,11 @@ import WorkflowDropdownSelect from '../components/WorkflowDropdownSelect';
 import WorkflowStepTable from '../components/WorkflowStepTable';
 import ChatPanel from '../components/ChatPanel';
 import {agilePairTDDWorkflow, helpDeskWorkflow, respawnRantsWorkflow} from "../data/WorkflowsData";
-import {StatusType} from '../types/App.types';
+import {Agent, AgentKey, StatusType} from '../types/App.types';
 import {AgentInitial, AvatarCircle, PresenceAgent, PresenceBar} from "../styles/App.styled";
-import {AgentProfile, AgentProfiles} from "../data/AgentProfiles";
 import {statusMeta} from "../data/statusMeta";
 import {StepStatusDot} from "../styles/Steps.styled";
+import {Agents} from "../data/Agents";
 
 // Available workflows
 const availableWorkflows = [
@@ -75,14 +75,14 @@ const Workflow: React.FC = () => {
     // Sample agent statuses for the presence bar
     const getActiveAgents = () => {
         // Get unique agent IDs from the current workflow
-        const agentIds = [...new Set(workflow.steps.map(step => step.ownerAgentId))];
+        const agentIds = [...new Set(workflow.steps.map(step => step.ownerAgentId))] as AgentKey[];
 
         // Sample statuses for demonstration
         return agentIds.map(id => {
             let status: StatusType;
 
             // Simulate different statuses
-            if (id === 'josh' || id === 'james' || id === 'terrell' || id === 'james_terrell') {
+            if (id === 'josh' || id === 'james' || id === 'terrell' || id === 'twin') {
                 status = 'active';
             } else if (id === 'nat' || id === 'compass') {
                 status = 'pending';
@@ -146,11 +146,11 @@ const Workflow: React.FC = () => {
                         }}/>
                     </div>
 
-                    {getActiveAgents().map(({ id, status }) => {
+                    {getActiveAgents().map(({ id, status }:{id:AgentKey, status:StatusType}) => {
                         // Get agent profile from AgentProfiles or use fallback
-                        const agent:AgentProfile = AgentProfiles[id] || {
+                        const agent:Agent = Agents[id] || {
                             name: id,
-                            color: '#666666',
+                            color: '#665566',
                             short: id.charAt(0).toUpperCase()
                         };
 
@@ -201,12 +201,7 @@ const Workflow: React.FC = () => {
                             
             {/* Add the chat panel with the workflow owner as the agent and their profile */}
             <ChatPanel 
-              agentId={workflow.ownerAgentId} 
-              agentProfile={AgentProfiles[workflow.ownerAgentId] || {
-                name: workflow.ownerAgentId,
-                color: '#8b5cf6',
-                short: workflow.ownerAgentId.charAt(0).toUpperCase()
-              }} 
+              agentId={workflow.ownerAgentId}
             />
         </WorkflowContainer>
     );
