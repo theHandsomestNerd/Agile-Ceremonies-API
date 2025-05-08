@@ -443,10 +443,20 @@ interface Message {
 
 
 const ChatPanelComponent: React.FC<ChatPanelProps> = ({
-                                                          agentId = 'Assistant',
+                                                          agentId = 'compass',
                                                       }) => {
+    // Ensure we have a valid agent key
+    const safeAgentId = (agentId && typeof agentId === 'string' && agentId in Agents)
+        ? agentId as AgentKey
+        : 'compass';
 
-    const agentAccentColor = `var(--color-${agentId.toLowerCase()}-secondary)`;
+    // Get agent details from dictionary
+    const agentData = Agents[safeAgentId];
+    const agentName = agentData?.name || safeAgentId;
+    const agentRole = agentData?.role || 'Agent';
+    const agentColor = agentData?.color || 'var(--color-primary)';
+    const agentAccentColor = agentData?.accent || `var(--color-${safeAgentId.toLowerCase()}-secondary)`;
+
     const [isOpen, setIsOpen] = useState(false);
     const [message, setMessage] = useState('');
     const [isThinking, setIsThinking] = useState(false);
@@ -455,7 +465,7 @@ const ChatPanelComponent: React.FC<ChatPanelProps> = ({
     const [messages, setMessages] = useState<Message[]>([
         {
             id: '1',
-            text: 'Hello! How can I help you with your workflows today?',
+            text: `Hello! I'm ${agentName}, your ${agentRole}. How can I help you with your workflows today?`,
             isUser: false,
             timestamp: new Date()
         }
@@ -463,6 +473,18 @@ const ChatPanelComponent: React.FC<ChatPanelProps> = ({
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const thinkingRef = useRef<HTMLDivElement>(null);
+
+    // Update greeting when agent changes
+    useEffect(() => {
+        if (safeAgentId && Agents[safeAgentId]) {
+            setMessages([{
+                id: '1',
+                text: `Hello! I'm ${agentName}, your ${agentRole}. How can I help you with your workflows today?`,
+                isUser: false,
+                timestamp: new Date()
+            }]);
+        }
+    }, [safeAgentId, agentName, agentRole]);
 
     // Process agent information
 
@@ -540,18 +562,8 @@ const ChatPanelComponent: React.FC<ChatPanelProps> = ({
             setIsThinking(true);
 
             // Mock response text
-            const responseText = `
-I
-understand
-your
-question
-about
-"${message.substring(0, 20)}${message.length > 20 ? '...' : ''}".Let
-me
-help
-you
-with that workflow
-issue.`;
+            const responseText = `I understand your question about "${message.substring(0, 20)}${message.length > 20 ? '...' : ''}". 
+    As ${agentName}, I can help you with that workflow issue.`;
 
             // Simulate thinking and then start streaming
             setTimeout(() => {
@@ -567,13 +579,29 @@ issue.`;
         }
     };
 
-    const [selectedAgent, setSelectedAgent] = useState<AgentKey>('compass')
+    const [selectedAgent, setSelectedAgent] = useState<AgentKey>(safeAgentId)
 
     const handleAgentChange = (agentKey: AgentKey) => {
-        if (agentKey)
-            setSelectedAgent(agentKey)
-        else
-            setSelectedAgent('compass')
+        if (agentKey && Agents[agentKey]) {
+            setSelectedAgent(agentKey);
+
+            // Since ChatPanelComponent manages its own state separately from the ChatPanel
+            // component, we need to update the agent information here as well
+            const agentInfo = Agents[agentKey];
+
+            // Add a message about switching agents
+            setMessages(prevMessages => [
+                ...prevMessages,
+                {
+                    id: Date.now().toString(),
+                    text: `Switching to ${agentInfo?.name || agentKey}, your ${agentInfo?.role || 'Agent'}.`,
+                    isUser: false,
+                    timestamp: new Date()
+                }
+            ]);
+        } else {
+            setSelectedAgent('compass');
+        }
     }
 
     const formatTime = (date: Date) => {
@@ -603,6 +631,7 @@ issue.`;
                             key={msg.id}
                             message={msg.text}
                             isUser={msg.isUser}
+                            agentKey={msg.isUser ? undefined : safeAgentId}
                             isStreaming={msg.isStreaming}>
                             {msg.text}
                             <TimeStamp isHuman={msg.isUser}>{formatTime(msg.timestamp)}</TimeStamp>
@@ -613,13 +642,19 @@ issue.`;
                         <ChatBubble
                             isUser={false}
                             you={false}
+                            agentKey={safeAgentId}
                             message="">
                             <ThinkingDotsComponent dotColor={agentAccentColor}/>
                         </ChatBubble>
                     )}
 
                     {isStreaming && (
-                        <ChatBubble you={false} isStreaming isUser={false} message={""}>
+                        <ChatBubble
+                            you={false}
+                            isStreaming
+                            isUser={false}
+                            agentKey={safeAgentId}
+                            message={""}>
                             <div className="streaming-text">
                                 {streamedMessage}
                             </div>
@@ -632,14 +667,21 @@ issue.`;
                 <ChatInputBar>
                     <ChatInput
                         type="text"
-                        placeholder="Type a message..."
+                        placeholder={`Message ${agentName}...`}
                         value={message}
                         onChange={(e: any) => setMessage(e.target.value)}
                         onKeyDown={handleKeyDown}
+                        style={{
+                            borderColor: `${agentColor}40`,
+                            boxShadow: `0 0 0 1px ${agentColor}20`
+                        }}
                     />
                     <SendButton
                         onClick={handleSendMessage}
                         aria-label="Send message"
+                        style={{
+                            background: `linear-gradient(135deg, ${agentColor}, ${agentColor}dd)`
+                        }}
                     >
                         <SendIcon/>
                     </SendButton>

@@ -1,12 +1,9 @@
-import React, {PropsWithChildren, useState} from 'react';
+import React, { PropsWithChildren } from 'react';
 import styled from 'styled-components';
-import {Agent, AgentKey} from '../types/App.types';
-import {ChevronLeftIcon, ChevronRightIcon} from './CustomIcons';
-import {Agents} from '../data/Agents';
-import {AvatarCircle} from "../styles/App.styled";
-
-// Animation constants
-const TRANSITION_DURATION = 300; // ms
+import { AgentKey } from '../types/App.types';
+import { ChevronLeftIcon, ChevronRightIcon } from './CustomIcons';
+import { Agents } from '../data/Agents';
+import { AvatarCircle } from "../styles/App.styled";
 
 interface ChatHeaderProps {
     selectedAgent?: AgentKey;
@@ -16,7 +13,6 @@ interface ChatHeaderProps {
 const HeaderContainer = styled.div`
     position: relative;
     width: 100%;
-    overflow: hidden;
     background: var(--color-neutral-100);
     border-top-left-radius: var(--border-radius-md);
     border-top-right-radius: var(--border-radius-md);
@@ -24,24 +20,13 @@ const HeaderContainer = styled.div`
     border-bottom: 1px solid var(--color-neutral-200);
 `;
 
-const CarouselTrack = styled.div<{ offset: number }>`
-    display: flex;
-    transition: transform ${TRANSITION_DURATION}ms ease;
-    transform: translateX(${props => props.offset}px);
-    width: fit-content;
-`;
-
-const AgentCard = styled.div<{ isActive: boolean; borderColor: string }>`
+const AgentCard = styled.div<{ borderColor: string }>`
     position: relative;
     width: 100%;
-    min-width: 100%;
     padding: var(--spacing-sm);
     background-color: transparent;
     overflow: hidden;
-    cursor: pointer;
-    opacity: ${props => props.isActive ? 1 : 0.7};
-    transition: all var(--transition-normal);
-    border-left: ${props => props.isActive ? `4px solid ${props.borderColor}` : '4px solid transparent'};
+    border-left: 4px solid ${props => props.borderColor};
 
     &::before {
         content: '';
@@ -52,35 +37,13 @@ const AgentCard = styled.div<{ isActive: boolean; borderColor: string }>`
         height: 100%;
         background: linear-gradient(to right, ${props => props.borderColor}10, transparent 30%);
         pointer-events: none;
-        opacity: ${props => props.isActive ? 1 : 0};
-        transition: opacity var(--transition-normal);
-    }
-
-    &:hover {
         opacity: 1;
-
-        &::before {
-            opacity: 0.5;
-        }
     }
 `;
 
 const AgentInfo = styled.div`
     display: flex;
     align-items: center;
-`;
-
-const Avatar = styled.div<{ bgColor: string }>`
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: ${props => props.bgColor};
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: var(--font-weight-bold);
-    margin-right: var(--spacing-sm);
 `;
 
 const AgentDetails = styled.div`
@@ -108,34 +71,6 @@ const AgentRole = styled.p`
     }
 `;
 
-const TeamIndicator = styled.div`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    margin-top: var(--spacing-xs);
-    gap: var(--spacing-xxs);
-`;
-
-const IndicatorDot = styled.div<{ active: boolean; color: string }>`
-    width: 6px;
-    height: 6px;
-    border-radius: var(--border-radius-full);
-    background-color: ${props => props.active ? props.color : 'var(--color-neutral-300)'};
-    transition: all var(--transition-normal);
-    cursor: pointer;
-
-    &:hover {
-        transform: ${props => props.active ? 'none' : 'scale(1.2)'};
-        opacity: ${props => props.active ? 1 : 0.8};
-    }
-
-    /* Active state adds a subtle glow */
-    ${props => props.active && `
-    box-shadow: 0 0 5px ${props.color}50;
-  `}
-`;
-
 const NavButton = styled.button<{ direction: 'left' | 'right'; color: string }>`
     background-color: ${props => props.color};
     color: white;
@@ -149,7 +84,6 @@ const NavButton = styled.button<{ direction: 'left' | 'right'; color: string }>`
     justify-content: center;
     transition: all var(--transition-bounce);
     opacity: 0.85;
-    margin: 0 var(--spacing-xs);
 
     &:hover {
         filter: brightness(1.1);
@@ -169,32 +103,31 @@ const NavButton = styled.button<{ direction: 'left' | 'right'; color: string }>`
 `;
 
 const CardNavigation = styled.div`
-    display: grid;
-    grid-template-columns: auto 1fr auto;
+    display: flex;
+    justify-content: space-between;
     align-items: center;
     padding-top: var(--spacing-xs);
     margin-top: var(--spacing-xs);
     width: 100%;
 `;
 
-const ChatHeader: React.FC<PropsWithChildren<ChatHeaderProps>> = ({children, selectedAgent = 'compass', onAgentChange}) => {
-    const [slideWidth, setSlideWidth] = useState(0);
-    const containerRef = React.useRef<HTMLDivElement>(null);
+const AgentCounter = styled.div`
+    font-size: var(--font-size-sm);
+    color: var(--color-neutral-600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`;
 
-    React.useEffect(() => {
-        if (containerRef.current) {
-            setSlideWidth(containerRef.current.offsetWidth);
-        }
-
-        const handleResize = () => {
-            if (containerRef.current) {
-                setSlideWidth(containerRef.current.offsetWidth);
-            }
-        };
-
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
+const ChatHeader: React.FC<PropsWithChildren<ChatHeaderProps>> = ({
+    children, 
+    selectedAgent = 'compass', 
+    onAgentChange
+}) => {
+    // If children are provided, render them instead of the agent header
+    if (children) {
+        return <HeaderContainer>{children}</HeaderContainer>;
+    }
 
     // Get all agent keys for navigation
     const agentKeys = Object.keys(Agents) as AgentKey[];
@@ -218,43 +151,20 @@ const ChatHeader: React.FC<PropsWithChildren<ChatHeaderProps>> = ({children, sel
         }
     };
 
-    // Handle clicking on indicator dots
-    const handleDotClick = (agentKey: AgentKey) => {
-        if (typeof onAgentChange === 'function') {
-            onAgentChange(agentKey);
-        }
-    };
-
-    // If children are provided, render them instead of the carousel
-    if (children) {
-        return <HeaderContainer>{children}</HeaderContainer>;
-    }
-
     return (
-        <HeaderContainer ref={containerRef}>
-            <CarouselTrack offset={-currentIndex * slideWidth}>
-                {agentKeys.map((agentKey, index) => {
-                    const agent = Agents[agentKey];
-                    return (
-                        <AgentCard
-                            key={agentKey}
-                            isActive={agentKey === selectedAgent}
-                            borderColor={agent?.color || 'var(--color-primary)'}
-                            onClick={() => onAgentChange && onAgentChange(agentKey)}
-                        >
-                            <AgentInfo>
-                                <AvatarCircle color={agent?.color || 'var(--color-primary)'}>
-                                    {agent?.short || agent?.name?.charAt(0) || '?'}
-                                </AvatarCircle>
-                                <AgentDetails>
-                                    <AgentName>{agent?.name || agentKey}</AgentName>
-                                    <AgentRole>{agent?.role || 'Agent'}</AgentRole>
-                                </AgentDetails>
-                            </AgentInfo>
-                        </AgentCard>
-                    );
-                })}
-            </CarouselTrack>
+        <HeaderContainer>
+            {/* Display only the currently selected agent */}
+            <AgentCard borderColor={currentAgentColor}>
+                <AgentInfo>
+                    <AvatarCircle color={currentAgentColor}>
+                        {currentAgentData?.short || currentAgentData?.name?.charAt(0) || '?'}
+                    </AvatarCircle>
+                    <AgentDetails>
+                        <AgentName>{currentAgentData?.name || selectedAgent}</AgentName>
+                        <AgentRole>{currentAgentData?.role || 'Agent'}</AgentRole>
+                    </AgentDetails>
+                </AgentInfo>
+            </AgentCard>
 
             <CardNavigation>
                 <NavButton
@@ -265,16 +175,9 @@ const ChatHeader: React.FC<PropsWithChildren<ChatHeaderProps>> = ({children, sel
                     <ChevronLeftIcon/>
                 </NavButton>
 
-                <TeamIndicator>
-                    {agentKeys.map((agentKey, index) => (
-                        <IndicatorDot
-                            key={index}
-                            active={agentKey === selectedAgent}
-                            color={Agents[agentKey]?.color || 'var(--color-primary)'}
-                            onClick={() => handleDotClick(agentKey)}
-                        />
-                    ))}
-                </TeamIndicator>
+                <AgentCounter>
+                    {currentIndex + 1} / {agentKeys.length}
+                </AgentCounter>
 
                 <NavButton
                     direction="right"
