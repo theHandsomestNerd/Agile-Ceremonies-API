@@ -14,7 +14,7 @@ export type AgentKey =
     | "Terrell"
     | "James"
     | "Antosh";
-export type StatusType = "complete" | "active" | "todo" | "error";
+export type StatusType = "complete" | "active" | "todo" | "error" | "pending";
 export type Step = {
     id: number;
     name: string;

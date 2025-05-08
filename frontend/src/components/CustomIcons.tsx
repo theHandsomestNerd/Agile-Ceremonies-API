@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-interface IconProps {
+export interface IconProps {
   size?: number;
   color?: string;
   hoverColor?: string;

@@ -119,4 +119,17 @@ export const statusMeta: Record<StatusType, {
     color: "var(--color-error)",
     description: "Task encountered an error during execution"
   },
+  pending: {
+    label: "Pending",
+    icon: (
+        <StatusIndicator color="var(--color-neutral-400)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 6v6l4 2"/>
+          </svg>
+        </StatusIndicator>
+    ),
+    color: "#f59e0b", // Amber color for pending status
+    description: "Waiting to be started"
+  }
 };

@@ -1,7 +1,7 @@
 import React, {useMemo, useState,} from "react";
 import ReactJson from "react-json-view";
 import {GlobalStyles} from "./styles/globalStyles";
-import {Agent, AgentKey, StatusType, Step} from "./types/App.types";
+import {Agent, AgentKey, Step} from "./types/App.types";
 import {statusMeta} from "./data/statusMeta";
 import PromptLibrary from "./PromptLibrary";
 import {
@@ -15,7 +15,6 @@ import {
 } from "./styles/Chat.styled"
 import {
     AgentInitial,
-    AgentNameInline,
     AvatarCircle,
     GlobalJsonBody,
     GlobalJsonFooter,
@@ -25,31 +24,13 @@ import {
     HeaderIcon,
     LiveRegion,
     MainPanelLayout,
-    PresenceAgent,
-    PresenceBar,
     RootLayout,
     SectionLabel,
     Sidebar,
     SidebarAgentWrap,
-    TableGrid,
-    TableRow,
-    TableRows,
-    TableWrap,
-    TH,
     WorkflowCard,
     WorkflowListCardWrap
 } from "./styles/App.styled";
-
-import {
-    StepDesc,
-    StepDetailHint,
-    StepDetailsPanelWrap,
-    StepDevNotes,
-    StepField,
-    StepLabel,
-    StepStatusDot,
-    StepValue,
-} from "./styles/Steps.styled"
 import {
     N8nCollapsibleToggle,
     N8nJsonBody,
@@ -166,7 +147,7 @@ export default function App() {
         if (e.key === "Enter") sendChatMessage();
     }
 
-    const AppHeader = () =>{
+    const AppHeader = () => {
         return <HeaderBar role="banner" aria-label="Header">
             <HeaderIcon/>
             AI Agent Workflow Orchestrator v3.9.5
@@ -201,247 +182,222 @@ export default function App() {
                 <>
                     <AppHeader/>
                     <RootLayout>
-                    {/* ==== SIDEBAR: Agent filter avatars ==== */}
-                    <Sidebar
-                        role="navigation"
-                        aria-label="Agent Navigation Sidebar"
-                        tabIndex={0}
-                    >
-                        {Object.values(Agents).map((agent: Agent) => (
-                            <SidebarAgentWrap
-                                key={agent.key}
-                                selected={agentFilter === agent.key}
-                                tabIndex={0}
-                                aria-label={`Filter steps to only ${agent.name}`}
-                                aria-selected={agentFilter === agent.key}
-                                title={agent.role}
-                                onClick={() => setAgentFilter(agentFilter === agent.key ? null : agent.key)}
-                                onKeyDown={(e: any) => {
-                                    if (e.key === "Enter" || e.key === " " || e.key === "Spacebar")
-                                        setAgentFilter(agentFilter === agent.key ? null : agent.key);
-                                }}
-                            >
-                                <AvatarCircle color={agent.color}>
-                                    <AgentInitial>{agent.short}</AgentInitial>
-                                </AvatarCircle>
-                            </SidebarAgentWrap>
-                        ))}
-                    </Sidebar>
-
-                    {/* ==== MAIN PANEL ==== */}
-
-                    <MainPanelLayout role="main" aria-label="Main Workflow Panel">
-                        {/* ==== Workflow Cards ==== */}
-                        <WorkflowListCardWrap>
-                            {[
-                                "Standard Blog Generation",
-                                "Customer Outreach Flow",
-                                "Social Blast",
-                            ].map((wf, idx) => (
-                                <WorkflowCard
-                                    key={wf}
-                                    selected={idx === workflowIdx}
+                        {/* ==== SIDEBAR: Agent filter avatars ==== */}
+                        <Sidebar
+                            role="navigation"
+                            aria-label="Agent Navigation Sidebar"
+                            tabIndex={0}
+                        >
+                            {Object.values(Agents).map((agent: Agent) => (
+                                <SidebarAgentWrap
+                                    key={agent.key}
+                                    selected={agentFilter === agent.key}
                                     tabIndex={0}
-                                    aria-label={`Workflow: ${wf}`}
-                                    aria-selected={idx === workflowIdx}
-                                    onClick={() => setWorkflowIdx(idx)}
+                                    aria-label={`Filter steps to only ${agent.name}`}
+                                    aria-selected={agentFilter === agent.key}
+                                    title={agent.role}
+                                    onClick={() => setAgentFilter(agentFilter === agent.key ? null : agent.key)}
                                     onKeyDown={(e: any) => {
-                                        if (e.key === "Enter" || e.key === " ")
-                                            setWorkflowIdx(idx);
+                                        if (e.key === "Enter" || e.key === " " || e.key === "Spacebar")
+                                            setAgentFilter(agentFilter === agent.key ? null : agent.key);
                                     }}
                                 >
-                                    <SectionLabel
-                                        style={{
-                                            fontSize: "var(--font-size-base)",
-                                            color: idx !== workflowIdx
-                                                ? "var(--color-josh-primary)"
-                                                : "var(--color-text-dark)",
-                                            fontWeight: idx === workflowIdx
-                                                ? "var(--font-weight-bold)"
-                                                : "var(--font-weight-medium)"
+                                    <AvatarCircle color={agent.color}>
+                                        <AgentInitial>{agent.short}</AgentInitial>
+                                    </AvatarCircle>
+                                </SidebarAgentWrap>
+                            ))}
+                        </Sidebar>
+
+                        {/* ==== MAIN PANEL ==== */}
+
+                        <MainPanelLayout role="main" aria-label="Main Workflow Panel">
+                            {/* ==== Workflow Cards ==== */}
+                            <WorkflowListCardWrap>
+                                {[
+                                    "Standard Blog Generation",
+                                    "Customer Outreach Flow",
+                                    "Social Blast",
+                                ].map((wf, idx) => (
+                                    <WorkflowCard
+                                        key={wf}
+                                        selected={idx === workflowIdx}
+                                        tabIndex={0}
+                                        aria-label={`Workflow: ${wf}`}
+                                        aria-selected={idx === workflowIdx}
+                                        onClick={() => setWorkflowIdx(idx)}
+                                        onKeyDown={(e: any) => {
+                                            if (e.key === "Enter" || e.key === " ")
+                                                setWorkflowIdx(idx);
                                         }}
                                     >
-                                        {wf}
-                                    </SectionLabel>
-                                </WorkflowCard>
-                            ))}
-                        </WorkflowListCardWrap>
-                        {/* ==== Presence ==== */}
-                        <PresenceBar role="region" aria-label="Present Agents">
-                            {["Reqqy", "Josh", "Twin", "Antosh", "Man-Man"].map((key, i) => {
-                                const agent = Agents[key as AgentKey];
-                                let status: StatusType = key === "Josh" || key === "Twin"
-                                    ? "active"
-                                    : key === "Man-Man"
-                                        ? "complete"
-                                        : key === "Antosh"
-                                            ? "error"
-                                            : "complete";
-                                return (
-                                    <PresenceAgent key={key}>
-                                        <AvatarCircle color={agent.color}>
-                                            <AgentInitial>{agent.short}</AgentInitial>
-                                        </AvatarCircle>
-                                        <StepStatusDot
-                                            color={statusMeta[status].color}
-                                            error={status === "error"}
+                                        <SectionLabel
+                                            style={{
+                                                fontSize: "var(--font-size-base)",
+                                                color: idx !== workflowIdx
+                                                    ? "var(--color-josh-primary)"
+                                                    : "var(--color-text-dark)",
+                                                fontWeight: idx === workflowIdx
+                                                    ? "var(--font-weight-bold)"
+                                                    : "var(--font-weight-medium)"
+                                            }}
                                         >
-                                            {statusMeta[status].icon}
-                                        </StepStatusDot>
-                                    </PresenceAgent>
-                                );
-                            })}
-                        </PresenceBar>
-                        {/* ==== Step Table ==== */}
-                        <Workflow></Workflow>
-                        {/* ==== Step Details & n8n JSON ==== */}
-                        <div
-                            style={{
-                                display: "flex",
-                                flexDirection: "row",
-                                gap: "25px",
-                                width: "100%",
-                                minHeight: "190px",
-                            }}
-                        >
-                            <N8nWrapper
-                                tabIndex={0}
-                                aria-label="n8n Node JSON Viewer"
-                                aria-expanded={n8nOpen}
+                                            {wf}
+                                        </SectionLabel>
+                                    </WorkflowCard>
+                                ))}
+                            </WorkflowListCardWrap>
+                            {/* Presence Bar moved to Workflow.tsx component */}
+                            {/* ==== Step Table ==== */}
+                            <Workflow></Workflow>
+                            {/* ==== Step Details & n8n JSON ==== */}
+                            <div
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    gap: "25px",
+                                    width: "100%",
+                                    minHeight: "190px",
+                                }}
                             >
-                                <N8nJsonHeader
-                                    onClick={() => setN8nOpen(!n8nOpen)}
+                                <N8nWrapper
                                     tabIndex={0}
-                                    aria-label={"Expand/collapse n8n Node JSON viewer"}
-                                    onKeyDown={(e: any) => {
-                                        if (e.key === "Enter" || e.key === " ")
-                                            setN8nOpen((v) => !v);
-                                    }}
+                                    aria-label="n8n Node JSON Viewer"
+                                    aria-expanded={n8nOpen}
                                 >
-                                    <N8nCollapsibleToggle aria-hidden>
-                                        {n8nOpen ? <ChevronUpIcon/> : <ChevronDownIcon/>}
-                                    </N8nCollapsibleToggle>
-                                    n8n Node JSON
-                                </N8nJsonHeader>
-                                {n8nOpen && step && (
-                                    <N8nJsonBody aria-label="n8n Node JSON panel" tabIndex={-1}>
-                                        <ReactJson
-                                            src={step.n8nJson}
-                                            theme="apathy:inverted"
-                                            name={false}
-                                            collapsed={false}
-                                            enableClipboard={false}
-                                            displayDataTypes={false}
-                                            style={{background: "#fff", fontSize: "1rem"}}/>
-                                    </N8nJsonBody>
-                                )}
-                                <N8nPanelFooter>
-                                    <N8nPanelBtn
-                                        type="button"
-                                        onClick={handleN8nCopy}
-                                        aria-label="Copy this step n8n JSON"
+                                    <N8nJsonHeader
+                                        onClick={() => setN8nOpen(!n8nOpen)}
+                                        tabIndex={0}
+                                        aria-label={"Expand/collapse n8n Node JSON viewer"}
+                                        onKeyDown={(e: any) => {
+                                            if (e.key === "Enter" || e.key === " ")
+                                                setN8nOpen((v) => !v);
+                                        }}
                                     >
-                                        <CopyIcon/>
-                                        {n8nCopied ? "Copied" : "Copy"}
-                                    </N8nPanelBtn>
+                                        <N8nCollapsibleToggle aria-hidden>
+                                            {n8nOpen ? <ChevronUpIcon/> : <ChevronDownIcon/>}
+                                        </N8nCollapsibleToggle>
+                                        n8n Node JSON
+                                    </N8nJsonHeader>
+                                    {n8nOpen && step && (
+                                        <N8nJsonBody aria-label="n8n Node JSON panel" tabIndex={-1}>
+                                            <ReactJson
+                                                src={step.n8nJson}
+                                                theme="apathy:inverted"
+                                                name={false}
+                                                collapsed={false}
+                                                enableClipboard={false}
+                                                displayDataTypes={false}
+                                                style={{background: "#fff", fontSize: "1rem"}}/>
+                                        </N8nJsonBody>
+                                    )}
+                                    <N8nPanelFooter>
+                                        <N8nPanelBtn
+                                            type="button"
+                                            onClick={handleN8nCopy}
+                                            aria-label="Copy this step n8n JSON"
+                                        >
+                                            <CopyIcon/>
+                                            {n8nCopied ? "Copied" : "Copy"}
+                                        </N8nPanelBtn>
+                                        <N8nPanelBtn
+                                            type="button"
+                                            onClick={() => setAriaStatus("Edit step JSON coming soon.")}
+                                            aria-label="Edit (disabled)"
+                                            style={{
+                                                background: "var(--color-primary)",
+                                                opacity: 0.68,
+                                                cursor: "not-allowed",
+                                            }}
+                                            disabled
+                                        >
+                                            <EditIcon/> Edit
+                                        </N8nPanelBtn>
+                                    </N8nPanelFooter>
+                                </N8nWrapper>
+                            </div>
+                            {/* ==== Global Workflow JSON Viewer ==== */}
+                            <GlobalJsonPanelWrap>
+                                <GlobalJsonHeader>Global Workflow JSON</GlobalJsonHeader>
+                                <GlobalJsonBody aria-label="Workflow JSON Preview">
+                                    {JSON.stringify(
+                                        Steps.map((s: Step) => ({
+                                            id: s.id,
+                                            name: s.name,
+                                        })),
+                                        null,
+                                        2
+                                    )}
+                                </GlobalJsonBody>
+                                <GlobalJsonFooter>
                                     <N8nPanelBtn
-                                        type="button"
-                                        onClick={() => setAriaStatus("Edit step JSON coming soon.")}
-                                        aria-label="Edit (disabled)"
+                                        onClick={() => setAriaStatus("Edit global JSON coming soon.")}
                                         style={{
                                             background: "var(--color-primary)",
                                             opacity: 0.68,
                                             cursor: "not-allowed",
                                         }}
+                                        aria-label="Edit (disabled)"
                                         disabled
                                     >
-                                        <EditIcon/> Edit
+                                        <EditIcon/>
+                                        Edit
                                     </N8nPanelBtn>
-                                </N8nPanelFooter>
-                            </N8nWrapper>
-                        </div>
-                        {/* ==== Global Workflow JSON Viewer ==== */}
-                        <GlobalJsonPanelWrap>
-                            <GlobalJsonHeader>Global Workflow JSON</GlobalJsonHeader>
-                            <GlobalJsonBody aria-label="Workflow JSON Preview">
-                                {JSON.stringify(
-                                    Steps.map((s: Step) => ({
-                                        id: s.id,
-                                        name: s.name,
-                                    })),
-                                    null,
-                                    2
-                                )}
-                            </GlobalJsonBody>
-                            <GlobalJsonFooter>
-                                <N8nPanelBtn
-                                    onClick={() => setAriaStatus("Edit global JSON coming soon.")}
-                                    style={{
-                                        background: "var(--color-primary)",
-                                        opacity: 0.68,
-                                        cursor: "not-allowed",
-                                    }}
-                                    aria-label="Edit (disabled)"
-                                    disabled
-                                >
-                                    <EditIcon/>
-                                    Edit
-                                </N8nPanelBtn>
-                                <N8nPanelBtn onClick={handleGlobalCopy}>
-                                    <CopyIcon/>
-                                    {globalCopied ? "Copied" : "Copy"}
-                                </N8nPanelBtn>
-                            </GlobalJsonFooter>
-                        </GlobalJsonPanelWrap>
-                        {/* ==== Visual Node Graph ==== */}
-                        <h3
-                            style={{
-                                color: "var(--color-accent-josh)",
-                                fontWeight: 700,
-                                margin: "40px 0 13px 19px",
-                            }}
-                        >
-                            Visual Builder
-                        </h3>
-                        <VizBuilderWrap>
-                            {Steps.map((s: Step, i: any) => (
-                                <VizNode
-                                    key={s.id}
-                                    color={getAgentColor(s.assigned)}
-                                    selected={step?.id === s.id}
-                                    error={s.status === "error"}
-                                    tabIndex={0}
-                                    aria-label={`Step: ${s.name}, assigned to ${Agents[s.assigned].name}`}
-                                >
-                                    <VizNodeInitial>{Agents[s.assigned].short}</VizNodeInitial>
-                                    <VizNodeStatusBadge color={statusMeta[s.status].color}>
-                                        {(statusMeta[s.status]).label}
-                                    </VizNodeStatusBadge>
-                                </VizNode>
-                            ))}
-                        </VizBuilderWrap>
-                    </MainPanelLayout>
+                                    <N8nPanelBtn onClick={handleGlobalCopy}>
+                                        <CopyIcon/>
+                                        {globalCopied ? "Copied" : "Copy"}
+                                    </N8nPanelBtn>
+                                </GlobalJsonFooter>
+                            </GlobalJsonPanelWrap>
+                            {/* ==== Visual Node Graph ==== */}
+                            <h3
+                                style={{
+                                    color: "var(--color-accent-josh)",
+                                    fontWeight: 700,
+                                    margin: "40px 0 13px 19px",
+                                }}
+                            >
+                                Visual Builder
+                            </h3>
+                            <VizBuilderWrap>
+                                {Steps.map((s: Step, i: any) => (
+                                    <VizNode
+                                        key={s.id}
+                                        color={getAgentColor(s.assigned)}
+                                        selected={step?.id === s.id}
+                                        error={s.status === "error"}
+                                        tabIndex={0}
+                                        aria-label={`Step: ${s.name}, assigned to ${Agents[s.assigned].name}`}
+                                    >
+                                        <VizNodeInitial>{Agents[s.assigned].short}</VizNodeInitial>
+                                        <VizNodeStatusBadge color={statusMeta[s.status].color}>
+                                            {(statusMeta[s.status]).label}
+                                        </VizNodeStatusBadge>
+                                    </VizNode>
+                                ))}
+                            </VizBuilderWrap>
+                        </MainPanelLayout>
 
-                    {/* ==== CHAT SIDEBAR ==== */}
-                    <ChatPanelSidebar aria-label="Chat with Josh">
-                        <ChatHeader>
-                            <AvatarCircle color={getAgentColor("Josh")}>
-                                <AgentInitial>J</AgentInitial>
-                            </AvatarCircle>
-                            Chat with Josh
-                        </ChatHeader>
-                        <ChatMessagesPanel>
-                            {chatHistory.map((msg, idx) => (
-                                <ChatBubble key={msg.id} you={msg.you}>
-                                    {msg.content.split("\n").map((t, i) => (
-                                        <span key={i}>
+                        {/* ==== CHAT SIDEBAR ==== */}
+                        <ChatPanelSidebar aria-label="Chat with Josh">
+                            <ChatHeader>
+                                <AvatarCircle color={getAgentColor("Josh")}>
+                                    <AgentInitial>J</AgentInitial>
+                                </AvatarCircle>
+                                Chat with Josh
+                            </ChatHeader>
+                            <ChatMessagesPanel>
+                                {chatHistory.map((msg, idx) => (
+                                    <ChatBubble key={msg.id} you={msg.you}>
+                                        {msg.content.split("\n").map((t, i) => (
+                                            <span key={i}>
                                                 {i ? <br/> : null}
-                                            {t}
+                                                {t}
                                             </span>
-                                    ))}
-                                </ChatBubble>
-                            ))}
-                            <div aria-live="polite" aria-atomic="true">
+                                        ))}
+                                    </ChatBubble>
+                                ))}
+                                <div aria-live="polite" aria-atomic="true">
                                     <span>
                                         <span
                                             style={{
@@ -473,22 +429,22 @@ export default function App() {
                                             •
                                         </span>
                                     </span>
-                            </div>
-                        </ChatMessagesPanel>
-                        <ChatInputBar>
-                            <ChatInput
-                                placeholder="Type your message..."
-                                value={chatInput}
-                                onChange={(e: any) => setChatInput(e.target.value)}
-                                onKeyDown={handleChatKeyDown}
-                                aria-label="Type your message"/>
-                            <ChatSendBtn onClick={sendChatMessage}>Send</ChatSendBtn>
-                        </ChatInputBar>
-                    </ChatPanelSidebar>
+                                </div>
+                            </ChatMessagesPanel>
+                            <ChatInputBar>
+                                <ChatInput
+                                    placeholder="Type your message..."
+                                    value={chatInput}
+                                    onChange={(e: any) => setChatInput(e.target.value)}
+                                    onKeyDown={handleChatKeyDown}
+                                    aria-label="Type your message"/>
+                                <ChatSendBtn onClick={sendChatMessage}>Send</ChatSendBtn>
+                            </ChatInputBar>
+                        </ChatPanelSidebar>
 
-                    {/* ==== Status ARIA live region for copy/cues ==== */}
-                    <LiveRegion aria-live="polite">{ariaStatus}</LiveRegion>
-                </RootLayout></>
+                        {/* ==== Status ARIA live region for copy/cues ==== */}
+                        <LiveRegion aria-live="polite">{ariaStatus}</LiveRegion>
+                    </RootLayout></>
             ) : (
                 <PromptLibrary onBackToWorkflow={() => setCurrentView("workflow")}/>
             )}
