@@ -13,42 +13,21 @@ import {
   MetadataItem,
   MetadataLabel,
   MetadataValue,
-  WorkflowStatusBadge
+  WorkflowStatusBadge,
+  WorkflowSelector,
+  WorkflowDropdown
 } from '../styles/Workflow.styled';
-import {
-  PlayIcon,
-  PauseIcon,
-  RefreshIcon,
-  SaveIcon,
-  FileTextIcon,
-  UserIcon,
-  CalendarIcon,
-  ActivityIcon
+import { 
+  PlayIcon, 
+  PauseIcon, 
+  RefreshIcon, 
+  SaveIcon, 
+  FileTextIcon, 
+  UserIcon, 
+  CalendarIcon, 
+  ActivityIcon 
 } from '../components/WorkflowIcons';
 import WorkflowStepTable from '../components/WorkflowStepTable';
-import {
-  StepDesc,
-  StepDetailHint,
-  StepDetailsPanelWrap,
-  StepDevNotes,
-  StepField,
-  StepLabel,
-  StepValue
-} from "../styles/Steps.styled";
-import {AgentInitial, AgentNameInline, AvatarCircle} from "../styles/App.styled";
-import {Agents} from "../data/Agents";
-import {statusMeta} from "../data/statusMeta";
-import {
-  N8nCollapsibleToggle,
-  N8nJsonBody,
-  N8nJsonHeader,
-  N8nPanelBtn,
-  N8nPanelFooter,
-  N8nWrapper
-} from "../styles/N8N.styled";
-import {ChevronDownIcon, ChevronUpIcon, CopyIcon, EditIcon} from "../components/CustomIcons";
-import ReactJson from "react-json-view";
-import N8NJsonViewer from "../components/N8NJsonViewer";
 
 // Agile Pair Programming with TDD Workflow data
 const agilePairTDDWorkflow = {
@@ -269,9 +248,91 @@ const agilePairTDDWorkflow = {
   ]
 };
 
+// Help Desk Workflow data
+const helpDeskWorkflow = {
+  id: "help_desk_001",
+  name: "Help Desk Workflow",
+  ownerAgentId: "compass",
+  description: "Answer questions about Handsomest Nerd, its agents, and system capabilities; troubleshoot user technical issues.",
+  steps: [
+    {
+      id: "help_desk_step_1",
+      ownerAgentId: "compass",
+      serviceName: "Parse Request",
+      tools: ["Webhook Parser"],
+      actionToTake: "Parse incoming message for help desk request category and keywords.",
+      expectedIO: {
+        input: {
+          inputType: "json",
+          systemPrompt: "{master-system-prompt+\n+compass-system-prompt}",
+          userPrompt: "Parse incoming help desk request."
+        },
+        output: {
+          outputType: "json", 
+          output: "question_category"
+        }
+      },
+      prerequisiteSteps: []
+    },
+    {
+      id: "help_desk_step_2",
+      ownerAgentId: "compass",
+      serviceName: "Knowledge Lookup",
+      tools: ["Internal Docs Search", "OpenAI API"],
+      actionToTake: "Search docs and/or ask OpenAI for concise, relevant answers.",
+      expectedIO: {
+        input: {
+          inputType: "json",
+          systemPrompt: "{master-system-prompt+\n+compass-system-prompt}",
+          userPrompt: "Find or generate help desk response."
+        },
+        output: {
+          outputType: "text", 
+          output: "AI/Docs-generated answer"
+        }
+      },
+      prerequisiteSteps: ["help_desk_step_1"]
+    },
+    {
+      id: "help_desk_step_3",
+      ownerAgentId: "compass",
+      serviceName: "Respond",
+      tools: ["Webhook Response"],
+      actionToTake: "Format and return response to caller in markdown.",
+      expectedIO: {
+        input: {
+          inputType: "text",
+          userPrompt: "Format answer.",
+          systemPrompt: "{master-system-prompt+\n+compass-system-prompt}",
+        },
+        output: {
+          outputType: "json", 
+          output: "Formatted markdown response"
+        }
+      },
+      prerequisiteSteps: ["help_desk_step_2"]
+    }
+  ]
+};
+
+// Available workflows
+const availableWorkflows = [
+  agilePairTDDWorkflow,
+  helpDeskWorkflow
+];
+
 const Workflow: React.FC = () => {
-  const [workflow, setWorkflow] = useState(agilePairTDDWorkflow);
+  const [selectedWorkflowIndex, setSelectedWorkflowIndex] = useState(0);
+  const [workflow, setWorkflow] = useState(availableWorkflows[selectedWorkflowIndex]);
   const [workflowStatus, setWorkflowStatus] = useState<'active' | 'paused' | 'completed'>('active');
+
+  // Handler for workflow selection
+  const handleWorkflowChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const index = parseInt(e.target.value);
+    setSelectedWorkflowIndex(index);
+    setWorkflow(availableWorkflows[index]);
+    setWorkflowStatus('active'); // Reset workflow status
+  };
 
   // Handler for control buttons
   const handleStart = () => {
@@ -308,6 +369,19 @@ const Workflow: React.FC = () => {
     <WorkflowContainer>
       <WorkflowHeader>
         <div>
+          <WorkflowSelector>
+            <WorkflowDropdown 
+              value={selectedWorkflowIndex.toString()} 
+              onChange={handleWorkflowChange}
+              aria-label="Select workflow"
+            >
+              {availableWorkflows.map((wf, index) => (
+                <option key={wf.id} value={index.toString()}>
+                  {wf.name}
+                </option>
+              ))}
+            </WorkflowDropdown>
+          </WorkflowSelector>
           <WorkflowTitle>
             {workflow.name}
             <WorkflowStatusBadge status={workflowStatus}>
@@ -356,23 +430,12 @@ const Workflow: React.FC = () => {
         <WorkflowSection>
           <WorkflowStepTable 
             steps={workflow.steps}
-            title="Agile Pair Programming with TDD Steps"
+            title={`${workflow.name} Steps`}
           />
         </WorkflowSection>
-        <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              gap: "25px",
-              width: "100%",
-              minHeight: "190px",
-            }}
-        >
-        </div>
       </WorkflowContent>
     </WorkflowContainer>
   );
 };
-
 
 export default Workflow;

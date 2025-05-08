@@ -128,6 +128,32 @@ export const WorkflowControls = styled.div`
   }
 `;
 
+export const WorkflowSelector = styled.div`
+  margin-bottom: var(--spacing-sm);
+`;
+
+export const WorkflowDropdown = styled.select`
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: var(--color-neutral-100);
+  border: var(--border-width-thin) solid var(--color-primary-light);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-base);
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-width: 300px;
+  
+  &:hover, &:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px var(--color-primary-light);
+    outline: none;
+  }
+  
+  option {
+    padding: var(--spacing-sm);
+  }
+`;
+
 export const ControlButton = styled.button<{ disabled?: boolean }>`
   display: flex;
   align-items: center;
