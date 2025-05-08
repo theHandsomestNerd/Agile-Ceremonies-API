@@ -5,15 +5,6 @@ import {Agent, AgentKey, Step} from "./types/App.types";
 import {statusMeta} from "./data/statusMeta";
 import PromptLibrary from "./PromptLibrary";
 import {
-    ChatBubble,
-    ChatHeader,
-    ChatInput,
-    ChatInputBar,
-    ChatMessagesPanel,
-    ChatPanelSidebar,
-    ChatSendBtn,
-} from "./styles/Chat.styled"
-import {
     AgentInitial,
     AvatarCircle,
     GlobalJsonBody,

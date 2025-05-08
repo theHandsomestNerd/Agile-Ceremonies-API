@@ -2,30 +2,6 @@
 // ---------- Chat Sidebar ----------
 import styled from "styled-components";
 
-export const ChatPanelSidebar = styled.aside`
-    min-width: 280px;
-    max-width: 290px;
-    padding: 0 var(--spacing-xxs) 0 0;
-    background: var(--color-neutral-100);
-    border-left: var(--border-width-medium) solid var(--color-neutral-200);
-    box-shadow: var(--shadow-sm);
-    display: flex;
-    flex-direction: column;
-`;
-
-// Top section:
-export const ChatHeader = styled.div`
-    font-weight: var(--font-weight-bold);
-    color: var(--color-josh-primary);
-    padding: var(--spacing-md) var(--spacing-md) var(--spacing-xs) var(--spacing-md);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    font-size: var(--font-size-base);
-    background: var(--color-neutral-100);
-    border-bottom: var(--border-width-medium) solid var(--color-neutral-200);
-`;
-
 // Message history (auto scrolls vertical)
 export const ChatMessagesPanel = styled.div`
     flex: 1 1 auto;
@@ -75,30 +51,5 @@ export const ChatInput = styled.input`
         border: var(--border-width-medium) solid var(--color-josh-primary);
         outline: none;
         box-shadow: var(--shadow-sm);
-    }
-`;
-
-export const ChatSendBtn = styled.button`
-    background: var(--color-josh-primary);
-    color: var(--color-neutral-100);
-    font-weight: var(--font-weight-bold);
-    border: none;
-    border-radius: var(--border-radius-sm);
-    font-size: var(--font-size-base);
-    padding: var(--spacing-xs) var(--spacing-md);
-    margin-left: var(--spacing-xxs);
-    cursor: pointer;
-    transition: background var(--transition-fast);
-    box-shadow: var(--shadow-xs);
-
-    &:hover {
-        background: var(--color-josh-secondary);
-        box-shadow: var(--shadow-sm);
-    }
-    
-    &:focus-visible {
-        outline: var(--border-width-medium) solid var(--color-josh-primary);
-        outline-offset: var(--spacing-xxs);
-        background: var(--color-josh-secondary);
     }
 `;

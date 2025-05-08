@@ -1,16 +1,31 @@
 import React, {PropsWithChildren} from 'react';
-import styled from 'styled-components';
+import styled, {css, keyframes} from 'styled-components';
 import { AgentKey } from '../types/App.types';
+
+// Animation for the typing indicator
+const dotPulse = keyframes`
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.3;
+    }
+`;
 
 interface ChatBubbleProps {
   message: string;
   isUser: boolean;
   agentKey?: AgentKey;
+  you?: boolean; // Alias for isUser for compatibility
+  isStreaming?: boolean; // For text streaming animation
+  children?: React.ReactNode; // Allow direct children content
 }
 
 interface StyledBubbleProps {
   isUser: boolean;
   agentKey?: AgentKey;
+  you?: boolean; // Alias for isUser for compatibility
+  isStreaming?: boolean;
 }
 
 const BubbleWrapper = styled.div<{ isUser: boolean }>`
@@ -23,11 +38,15 @@ const BubbleWrapper = styled.div<{ isUser: boolean }>`
 const Bubble = styled.div<StyledBubbleProps>`
   max-width: 80%;
   padding: var(--spacing-sm) var(--spacing-md);
+  
+  /* Different shapes for human vs agent messages */
   border-radius: ${props => 
     props.isUser 
-      ? 'var(--border-radius-lg) var(--border-radius-lg) 0 var(--border-radius-lg)' 
-      : 'var(--border-radius-lg) var(--border-radius-lg) var(--border-radius-lg) 0'
+      ? '18px 18px 4px 18px' /* Human: rounded with sharp bottom-right */
+      : '18px 18px 18px 4px' /* Agent: rounded with sharp bottom-left */
   };
+  
+  /* Gradient background for agent messages */
   background: ${props => {
     if (props.isUser) {
       return 'var(--color-neutral-200)';
@@ -42,7 +61,7 @@ const Bubble = styled.div<StyledBubbleProps>`
       case 'Reqqy':
         return 'var(--color-reqqy-gradient)';
       case 'Josh':
-        return 'var(--color-josh-gradient)';
+        return 'linear-gradient(90deg, var(--color-josh-primary) 35%, var(--color-josh-secondary) 100%)';
       case 'James':
         return 'var(--color-james-gradient)';
       case 'Terrell':
@@ -56,11 +75,36 @@ const Bubble = styled.div<StyledBubbleProps>`
       case 'Compass':
         return 'var(--color-compass-gradient)';
       default:
-        return 'var(--color-primary-gradient, linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%))';
+        return 'linear-gradient(90deg, var(--color-josh-primary) 35%, var(--color-josh-secondary) 100%)';
     }
   }};
-  color: ${props => props.isUser ? 'var(--color-neutral-900)' : 'white'};
-  box-shadow: var(--shadow-sm);
+  
+  color: ${props => props.isUser ? 'var(--color-neutral-900)' : 'var(--color-neutral-100)'};
+  
+  /* Custom border styling */
+  border: 1px solid ${props => props.isUser
+    ? 'rgba(230, 230, 240, 0.7)'
+    : 'rgba(139, 92, 246, 0.3)'};
+  
+  /* Streaming text animation */
+  ${props => props.isStreaming && css`
+    .streaming-text {
+      display: inline-block;
+      max-width: 100%;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+      word-break: break-word;
+      position: relative;
+
+      &:after {
+        content: '|';
+        display: inline-block;
+        animation: ${dotPulse} 0.8s infinite;
+        font-weight: normal;
+        opacity: 0.7;
+      }
+    }
+  `}
 `;
 
 const MessageText = styled.p`
@@ -69,11 +113,32 @@ const MessageText = styled.p`
   word-break: break-word;
 `;
 
-const ChatBubble: React.FC<PropsWithChildren<ChatBubbleProps>> = ({ message, isUser, agentKey }) => {
+const ChatBubble: React.FC<PropsWithChildren<ChatBubbleProps>> = ({ 
+  message, 
+  isUser, 
+  agentKey, 
+  you, 
+  isStreaming,
+  children 
+}) => {
+  // Support both isUser and you props for compatibility
+  const isUserMessage = isUser || you;
+  
   return (
-    <BubbleWrapper isUser={isUser}>
-      <Bubble isUser={isUser} agentKey={agentKey}>
-        <MessageText>{message}</MessageText>
+    <BubbleWrapper isUser={!isUserMessage}>
+      <Bubble 
+        isUser={!isUserMessage}
+        you={isUserMessage}
+        agentKey={agentKey}
+        isStreaming={isStreaming}
+      >
+        {children ? children : (
+          isStreaming ? (
+            <div className="streaming-text">{message}</div>
+          ) : (
+            <MessageText>{message}</MessageText>
+          )
+        )}
       </Bubble>
     </BubbleWrapper>
   );

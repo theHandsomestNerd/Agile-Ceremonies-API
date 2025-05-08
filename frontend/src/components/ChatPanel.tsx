@@ -1,12 +1,11 @@
 import React, {useEffect, useRef, useState} from 'react';
-import styled, {css, keyframes} from 'styled-components';
+import styled, {keyframes} from 'styled-components';
 import SvgIcon from './SvgIcon';
 import {ChatInput as StyledChatInput, ChatInputBar, ChatMessagesPanel} from '../styles/Chat.styled';
 import {AgentProfile, AgentProfiles} from '../data/AgentProfiles';
 import ChatHeader from './ChatHeader';
 import ChatBubble from './ChatBubble';
 import {AgentKey} from '../types/App.types';
-import {AgentInitial, AvatarCircle} from "../styles/App.styled";
 import {Agents} from "../data/Agents";
 
 const agents = [
@@ -125,20 +124,18 @@ const ThinkingDots = styled.div`
     justify-content: center;
     padding: 4px 0;
 `;
-
-const Dot = styled.span<{ delay: number }>`
-    color: var(--color-accent-josh);
+const Dot = styled.span<{ delay: number; agentColor?: string }>`
+    color: ${props => props.agentColor || 'var(--color-accent-josh)'};
     font-weight: 700;
     margin: 0 3px;
     animation: ${dotPulse} 1.4s infinite;
     animation-delay: ${props => props.delay}ms;
 `;
-
-const ThinkingDotsComponent = () => (
+const ThinkingDotsComponent = (props:{dotColor:string}) => (
     <ThinkingDots aria-live="polite" aria-atomic="true">
-        <Dot delay={0}>•</Dot>
-        <Dot delay={200}>•</Dot>
-        <Dot delay={400}>•</Dot>
+        <Dot delay={0} agentColor={props.dotColor}>•</Dot>
+        <Dot delay={200} agentColor={props.dotColor}>•</Dot>
+        <Dot delay={400} agentColor={props.dotColor}>•</Dot>
     </ThinkingDots>
 );
 
@@ -240,40 +237,40 @@ const TimeStamp = styled.span<{ isHuman?: boolean }>`
 `;
 
 // Custom chat bubble with gradient styling for agent messages and different shape for human/agent
-const CustomChatBubble = styled(ChatBubble)<{ you: boolean; isStreaming?: boolean }>`
-    background: ${(p) =>
-            !p.you
-                    ? "linear-gradient(90deg, var(--color-josh-primary) 35%, var(--color-josh-secondary) 100%)"
-                    : "var(--color-neutral-200)"};
-    color: ${(p) => (!p.you ? "var(--color-neutral-100)" : "var(--color-neutral-900)")};
-    border: 1px solid ${props => props.you
-            ? 'rgba(230, 230, 240, 0.7)'
-            : 'rgba(139, 92, 246, 0.3)'};
-    /* Different shapes for human vs agent */
-    border-radius: ${props => props.you
-            ? '18px 18px 4px 18px' /* Human: rounded with sharp bottom-right */
-            : '18px 18px 18px 4px' /* Agent: rounded with sharp bottom-left */};
-
-    /* Streaming text animation fixed to wrap properly */
-    ${props => props.isStreaming && css`
-        .streaming-text {
-            display: inline-block;
-            max-width: 100%;
-            overflow-wrap: break-word;
-            word-wrap: break-word;
-            word-break: break-word;
-            position: relative;
-
-            &:after {
-                content: '|';
-                display: inline-block;
-                animation: ${dotPulse} 0.8s infinite;
-                font-weight: normal;
-                opacity: 0.7;
-            }
-        }
-    `}
-`;
+// const CustomChatBubble = styled(ChatBubble)<{ you: boolean; isStreaming?: boolean }>`
+//     background: ${(p) =>
+//             !p.you
+//                     ? "linear-gradient(90deg, var(--color-josh-primary) 35%, var(--color-josh-secondary) 100%)"
+//                     : "var(--color-neutral-200)"};
+//     color: ${(p) => (!p.you ? "var(--color-neutral-100)" : "var(--color-neutral-900)")};
+//     border: 1px solid ${props => props.you
+//             ? 'rgba(230, 230, 240, 0.7)'
+//             : 'rgba(139, 92, 246, 0.3)'};
+//     /* Different shapes for human vs agent */
+//     border-radius: ${props => props.you
+//             ? '18px 18px 4px 18px' /* Human: rounded with sharp bottom-right */
+//             : '18px 18px 18px 4px' /* Agent: rounded with sharp bottom-left */};
+//
+//     /* Streaming text animation fixed to wrap properly */
+//     ${props => props.isStreaming && css`
+//         .streaming-text {
+//             display: inline-block;
+//             max-width: 100%;
+//             overflow-wrap: break-word;
+//             word-wrap: break-word;
+//             word-break: break-word;
+//             position: relative;
+//
+//             &:after {
+//                 content: '|';
+//                 display: inline-block;
+//                 animation: ${dotPulse} 0.8s infinite;
+//                 font-weight: normal;
+//                 opacity: 0.7;
+//             }
+//         }
+//     `}
+// `;
 
 // Custom input styling with medium text color
 const ChatInput = styled(StyledChatInput)`
@@ -376,7 +373,10 @@ const ChatPanel: React.FC = () => {
     }, [messages, selectedAgent]);
 
     const handleAgentChange = (agentKey: AgentKey) => {
-        setSelectedAgent(agentKey);
+        if (agentKey && agentKey !== selectedAgent) {
+            setSelectedAgent(agentKey);
+            // You could add other actions here when agent changes
+        }
     };
 
     const handleSendMessage = () => {
@@ -418,7 +418,7 @@ const ChatPanel: React.FC = () => {
 
             <MessagesContainer ref={messagesContainerRef}>
                 {currentMessages.map((message, index) => (
-                    <CustomChatBubble
+                    <ChatBubble
                         key={index}
                         message={message.text}
                         isUser={message.isUser}
@@ -426,7 +426,7 @@ const ChatPanel: React.FC = () => {
                         agentKey={message.isUser ? undefined : selectedAgent}
                     >
                         {message.text}
-                    </CustomChatBubble>
+                    </ChatBubble>
                 ))}
             </MessagesContainer>
 
@@ -466,26 +466,36 @@ interface Message {
 }
 
 // Helper function to get agent color
-const getAgentColor = (agentId: string): string => {
-    const agent = AgentProfiles[agentId.toLowerCase()];
-    return agent ? agent.color : 'var(--color-josh-primary)';
-};
+// const getAgentColor = (agentId: string): string => {
+//     const agent = AgentProfiles[agentId.toLowerCase()];
+//     return agent ? agent.color : 'var(--color-josh-primary)';
+// };
+//
+// const getAgentAccentColor = (agentId: string): string => {
+//     return agentId.toLowerCase() ? `var(--color-${agentId.toLowerCase()}-primary)` : 'var(--color-josh-primary)';
+// };
+//
+// // Helper function to get agent initial
+// const getAgentInitial = (agentId: string): string => {
+//     const agent = AgentProfiles[agentId.toLowerCase()];
+//     if (agent) {
+//         return agent.name && agent.name.includes('&')
+//             ? 'JT'
+//             : agent.short || agent.name.charAt(0).toUpperCase();
+//     }
+//     return agentId.charAt(0).toUpperCase();
+// };
 
-// Helper function to get agent initial
-const getAgentInitial = (agentId: string): string => {
-    const agent = AgentProfiles[agentId.toLowerCase()];
-    if (agent) {
-        return agent.name && agent.name.includes('&')
-            ? 'JT'
-            : agent.short || agent.name.charAt(0).toUpperCase();
-    }
-    return agentId.charAt(0).toUpperCase();
-};
 
 const ChatPanelComponent: React.FC<ChatPanelProps> = ({
                                                           agentId = 'Assistant',
                                                           agentProfile
                                                       }) => {
+
+    const agentName = agentProfile?.name || agentId.charAt(0).toUpperCase() + agentId.slice(1);
+    const agentColor = agentProfile?.color;
+    const agentAccentColor = `var(--color-${agentId.toLowerCase()}-secondary)`;
+    const agentInitial = agentProfile?.short || "?";
     const [isOpen, setIsOpen] = useState(false);
     const [message, setMessage] = useState('');
     const [isThinking, setIsThinking] = useState(false);
@@ -504,9 +514,7 @@ const ChatPanelComponent: React.FC<ChatPanelProps> = ({
     const thinkingRef = useRef<HTMLDivElement>(null);
 
     // Process agent information
-    const agentName = agentProfile?.name || agentId.charAt(0).toUpperCase() + agentId.slice(1);
-    const agentColor = agentProfile?.color || getAgentColor(agentId);
-    const agentInitial = agentProfile?.short || getAgentInitial(agentId);
+
 
     // Scroll to bottom of messages when messages change
     useEffect(() => {
@@ -608,37 +616,39 @@ issue.`;
         }
     };
 
+    const [selectedAgent, setSelectedAgent] = useState<AgentKey>('Compass')
+
+    const handleAgentChange = (agentKey: AgentKey) => {
+        if (agentKey)
+            setSelectedAgent(agentKey)
+        else
+            setSelectedAgent('Compass')
+    }
+
     const formatTime = (date: Date) => {
         return date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
     };
-
     return (
         <ChatContainer>
             <ChatFabButton
                 isOpen={isOpen}
                 onClick={toggleChat}
                 aria-label={isOpen ? "Close chat" : "Open chat"}
+                style={isOpen ? {} : {}}
             >
                 <ChatIcon/>
             </ChatFabButton>
 
             <ChatPanelStyled isOpen={isOpen}>
-                <ChatHeader agents={agents} selectedAgent={agents[0].key} onAgentChange={() => {
-                }}>
-                    <div style={{display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)'}}>
-                        <AvatarCircle color={agentColor}>
-                            <AgentInitial>{agentInitial}</AgentInitial>
-                        </AvatarCircle>
-                        Chat with {agentName}
-                    </div>
-                    <CloseButton onClick={toggleChat} aria-label="Close chat">
-                        <CloseIcon/>
-                    </CloseButton>
-                </ChatHeader>
+                <ChatHeader
+                    agents={agents}
+                    selectedAgent={selectedAgent}
+                    onAgentChange={handleAgentChange}
+                />
 
                 <ChatMessagesPanel>
                     {messages.map(msg => (
-                        <CustomChatBubble
+                        <ChatBubble
                             you={msg.isUser}
                             key={msg.id}
                             message={msg.text}
@@ -646,24 +656,24 @@ issue.`;
                             isStreaming={msg.isStreaming}>
                             {msg.text}
                             <TimeStamp isHuman={msg.isUser}>{formatTime(msg.timestamp)}</TimeStamp>
-                        </CustomChatBubble>
+                        </ChatBubble>
                     ))}
 
                     {isThinking && (
-                        <CustomChatBubble
+                        <ChatBubble
                             isUser={false}
                             you={false}
                             message="">
-                            <ThinkingDotsComponent/>
-                        </CustomChatBubble>
+                            <ThinkingDotsComponent dotColor={agentAccentColor}/>
+                        </ChatBubble>
                     )}
 
                     {isStreaming && (
-                        <CustomChatBubble you={false} isStreaming isUser={false} message={""}>
+                        <ChatBubble you={false} isStreaming isUser={false} message={""}>
                             <div className="streaming-text">
                                 {streamedMessage}
                             </div>
-                        </CustomChatBubble>
+                        </ChatBubble>
                     )}
 
                     <div ref={messagesEndRef}/>

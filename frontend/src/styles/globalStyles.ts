@@ -52,15 +52,15 @@ export const GlobalStyles = createGlobalStyle`
 
         /* JAMES - Backend Dev Agent - Teal/Cyan */
         --color-james-primary: #00B4D8; /* Teal */
-        --color-james-secondary: #0FBED2; /* Slightly lighter teal */
+        --color-james-secondary: #BE185D; /* Slightly lighter teal */
         --color-james-surface: #E0FAFF; /* Light teal surface */
-        --color-james-gradient: linear-gradient(135deg, #00B4D8 0%, #38BEC9 100%);
+        --color-james-gradient: linear-gradient(135deg, #00B4D8 0%, #DB2777 100%);
 
         /* TERRELL - Frontend Dev Agent - Crimson */
         --color-terrell-primary: #9F1239; /* Deep wine */
-        --color-terrell-secondary: #BE185D; /* Lighter wine */
+        --color-terrell-secondary: #0FBED2; /* Lighter wine */
         --color-terrell-surface: #FFE4E6; /* Light rose surface */
-        --color-terrell-gradient: linear-gradient(135deg, #9F1239 0%, #DB2777 100%);
+        --color-terrell-gradient: linear-gradient(135deg, #9F1239 0%, #38BEC9 100%);
 
 
         /* ANTOSH - Testing & Analytics - Teal with orange */
@@ -89,12 +89,6 @@ export const GlobalStyles = createGlobalStyle`
 
         /* Legacy agent variables (maintained for backward compatibility) */
         --color-accent-josh: var(--color-josh-primary);
-        --color-accent-nat: var(--color-nat-secondary);
-        --color-accent-reqqy: var(--color-reqqy-primary);
-        --color-accent-lia: var(--color-lia-primary);
-        --color-accent-manman: var(--color-manman-primary);
-        --color-accent-antosh: var(--color-antosh-primary);
-        --color-accent-twin: var(--color-twin-primary);
 
         /* ====================
          * SEMANTIC COLORS
