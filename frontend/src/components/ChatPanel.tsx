@@ -1,6 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import SvgIcon from './SvgIcon';
+import { ChatBubble, ChatHeader as StyledChatHeader, ChatInputBar, ChatInput as StyledChatInput, ChatMessagesPanel, ChatSendBtn } from '../styles/Chat.styled';
+import { AgentInitial, AvatarCircle } from '../styles/App.styled';
+import { AgentProfile, AgentProfiles } from '../data/AgentProfiles';
 
 const ChatIcon = () => (
     <SvgIcon>
@@ -20,11 +23,50 @@ const CloseIcon = () => (
       <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
     </SvgIcon>
 );
+
 // Animation constants
 const ANIMATION_DURATION = 300; // ms
 
+// Thinking animation dot component
+const ThinkingDots = () => (
+    <div aria-live="polite" aria-atomic="true">
+        <span>
+            <span
+                style={{
+                    color: "var(--color-accent-josh)",
+                    fontWeight: 700,
+                    margin: "0 3px",
+                }}
+            >
+                •
+            </span>
+            <span
+                style={{
+                    color: "var(--color-accent-josh)",
+                    fontWeight: 700,
+                    margin: "0 3px",
+                    opacity: 0.6,
+                }}
+            >
+                •
+            </span>
+            <span
+                style={{
+                    color: "var(--color-accent-josh)",
+                    fontWeight: 700,
+                    margin: "0 3px",
+                    opacity: 0.44,
+                }}
+            >
+                •
+            </span>
+        </span>
+    </div>
+);
+
 interface ChatPanelProps {
   agentId?: string;
+  agentProfile?: AgentProfile;
 }
 
 // Styled components
@@ -43,15 +85,15 @@ const ChatFabButton = styled.button<{ isOpen: boolean }>`
   position: fixed;
   bottom: 24px;
   right: 24px;
-  width: 60px;
-  height: 60px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   background: linear-gradient(135deg, #8b5cf6, #7209b7);
   color: white;
   border: none;
-  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.5);
   cursor: pointer;
-  display: flex;
+  display: ${props => props.isOpen ? 'none' : 'flex'};
   align-items: center;
   justify-content: center;
   z-index: 1001;
@@ -60,48 +102,45 @@ const ChatFabButton = styled.button<{ isOpen: boolean }>`
   
   &:hover {
     transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+    background: linear-gradient(135deg, #9461fb, #7f18c9);
+  }
+  
+  &:active {
+    transform: scale(0.98);
   }
   
   svg {
-    font-size: 28px;
+    width: 32px;
+    height: 32px;
     transition: transform 0.3s ease;
-    transform: ${props => props.isOpen ? 'rotate(360deg)' : 'rotate(0deg)'};
+    transform: ${props => props.isOpen ? 'rotate(180deg)' : 'rotate(0deg)'};
   }
 `;
 
 const ChatPanel = styled.div<{ isOpen: boolean }>`
-  width: 400px;
+  width: 800px;
   height: 100%;
-  background-color: rgba(20, 20, 40, 0.95);
-  box-shadow: -5px 0 25px rgba(0, 0, 0, 0.2);
+  background-color: var(--color-neutral-100);
+  box-shadow: -5px 0 25px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
   transform: translateX(${props => props.isOpen ? '0' : '100%'});
   transition: transform ${ANIMATION_DURATION}ms ease;
   pointer-events: ${props => props.isOpen ? 'all' : 'none'};
-  border-left: 1px solid rgba(139, 92, 246, 0.2);
+  border-left: var(--border-width-medium) solid var(--color-neutral-200);
 `;
 
-const ChatHeader = styled.div`
+const CustomChatHeader = styled(StyledChatHeader)`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid rgba(139, 92, 246, 0.2);
-`;
-
-const ChatTitle = styled.h2`
-  color: white;
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
 `;
 
 const CloseButton = styled.button`
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--color-neutral-700);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -109,113 +148,18 @@ const CloseButton = styled.button`
   transition: color 0.2s ease;
   
   &:hover {
-    color: white;
+    color: var(--color-josh-primary);
   }
   
   svg {
-    font-size: 24px;
+    width: 24px;
+    height: 24px;
   }
-`;
-
-const ChatMessagesContainer = styled.div`
-  flex: 1;
-  overflow-y: auto;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  
-  /* Custom scrollbar */
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  &::-webkit-scrollbar-track {
-    background: var(--color-bg-secondary);
-    border-radius: 10px;
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background: var(--color-border);
-    border-radius: 10px;
-  }
-  
-  &::-webkit-scrollbar-thumb:hover {
-    background: var(--color-text-light);
-  }
-`;
-
-const ChatInputContainer = styled.div`
-  padding: 16px;
-  border-top: 1px solid rgba(139, 92, 246, 0.2);
-  display: flex;
-  align-items: center;
-`;
-
-const ChatInput = styled.input`
-  flex: 1;
-  padding: 12px 16px;
-  border-radius: 20px;
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  background-color: rgba(30, 30, 60, 0.6);
-  color: white;
-  font-size: 1rem;
-  outline: none;
-  transition: border-color 0.2s ease;
-  
-  &:focus {
-    border-color: rgba(139, 92, 246, 0.6);
-  }
-  
-  &::placeholder {
-    color: rgba(255, 255, 255, 0.5);
-  }
-`;
-
-const SendButton = styled.button`
-  background: linear-gradient(135deg, #8b5cf6, #7209b7);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  margin-left: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    transform: scale(1.05);
-    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
-  }
-  
-  svg {
-    font-size: 20px;
-  }
-`;
-
-// Message styles
-const MessageBubble = styled.div<{ isUser: boolean }>`
-  max-width: 80%;
-  padding: 10px 16px;
-  border-radius: 18px;
-  margin-bottom: 12px;
-  align-self: ${props => props.isUser ? 'flex-end' : 'flex-start'};
-  background-color: ${props => props.isUser ? 'rgba(139, 92, 246, 0.3)' : 'rgba(30, 30, 60, 0.6)'};
-  color: white;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-`;
-
-const MessageText = styled.p`
-  margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.4;
 `;
 
 const TimeStamp = styled.span`
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.7);
   margin-top: 4px;
   display: block;
   text-align: right;
@@ -229,9 +173,30 @@ interface Message {
   timestamp: Date;
 }
 
-const ChatPanelComponent: React.FC<ChatPanelProps> = ({ agentId = 'Assistant' }) => {
+// Helper function to get agent color
+const getAgentColor = (agentId: string): string => {
+  const agent = AgentProfiles[agentId.toLowerCase()];
+  return agent ? agent.color : 'var(--color-josh-primary)';
+};
+
+// Helper function to get agent initial
+const getAgentInitial = (agentId: string): string => {
+  const agent = AgentProfiles[agentId.toLowerCase()];
+  if (agent) {
+    return agent.name && agent.name.includes('&')
+      ? 'JT'
+      : agent.short || agent.name.charAt(0).toUpperCase();
+  }
+  return agentId.charAt(0).toUpperCase();
+};
+
+const ChatPanelComponent: React.FC<ChatPanelProps> = ({
+  agentId = 'Assistant',
+  agentProfile
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
+  const [isThinking, setIsThinking] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -243,12 +208,17 @@ const ChatPanelComponent: React.FC<ChatPanelProps> = ({ agentId = 'Assistant' })
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
+  // Process agent information
+  const agentName = agentProfile?.name || agentId.charAt(0).toUpperCase() + agentId.slice(1);
+  const agentColor = agentProfile?.color || getAgentColor(agentId);
+  const agentInitial = agentProfile?.short || getAgentInitial(agentId);
+
   // Scroll to bottom of messages when messages change
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages]);
+  }, [messages, isThinking]);
   
   const toggleChat = () => {
     setIsOpen(!isOpen);
@@ -267,8 +237,13 @@ const ChatPanelComponent: React.FC<ChatPanelProps> = ({ agentId = 'Assistant' })
       setMessages([...messages, newUserMessage]);
       setMessage('');
       
+      // Show thinking animation
+      setIsThinking(true);
+
       // Simulate response after a short delay
       setTimeout(() => {
+        setIsThinking(false);
+
         const botResponse: Message = {
           id: (Date.now() + 1).toString(),
           text: `I'm processing your request about "${message.substring(0, 30)}${message.length > 30 ? '...' : ''}"`,
@@ -277,7 +252,7 @@ const ChatPanelComponent: React.FC<ChatPanelProps> = ({ agentId = 'Assistant' })
         };
         
         setMessages(prevMessages => [...prevMessages, botResponse]);
-      }, 1000);
+      }, 2000);
     }
   };
   
@@ -298,42 +273,54 @@ const ChatPanelComponent: React.FC<ChatPanelProps> = ({ agentId = 'Assistant' })
         onClick={toggleChat} 
         aria-label={isOpen ? "Close chat" : "Open chat"}
       >
-        {isOpen ? <CloseIcon /> : <ChatIcon />}
+        <ChatIcon />
       </ChatFabButton>
       
       <ChatPanel isOpen={isOpen}>
-        <ChatHeader>
-          <ChatTitle>Chat with {agentId}</ChatTitle>
+        <CustomChatHeader>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
+            <AvatarCircle color={agentColor}>
+              <AgentInitial>{agentInitial}</AgentInitial>
+            </AvatarCircle>
+            Chat with {agentName}
+          </div>
           <CloseButton onClick={toggleChat} aria-label="Close chat">
-            <CloseButton />
+            <CloseIcon />
           </CloseButton>
-        </ChatHeader>
+        </CustomChatHeader>
         
-        <ChatMessagesContainer>
+        <ChatMessagesPanel>
           {messages.map(msg => (
-            <MessageBubble key={msg.id} isUser={msg.isUser}>
-              <MessageText>{msg.text}</MessageText>
+            <ChatBubble key={msg.id} you={msg.isUser}>
+              {msg.text}
               <TimeStamp>{formatTime(msg.timestamp)}</TimeStamp>
-            </MessageBubble>
+            </ChatBubble>
           ))}
+
+          {isThinking && (
+            <ChatBubble you={false} style={{ display: 'inline-block', minWidth: 'auto' }}>
+              <ThinkingDots />
+            </ChatBubble>
+          )}
+
           <div ref={messagesEndRef} />
-        </ChatMessagesContainer>
+        </ChatMessagesPanel>
         
-        <ChatInputContainer>
-          <ChatInput
+        <ChatInputBar>
+          <StyledChatInput
             type="text"
             placeholder="Type a message..."
             value={message}
             onChange={(e:any) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
           />
-          <SendButton 
+          <ChatSendBtn
             onClick={handleSendMessage}
             aria-label="Send message"
           >
-            <SendButton />
-          </SendButton>
-        </ChatInputContainer>
+            Send
+          </ChatSendBtn>
+        </ChatInputBar>
       </ChatPanel>
     </ChatContainer>
   );
