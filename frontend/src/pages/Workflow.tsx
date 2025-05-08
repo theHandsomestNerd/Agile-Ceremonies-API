@@ -139,58 +139,8 @@ const Workflow: React.FC = () => {
             </WorkflowHeader>
 
             <WorkflowContent>
-                {/* Presence Bar */}
-                <PresenceBar role="region" aria-label="Present Agents">
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        marginRight: '10px',
-                        position: 'relative',
-                        paddingRight: '15px'
-                    }}>
 
-                        {/* Add a vertical divider after the icon */}
-                        <div style={{
-                            position: 'absolute',
-                            right: 0,
-                            height: '28px',
-                            width: '1px',
-                            backgroundColor: 'var(--color-border)',
-                            opacity: 0.5
-                        }}/>
-                    </div>
-
-                    {getActiveAgents().map(({ id, status }) => {
-                        // Get agent profile from AgentProfiles or use fallback
-                        const agent:AgentProfile = AgentProfiles[id] || {
-                            name: id,
-                            color: '#666666',
-                            short: id.charAt(0).toUpperCase()
-                        };
-                        
-                        // Access status metadata with fallback
-                        const statusInfo = statusMeta[status] || statusMeta.todo;
-                        
-                        return (
-                            <PresenceAgent key={id}>
-                                <AvatarCircle color={agent.color}>
-                                    <AgentInitial>
-                                        {agent.name && agent.name.includes('&') 
-                                            ? 'JT' 
-                                            : agent.short || agent.name.charAt(0).toUpperCase()}
-                                    </AgentInitial>
-                                </AvatarCircle>
-                                <StepStatusDot
-                                    color={statusInfo.color}
-                                    error={status === "error"}
-                                >
-                                    {statusInfo.icon}
-                                </StepStatusDot>
-                            </PresenceAgent>
-                        );
-                    })}
-                </PresenceBar>
-                
+                // TODO: Make the component below a dropdown
                 <WorkflowInfo>
                     <WorkflowMetadata>
                         <MetadataItem>
