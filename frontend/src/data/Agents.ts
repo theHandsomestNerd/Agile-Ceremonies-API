@@ -65,7 +65,7 @@ export const Agents: Record<AgentKey, Agent> = {
     twin: {
         key: "twin",
         name: "James & Terrell",
-        short: "T",
+        short: "JT",
         role: "Twin Developer Agents",
         color: "var(--color-twin-primary)",
         accent: "var(--color-twin-secondary)",

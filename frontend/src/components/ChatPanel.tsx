@@ -1,11 +1,20 @@
 import React, {useEffect, useRef, useState} from 'react';
 import styled, {keyframes} from 'styled-components';
 import SvgIcon from './SvgIcon';
-import {ChatInput as StyledChatInput, ChatInputBar, ChatMessagesPanel} from '../styles/Chat.styled';
+import {
+    ChatInput as StyledChatInput,
+    ChatInputBar,
+    ChatMessagesPanel,
+    EditableUUID, IconButton, MenuContainer,
+    MenuDropdown,
+    MenuItem,
+    UUIDContainer
+} from '../styles/Chat.styled';
 import ChatHeader from './ChatHeader';
 import ChatBubble from './ChatBubble';
 import {AgentKey} from '../types/App.types';
 import {Agents} from "../data/Agents";
+import {DeleteIcon, ExportIcon, RefreshIcon, RenameIcon, VerticalDotsIcon} from "./ChatIcons";
 
 // Example messages for each agent
 const agentMessages = {
@@ -103,6 +112,18 @@ const blink = keyframes`
         transform: scale(0.98);
     }
 `;
+// Enhanced bounce animation for dots
+const dotBounce = keyframes`
+    0%, 100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    50% {
+        transform: translateY(-5px);
+        opacity: 0.5;
+    }
+`;
+
 // Thinking animation dot component with pulsing dots
 const ThinkingDots = styled.div`
     display: flex;
@@ -110,15 +131,18 @@ const ThinkingDots = styled.div`
     justify-content: center;
     padding: 4px 0;
 `;
+
 const Dot = styled.span<{ delay: number; agentColor?: string }>`
-    color: ${props => props.agentColor || 'var(--color-accent-josh)'}; // Requirement #3: Agent's accent color
+    color: ${props => props.agentColor || 'var(--color-accent-josh)'}; // Use agent's accent color
     font-weight: 700;
     margin: 0 3px;
-    animation: ${dotPulse} 1.4s infinite;
+    animation: ${dotBounce} 1.4s infinite ease-in-out;
     animation-delay: ${props => props.delay}ms;
     font-size: 1.5rem;
-    font-size: 1.5rem; // Make dots a bit bigger for better visibility
+    display: inline-block;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 `;
+
 const ThinkingDotsComponent = (props:{dotColor:string}) => (
     <ThinkingDots aria-live="polite" aria-atomic="true">
         <Dot delay={0} agentColor={props.dotColor}>•</Dot>
@@ -217,7 +241,7 @@ const CloseButton = styled.button`
 
 const TimeStamp = styled.span<{ isHuman?: boolean }>`
     font-size: 0.75rem;
-    color: var(--color-neutral-600); // Changed from darker to medium gray to differentiate from message text
+    color: var(--color-neutral-900); // Changed from darker to medium gray to differentiate from message text
     margin-top: 4px;
     display: block;
     text-align: right;
@@ -306,6 +330,27 @@ const SendButton = styled.button`
 `;
 
 
+// API request/response types for the Agent messaging
+interface AgentMessageRequest {
+    message: string;
+    agentId: AgentKey;
+    userId?: string;
+    sessionId?: string;
+    chatId?: string;
+    workflowId?: string;
+    messageId?: string;
+    metadata?: Record<string, any>;
+}
+
+interface AgentMessageResponse {
+    id: string;
+    message: string;
+    agentId: AgentKey;
+    timestamp: string;
+    status: 'success' | 'error';
+    error?: string;
+}
+
 // Sample message type
 interface Message {
     id: string;
@@ -314,29 +359,8 @@ interface Message {
     timestamp: Date;
     isStreaming?: boolean;
     agentKey?: AgentKey; // Add agentKey to track which agent sent the message
+    metadata?: Record<string, any>; // Additional message data
 }
-
-// Helper function to get agent color
-// const getAgentColor = (agentId: string): string => {
-//     const agent = AgentProfiles[agentId.toLowerCase()];
-//     return agent ? agent.color : 'var(--color-josh-primary)';
-// };
-//
-// const getAgentAccentColor = (agentId: string): string => {
-//     return agentId.toLowerCase() ? `var(--color-${agentId.toLowerCase()}-primary)` : 'var(--color-josh-primary)';
-// };
-//
-// // Helper function to get agent initial
-// const getAgentInitial = (agentId: string): string => {
-//     const agent = AgentProfiles[agentId.toLowerCase()];
-//     if (agent) {
-//         return agent.name && agent.name.includes('&')
-//             ? 'JT'
-//             : agent.short || agent.name.charAt(0).toUpperCase();
-//     }
-//     return agentId.charAt(0).toUpperCase();
-// };
-
 
 const ChatPanelComponent: React.FC<ChatPanelProps> = ({
                                                           agentId = 'compass',
@@ -361,6 +385,23 @@ const ChatPanelComponent: React.FC<ChatPanelProps> = ({
     const [isThinking, setIsThinking] = useState(false);
     const [isStreaming, setIsStreaming] = useState(false);
     const [streamedMessage, setStreamedMessage] = useState('');
+    const [isApiLoading, setIsApiLoading] = useState(false);
+    const [apiError, setApiError] = useState<string | null>(null);
+    const [chatUUID, setChatUUID] = useState<string>(generateUUID());
+    const [isEditingUUID, setIsEditingUUID] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
+
+
+    // Generate UUID function
+    function generateUUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            const r = Math.random() * 16 | 0;
+            const v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+
     const [messages, setMessages] = useState<Message[]>([
         {
             id: '1',
@@ -373,14 +414,72 @@ const ChatPanelComponent: React.FC<ChatPanelProps> = ({
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const thinkingRef = useRef<HTMLDivElement>(null);
 
-    // Initial setup - update from props
+
+    // Initial setup - update from props and check API URL
     useEffect(() => {
         console.log("ChatPanel received agentId prop:", agentId);
         if (agentId && agentId in Agents && agentId !== selectedAgent) {
             setSelectedAgent(agentId);
         }
+        
+        // Log the API URL that will be used (helpful for debugging)
+        const apiURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001/thn-agents/us-central1';
+        console.log(`Chat panel will use API URL: ${apiURL}/api/agents`);
+        
+        // Check if we're in development mode
+        if (process.env.NODE_ENV === 'development') {
+            console.log('Running in development mode - mock responses will be used if API calls fail');
+        }
     }, [agentId]);
-    
+
+    // Menu handlers
+    const handleRename = () => {
+        setIsEditingUUID(true);
+        setMenuOpen(false);
+    };
+
+    const handleExport = () => {
+        const chatData = {
+            uuid: chatUUID,
+            messages,
+            agent: selectedAgent,
+            timestamp: new Date().toISOString()
+        };
+
+        const blob = new Blob([JSON.stringify(chatData, null, 2)], { type: 'application/json' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `chat-${chatUUID}.json`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        setMenuOpen(false);
+    };
+
+    const handleDelete = () => {
+        if (window.confirm('Are you sure you want to delete this chat?')) {
+            // Add your delete logic here
+            setMessages([]);
+            setChatUUID(generateUUID());
+        }
+        setMenuOpen(false);
+    };
+
+
+    // Handle click outside menu
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setMenuOpen(false);
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+
+
     // Update greeting when selected agent changes
     useEffect(() => {
         console.log("Selected agent changed to:", selectedAgent);
@@ -411,6 +510,105 @@ const ChatPanelComponent: React.FC<ChatPanelProps> = ({
     const toggleChat = () => {
         setIsOpen(!isOpen);
     };
+    
+    /**
+     * Sends a message to the agent via API
+     * @param messageText - The message text to send
+     * @param currentAgentId - The agent to send the message to
+     * @returns Promise with the agent's response
+     */
+    const sendMessageToAgent = async (messageText: string, currentAgentId: AgentKey): Promise<AgentMessageResponse> => {
+        try {
+            console.log(`Sending message to agent ${currentAgentId}: ${messageText}`);
+            
+            // For development/demo purposes, we'll simulate an API delay and response
+            if (process.env.NODE_ENV === 'development' || process.env.REACT_APP_USE_MOCK_RESPONSES === 'true') {
+                // Simulate API call with some processing time
+                return new Promise((resolve) => {
+                    // Simulate server-side "thinking" time
+                    const thinkingTime = Math.floor(Math.random() * 1000) + 1000; // 1-2 seconds
+                    
+                    setTimeout(() => {
+                        // Prepare simulated response
+                        const simulatedResponse: AgentMessageResponse = {
+                            id: Date.now().toString(),
+                            message: `I understand your question about "${messageText.substring(0, 20)}${messageText.length > 20 ? '...' : ''}". 
+                            As ${agentName}, I can help you with that workflow issue. Let me provide you with a detailed response based on my capabilities as ${agentRole}.
+                            
+                            ${messageText.toLowerCase().includes('workflow') ? 'Workflows are a key part of our system. They allow for structured processes with multiple agents collaborating on tasks.' : ''}
+                            ${messageText.toLowerCase().includes('agent') ? 'Our agent system includes specialized roles like Project Managers, Developers, Requirements Specialists, and more.' : ''}
+                            
+                            Is there anything specific you'd like to know more about?`,
+                            agentId: currentAgentId,
+                            timestamp: new Date().toISOString(),
+                            status: 'success'
+                        };
+                        
+                        resolve(simulatedResponse);
+                    }, thinkingTime);
+                });
+            }
+            
+            // Actual API implementation for production
+            // Prepare request payload
+            const payload: AgentMessageRequest = {
+                message: messageText,
+                agentId: currentAgentId,
+                chatId: "uuid", // supplied by the user in an inline input field
+                sessionId: "", // if no chatId then sessionId is used for chatId since session ID will always be present
+                messageId: Date.now().toString(),
+                metadata: {
+                    clientTimestamp: new Date().toISOString(),
+                    source: 'chat-panel'
+                }
+            };
+            
+            // Set up request options
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'process-message',
+                    data: payload
+                })
+            };
+            
+            // Make the API call - use the full function URL path
+            const response = await fetch(`/api/handleAgentMessages`, requestOptions);
+
+            // Check content type before parsing
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                console.error('Non-JSON response received:', await response.text());
+                throw new Error('Server returned non-JSON response. API endpoint may be incorrect.');
+            }
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `Failed with status ${response.status}`);
+            }
+            
+            const responseData: AgentMessageResponse = await response.json();
+            console.log('Agent response:', responseData);
+            
+            return responseData;
+            
+        } catch (error: any) {
+            console.error('Error sending message to agent:', error);
+            
+            // Create a properly formatted error response
+            const errorResponse: AgentMessageResponse = {
+                id: Date.now().toString(),
+                message: `Error: ${error.message || 'Unknown error'}`,
+                agentId: currentAgentId,
+                timestamp: new Date().toISOString(),
+                status: 'error',
+                error: error.message || 'Unknown error occurred'
+            };
+            
+            throw errorResponse;
+        }
+    };
 
     // Simulate text streaming with a more natural effect and word wrap
     const streamText = (text: string) => {
@@ -420,32 +618,50 @@ const ChatPanelComponent: React.FC<ChatPanelProps> = ({
         let currentIndex = 0;
         const textLength = text.length;
 
-        // Variable speed to simulate natural typing
+        // Variable speed to simulate natural typing with human-like pauses
         const getRandomSpeed = () => {
-            // Occasionally pause longer at punctuation
+            // Get current character
             const char = text[currentIndex] || '';
-            if (['.', ',', '!', '?'].includes(char)) {
-                return Math.floor(Math.random() * 150) + 50;
+            
+            // Longer pauses at the end of sentences
+            if (['.', '!', '?'].includes(char) && (text[currentIndex + 1] === ' ' || currentIndex + 1 >= textLength)) {
+                return Math.floor(Math.random() * 300) + 200; // 200-500ms pause
             }
-            return Math.floor(Math.random() * 30) + 15;
+            
+            // Medium pauses at commas, semicolons
+            if ([',', ';', ':'].includes(char)) {
+                return Math.floor(Math.random() * 100) + 80; // 80-180ms pause
+            }
+            
+            // Brief pause at spaces (to simulate word thinking)
+            if (char === ' ') {
+                // Occasionally pause longer between words (as if thinking)
+                return Math.random() < 0.15 ? 
+                    Math.floor(Math.random() * 120) + 40 : // 15% chance of 40-160ms pause
+                    Math.floor(Math.random() * 30) + 10;   // 85% chance of 10-40ms pause
+            }
+            
+            // Normal character typing speed with slight variation
+            return Math.floor(Math.random() * 20) + 10; // 10-30ms per character
         };
-
+    
         const typeNextChar = () => {
             if (currentIndex < textLength) {
                 setStreamedMessage(prev => prev + text[currentIndex]);
                 currentIndex++;
                 setTimeout(typeNextChar, getRandomSpeed());
             } else {
-                // Done typing, add to messages
+                // Done typing, add to messages after a short delay
                 setTimeout(() => {
                     setIsStreaming(false);
-
+    
                     // Add the final message to the messages array
                     const botResponse: Message = {
                         id: Date.now().toString(),
                         text: text,
                         isUser: false,
-                        timestamp: new Date()
+                        timestamp: new Date(),
+                        agentKey: selectedAgent
                     };
 
                     setMessages(prevMessages => [...prevMessages, botResponse]);
@@ -473,15 +689,64 @@ const ChatPanelComponent: React.FC<ChatPanelProps> = ({
             // Show thinking animation
             setIsThinking(true);
 
-            // Mock response text
-            const responseText = `I understand your question about "${message.substring(0, 20)}${message.length > 20 ? '...' : ''}". 
-    As ${agentName}, I can help you with that workflow issue.`;
-
-            // Simulate thinking and then start streaming
+            // Store message text for API call
+            const messageText = message;
+            
+            // Set API loading state (affects input)
+            setIsApiLoading(true);
+            setApiError(null);
+            
+            // Simulate agent "thinking" time with the dots animation
+            const thinkingTime = Math.floor(Math.random() * 1500) + 1000; // 1-2.5 seconds of thinking
+            
+            // Always show thinking dots for a minimum time to improve UX
             setTimeout(() => {
-                setIsThinking(false);
-                streamText(responseText);
-            }, 2000);
+                // Call API or mock response based on environment
+                sendMessageToAgent(messageText, selectedAgent)
+                    .then(response => {
+                        // Keep the thinking dots visible for a moment to transition smoothly
+                        setTimeout(() => {
+                            setIsThinking(false);
+                            setIsApiLoading(false);
+                            
+                            if (response.status === 'success') {
+                                // Start streaming the response
+                                streamText(response.message);
+                            } else {
+                                // Handle error response from API
+                                setApiError(response.error || 'Unknown error occurred');
+                                setMessages(prevMessages => [
+                                    ...prevMessages, 
+                                    {
+                                        id: Date.now().toString(),
+                                        text: `Error: ${response.error || 'Unknown error occurred'}`,
+                                        isUser: false,
+                                        timestamp: new Date(),
+                                        agentKey: selectedAgent
+                                    }
+                                ]);
+                            }
+                        }, 300); // Short transition delay
+                    })
+                    .catch(error => {
+                        setIsThinking(false);
+                        setIsApiLoading(false);
+                        setApiError(error.message || 'Failed to communicate with agent');
+                        streamText(`Sorry, I encountered an error: ${error.message || 'Failed to fetch'}`);
+
+                        // Add error message to chat
+                        // setMessages(prevMessages => [
+                        //     ...prevMessages,
+                        //     {
+                        //         id: Date.now().toString(),
+                        //         text: `Sorry, I encountered an error: ${error.message || 'Failed to communicate with agent'}`,
+                        //         isUser: false,
+                        //         timestamp: new Date(),
+                        //         agentKey: selectedAgent
+                        //     }
+                        // ]);
+                    });
+            }, thinkingTime);
         }
     };
 
@@ -533,6 +798,52 @@ const ChatPanelComponent: React.FC<ChatPanelProps> = ({
             </ChatFabButton>
 
             <ChatPanelStyled isOpen={isOpen}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 16px' }}>
+                    <UUIDContainer>
+                        {isEditingUUID ? (
+                            <EditableUUID
+                                value={chatUUID}
+                                onChange={(e:any) => setChatUUID(e.target.value)}
+                                onBlur={() => setIsEditingUUID(false)}
+                                onKeyPress={(e:any) => {
+                                    if (e.key === 'Enter') {
+                                        setIsEditingUUID(false);
+                                    }
+                                }}
+                                autoFocus
+                            />
+                        ) : (
+                            <span onClick={() => setIsEditingUUID(true)}>
+                                {chatUUID}
+                            </span>
+                        )}
+                        <IconButton onClick={() => setChatUUID(generateUUID())} title="Generate new UUID">
+                            <RefreshIcon />
+                        </IconButton>
+                    </UUIDContainer>
+
+                    <MenuContainer ref={menuRef}>
+                        <IconButton onClick={() => setMenuOpen(!menuOpen)} title="Menu">
+                            <VerticalDotsIcon />
+                        </IconButton>
+
+                        <MenuDropdown isOpen={menuOpen}>
+                            <MenuItem onClick={handleRename}>
+                                <RenameIcon />
+                                Rename
+                            </MenuItem>
+                            <MenuItem onClick={handleExport}>
+                                <ExportIcon />
+                                Export
+                            </MenuItem>
+                            <MenuItem onClick={handleDelete}>
+                                <DeleteIcon />
+                                Delete
+                            </MenuItem>
+                        </MenuDropdown>
+                    </MenuContainer>
+                </div>
+
                 <ChatHeader
                     selectedAgent={selectedAgent}
                     onAgentChange={handleAgentChange}
@@ -582,24 +893,49 @@ const ChatPanelComponent: React.FC<ChatPanelProps> = ({
                 <ChatInputBar>
                     <ChatInput
                         type="text"
-                        placeholder={`Message ${agentName}...`}
+                        placeholder={isApiLoading ? "Processing..." : `Message ${agentName}...`}
                         value={message}
                         onChange={(e: any) => setMessage(e.target.value)}
                         onKeyDown={handleKeyDown}
+                        disabled={isApiLoading}
                         style={{
                             borderColor: agentColor,
-                            boxShadow: `0 0 0 1px ${agentColor}40`
+                            boxShadow: `0 0 0 1px ${agentColor}40`,
+                            opacity: isApiLoading ? 0.8 : 1
                         }}
                     />
                     <SendButton
                         onClick={handleSendMessage}
                         aria-label="Send message"
+                        disabled={isApiLoading}
                         style={{
-                            background: agentColor
+                            background: agentColor,
+                            opacity: isApiLoading ? 0.7 : 1
                         }}
+                        title={process.env.NODE_ENV === 'development' ? 
+                              "Using development mode - mock responses may be used" : 
+                              "Send message to agent"}
                     >
                         <SendIcon/>
                     </SendButton>
+                    
+                    {apiError && (
+                        <div style={{
+                            position: 'absolute', 
+                            bottom: '65px', 
+                            left: '10px', 
+                            right: '10px',
+                            padding: '10px',
+                            background: 'rgba(255, 61, 0, 0.05)',
+                            border: '1px solid rgba(255, 61, 0, 0.2)',
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            color: 'var(--color-neutral-700)',
+                            display: 'none' // Hidden for now, can be made visible for debugging
+                        }}>
+                            API Error: {apiError}
+                        </div>
+                    )}
                 </ChatInputBar>
             </ChatPanelStyled>
         </ChatContainer>

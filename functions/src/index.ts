@@ -15,6 +15,7 @@ import AgentProfilesController from "./controller/AgentProfilesController";
 import PromptsLibraryController from "./controller/PromptLibraryController";
 import WorkflowTriggerController from "./controller/WorkflowTriggerController";
 import './config'
+import AgentChatController from "./controller/AgentChatController";
 
 const cors = require('cors')({
     origin: [
@@ -55,4 +56,9 @@ export const handleAgentProfilesRequest = onRequest((req, res) => {
 
 export const handlePromptLibraryRequest = onRequest(async (request, response) => {
     return cors(request, response, async () => PromptsLibraryController.handlePromptLibrary(request, response))
+});
+
+// Add this with other exports
+export const handleAgentMessages = onRequest(async (request, response) => {
+    return cors(request, response, async () => AgentChatController.handleAgentMessages(request, response));
 });

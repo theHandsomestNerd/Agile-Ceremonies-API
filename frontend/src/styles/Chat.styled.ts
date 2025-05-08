@@ -53,3 +53,86 @@ export const ChatInput = styled.input`
         box-shadow: var(--shadow-sm);
     }
 `;
+
+export const UUIDContainer = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    background: var(--color-neutral-100);
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--color-neutral-600);
+`;
+
+export const EditableUUID = styled.input`
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: inherit;
+    padding: 2px;
+    width: 200px;
+    &:hover:not(:focus) {
+        background: var(--color-neutral-200);
+    }
+    &:focus {
+        outline: none;
+        background: white;
+        border: 1px solid var(--color-neutral-300);
+        border-radius: 2px;
+    }
+`;
+
+export const IconButton = styled.button`
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: var(--color-neutral-600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    
+    &:hover {
+        background: var(--color-neutral-200);
+        color: var(--color-neutral-800);
+    }
+`;
+
+export const MenuContainer = styled.div`
+    position: relative;
+`;
+
+export const MenuDropdown = styled.div<{ isOpen: boolean }>`
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    display: ${props => props.isOpen ? 'block' : 'none'};
+    z-index: 1000;
+`;
+
+export const MenuItem = styled.button`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 16px;
+    border: none;
+    background: none;
+    color: var(--color-neutral-700);
+    cursor: pointer;
+    text-align: left;
+    
+    &:hover {
+        background: var(--color-neutral-100);
+    }
+    
+    svg {
+        width: 18px;
+        height: 18px;
+    }
+`;

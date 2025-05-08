@@ -59,6 +59,48 @@ const handleWorkflowsRequest = async (req: any, res: any) => {
                             createdAt: (new Date()).toISOString(),
                         }
 
+                        // Check if streaming is requested
+                        if (parsedData.stream === true) {
+                            // Set headers for streaming
+                            res.setHeader('Content-Type', 'application/json');
+                            res.setHeader('Transfer-Encoding', 'chunked');
+
+                            // Start with an initial response
+                            res.write(JSON.stringify({
+                                status: 'thinking',
+                                message: 'Processing request...',
+                                timestamp: new Date().toISOString()
+                            }));
+
+                            // Simulate thinking/processing with periodic updates
+                            const triggerWorkflowStream = async () => {
+                                try {
+                                    // Actual execution
+                                    const response = await WorkflowTriggerService.executeWorkflowTrigger(workFlowTrigger);
+
+                                    // Send final response
+                                    res.write(JSON.stringify({
+                                        status: 'success',
+                                        data: response,
+                                        timestamp: new Date().toISOString()
+                                    }));
+                                    res.end();
+                                } catch (e:any) {
+                                    res.write(JSON.stringify({
+                                        status: 'error',
+                                        error: e.message,
+                                        timestamp: new Date().toISOString()
+                                    }));
+                                    res.end();
+                                }
+                            };
+
+                            // Start the stream processing
+                            triggerWorkflowStream();
+                            return;
+                        }
+
+                        // Non-streaming behavior (original)
                         const triggerWorkflowResp = WorkflowTriggerService.executeWorkflowTrigger(workFlowTrigger).then((response) => {
                             return response
                         }).catch((e) => {

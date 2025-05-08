@@ -100,13 +100,11 @@ const ChatBubble: React.FC<PropsWithChildren<ChatBubbleProps>> = ({
   message, 
   isUser, 
   agentKey, 
-  you, 
   isStreaming,
   children 
 }) => {
   // Support both isUser and you props for compatibility
-  const isUserMessage = isUser || you;
-  
+
   // For debugging - log when agent key is present
   if (agentKey) {
     console.log("ChatBubble rendering with agent key:", agentKey, 
@@ -115,10 +113,10 @@ const ChatBubble: React.FC<PropsWithChildren<ChatBubbleProps>> = ({
   }
   
   return (
-    <BubbleWrapper isUser={!!isUserMessage}>
+    <BubbleWrapper isUser={isUser}>
       <Bubble 
-        isUser={!!isUserMessage}
-        you={!!isUserMessage}
+        isUser={isUser}
+        you={isUser}
         agentKey={agentKey}
         isStreaming={isStreaming}
       >
