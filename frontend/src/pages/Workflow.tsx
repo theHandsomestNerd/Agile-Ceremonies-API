@@ -200,13 +200,13 @@ const Workflow: React.FC = () => {
             </WorkflowContent>
                             
             {/* Add the chat panel with the workflow owner as the agent and their profile */}
-            <ChatPanel
-              agentId={workflow.ownerAgentId}
+            <ChatPanel 
+              agentId={workflow.ownerAgentId} 
               agentProfile={AgentProfiles[workflow.ownerAgentId] || {
                 name: workflow.ownerAgentId,
                 color: '#8b5cf6',
                 short: workflow.ownerAgentId.charAt(0).toUpperCase()
-              }}
+              }} 
             />
         </WorkflowContainer>
     );

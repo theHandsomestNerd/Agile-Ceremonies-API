@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 import SvgIcon from './SvgIcon';
-import { ChatBubble, ChatHeader as StyledChatHeader, ChatInputBar, ChatInput as StyledChatInput, ChatMessagesPanel, ChatSendBtn } from '../styles/Chat.styled';
+import { ChatBubble, ChatHeader as StyledChatHeader, ChatInputBar, ChatInput as StyledChatInput, ChatMessagesPanel } from '../styles/Chat.styled';
 import { AgentInitial, AvatarCircle } from '../styles/App.styled';
 import { AgentProfile, AgentProfiles } from '../data/AgentProfiles';
 
@@ -26,42 +26,67 @@ const CloseIcon = () => (
 
 // Animation constants
 const ANIMATION_DURATION = 300; // ms
+const HEADER_HEIGHT = 60; // Height of the app header
 
-// Thinking animation dot component
-const ThinkingDots = () => (
-    <div aria-live="polite" aria-atomic="true">
-        <span>
-            <span
-                style={{
-                    color: "var(--color-accent-josh)",
-                    fontWeight: 700,
-                    margin: "0 3px",
-                }}
-            >
-                •
-            </span>
-            <span
-                style={{
-                    color: "var(--color-accent-josh)",
-                    fontWeight: 700,
-                    margin: "0 3px",
-                    opacity: 0.6,
-                }}
-            >
-                •
-            </span>
-            <span
-                style={{
-                    color: "var(--color-accent-josh)",
-                    fontWeight: 700,
-                    margin: "0 3px",
-                    opacity: 0.44,
-                }}
-            >
-                •
-            </span>
-        </span>
-    </div>
+// Animations
+const dotPulse = keyframes`
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+`;
+const fadeOut = keyframes`
+  from { 
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to { 
+    opacity: 0;
+    transform: translateX(20px);
+  }
+`;
+
+const fadeIn = keyframes`
+  from { 
+    opacity: 0;
+    transform: translateX(-20px); 
+  }
+  to { 
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
+const blink = keyframes`
+  0%, 100% { 
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.5;
+    transform: scale(0.98);
+  }
+`;
+// Thinking animation dot component with pulsing dots
+const ThinkingDots = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 0;
+`;
+
+const Dot = styled.span<{ delay: number }>`
+  color: var(--color-accent-josh);
+  font-weight: 700;
+  margin: 0 3px;
+  animation: ${dotPulse} 1.4s infinite;
+  animation-delay: ${props => props.delay}ms;
+`;
+
+const ThinkingDotsComponent = () => (
+    <ThinkingDots aria-live="polite" aria-atomic="true">
+      <Dot delay={0}>•</Dot>
+      <Dot delay={200}>•</Dot>
+      <Dot delay={400}>•</Dot>
+    </ThinkingDots>
 );
 
 interface ChatPanelProps {
@@ -99,17 +124,17 @@ const ChatFabButton = styled.button<{ isOpen: boolean }>`
   z-index: 1001;
   transition: all 0.3s ease;
   pointer-events: all;
-  
+
   &:hover {
     transform: scale(1.05);
     box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
     background: linear-gradient(135deg, #9461fb, #7f18c9);
   }
-  
+
   &:active {
     transform: scale(0.98);
   }
-  
+
   svg {
     width: 32px;
     height: 32px;
@@ -119,8 +144,9 @@ const ChatFabButton = styled.button<{ isOpen: boolean }>`
 `;
 
 const ChatPanel = styled.div<{ isOpen: boolean }>`
-  width: 800px;
-  height: 100%;
+  width: 350px;
+  height: calc(100% - ${HEADER_HEIGHT}px);
+  margin-top: ${HEADER_HEIGHT}px;
   background-color: var(--color-neutral-100);
   box-shadow: -5px 0 25px rgba(0, 0, 0, 0.3);
   display: flex;
@@ -146,23 +172,100 @@ const CloseButton = styled.button`
   align-items: center;
   justify-content: center;
   transition: color 0.2s ease;
-  
+
   &:hover {
     color: var(--color-josh-primary);
   }
-  
+
   svg {
     width: 24px;
     height: 24px;
   }
 `;
 
-const TimeStamp = styled.span`
+const TimeStamp = styled.span<{ isHuman?: boolean }>`
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--color-neutral-900);
   margin-top: 4px;
   display: block;
   text-align: right;
+`;
+
+// Custom chat bubble with gradient styling for agent messages and different shape for human/agent
+const CustomChatBubble = styled(ChatBubble)<{ you: boolean; isStreaming?: boolean }>`
+  background: ${(p) =>
+      !p.you
+          ? "linear-gradient(90deg, var(--color-josh-primary) 35%, var(--color-josh-secondary) 100%)"
+          : "var(--color-neutral-200)"};
+  color: ${(p) => (!p.you ? "var(--color-neutral-100)" : "var(--color-neutral-900)")};
+  border: 1px solid ${props => props.you
+      ? 'rgba(230, 230, 240, 0.7)'
+      : 'rgba(139, 92, 246, 0.3)'};
+  /* Different shapes for human vs agent */
+  border-radius: ${props => props.you
+      ? '18px 18px 4px 18px' /* Human: rounded with sharp bottom-right */
+      : '18px 18px 18px 4px' /* Agent: rounded with sharp bottom-left */};
+
+  /* Streaming text animation fixed to wrap properly */
+  ${props => props.isStreaming && css`
+    .streaming-text {
+      display: inline-block;
+      max-width: 100%;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+      word-break: break-word;
+      position: relative;
+
+      &:after {
+        content: '|';
+        display: inline-block;
+        animation: ${dotPulse} 0.8s infinite;
+        font-weight: normal;
+        opacity: 0.7;
+      }
+    }
+  `}
+`;
+
+// Custom input styling with medium text color
+const ChatInput = styled(StyledChatInput)`
+  color: var(--color-neutral-600);
+
+  &::placeholder {
+    color: var(--color-neutral-400);
+  }
+`;
+
+// Custom send button
+const SendButton = styled.button`
+  background: linear-gradient(135deg, #8b5cf6, #7209b7);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    transform: scale(1.08);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+    background: linear-gradient(135deg, #9461fb, #7f18c9);
+  }
+
+  &:active {
+    transform: scale(0.96);
+  }
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
 `;
 
 // Sample message type
@@ -171,6 +274,7 @@ interface Message {
   text: string;
   isUser: boolean;
   timestamp: Date;
+  isStreaming?: boolean;
 }
 
 // Helper function to get agent color
@@ -184,19 +288,21 @@ const getAgentInitial = (agentId: string): string => {
   const agent = AgentProfiles[agentId.toLowerCase()];
   if (agent) {
     return agent.name && agent.name.includes('&')
-      ? 'JT'
-      : agent.short || agent.name.charAt(0).toUpperCase();
+        ? 'JT'
+        : agent.short || agent.name.charAt(0).toUpperCase();
   }
   return agentId.charAt(0).toUpperCase();
 };
 
 const ChatPanelComponent: React.FC<ChatPanelProps> = ({
-  agentId = 'Assistant',
-  agentProfile
-}) => {
+                                                        agentId = 'Assistant',
+                                                        agentProfile
+                                                      }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [isThinking, setIsThinking] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [streamedMessage, setStreamedMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -205,9 +311,10 @@ const ChatPanelComponent: React.FC<ChatPanelProps> = ({
       timestamp: new Date()
     }
   ]);
-  
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
+  const thinkingRef = useRef<HTMLDivElement>(null);
+
   // Process agent information
   const agentName = agentProfile?.name || agentId.charAt(0).toUpperCase() + agentId.slice(1);
   const agentColor = agentProfile?.color || getAgentColor(agentId);
@@ -218,12 +325,57 @@ const ChatPanelComponent: React.FC<ChatPanelProps> = ({
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isThinking]);
-  
+  }, [messages, isThinking, isStreaming]);
+
   const toggleChat = () => {
     setIsOpen(!isOpen);
   };
-  
+
+  // Simulate text streaming with a more natural effect and word wrap
+  const streamText = (text: string) => {
+    setIsStreaming(true);
+    setStreamedMessage('');
+
+    let currentIndex = 0;
+    const textLength = text.length;
+
+    // Variable speed to simulate natural typing
+    const getRandomSpeed = () => {
+      // Occasionally pause longer at punctuation
+      const char = text[currentIndex] || '';
+      if (['.', ',', '!', '?'].includes(char)) {
+        return Math.floor(Math.random() * 150) + 50;
+      }
+      return Math.floor(Math.random() * 30) + 15;
+    };
+
+    const typeNextChar = () => {
+      if (currentIndex < textLength) {
+        setStreamedMessage(prev => prev + text[currentIndex]);
+        currentIndex++;
+        setTimeout(typeNextChar, getRandomSpeed());
+      } else {
+        // Done typing, add to messages
+        setTimeout(() => {
+          setIsStreaming(false);
+
+          // Add the final message to the messages array
+          const botResponse: Message = {
+            id: Date.now().toString(),
+            text: text,
+            isUser: false,
+            timestamp: new Date()
+          };
+
+          setMessages(prevMessages => [...prevMessages, botResponse]);
+        }, 300); // Short delay before completing
+      }
+    };
+
+    // Start the typing animation
+    typeNextChar();
+  };
+
   const handleSendMessage = () => {
     if (message.trim()) {
       // Add user message
@@ -233,96 +385,99 @@ const ChatPanelComponent: React.FC<ChatPanelProps> = ({
         isUser: true,
         timestamp: new Date()
       };
-      
+
       setMessages([...messages, newUserMessage]);
       setMessage('');
-      
+
       // Show thinking animation
       setIsThinking(true);
 
-      // Simulate response after a short delay
+      // Mock response text
+      const responseText = `I understand your question about "${message.substring(0, 20)}${message.length > 20 ? '...' : ''}". Let me help you with that workflow issue.`;
+
+      // Simulate thinking and then start streaming
       setTimeout(() => {
         setIsThinking(false);
-
-        const botResponse: Message = {
-          id: (Date.now() + 1).toString(),
-          text: `I'm processing your request about "${message.substring(0, 30)}${message.length > 30 ? '...' : ''}"`,
-          isUser: false,
-          timestamp: new Date()
-        };
-        
-        setMessages(prevMessages => [...prevMessages, botResponse]);
+        streamText(responseText);
       }, 2000);
     }
   };
-  
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleSendMessage();
     }
   };
-  
+
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
-  
+
   return (
-    <ChatContainer>
-      <ChatFabButton 
-        isOpen={isOpen} 
-        onClick={toggleChat} 
-        aria-label={isOpen ? "Close chat" : "Open chat"}
-      >
-        <ChatIcon />
-      </ChatFabButton>
-      
-      <ChatPanel isOpen={isOpen}>
-        <CustomChatHeader>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
-            <AvatarCircle color={agentColor}>
-              <AgentInitial>{agentInitial}</AgentInitial>
-            </AvatarCircle>
-            Chat with {agentName}
-          </div>
-          <CloseButton onClick={toggleChat} aria-label="Close chat">
-            <CloseIcon />
-          </CloseButton>
-        </CustomChatHeader>
-        
-        <ChatMessagesPanel>
-          {messages.map(msg => (
-            <ChatBubble key={msg.id} you={msg.isUser}>
-              {msg.text}
-              <TimeStamp>{formatTime(msg.timestamp)}</TimeStamp>
-            </ChatBubble>
-          ))}
+      <ChatContainer>
+        <ChatFabButton
+            isOpen={isOpen}
+            onClick={toggleChat}
+            aria-label={isOpen ? "Close chat" : "Open chat"}
+        >
+          <ChatIcon />
+        </ChatFabButton>
 
-          {isThinking && (
-            <ChatBubble you={false} style={{ display: 'inline-block', minWidth: 'auto' }}>
-              <ThinkingDots />
-            </ChatBubble>
-          )}
+        <ChatPanel isOpen={isOpen}>
+          <CustomChatHeader>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
+              <AvatarCircle color={agentColor}>
+                <AgentInitial>{agentInitial}</AgentInitial>
+              </AvatarCircle>
+              Chat with {agentName}
+            </div>
+            <CloseButton onClick={toggleChat} aria-label="Close chat">
+              <CloseIcon />
+            </CloseButton>
+          </CustomChatHeader>
 
-          <div ref={messagesEndRef} />
-        </ChatMessagesPanel>
-        
-        <ChatInputBar>
-          <StyledChatInput
-            type="text"
-            placeholder="Type a message..."
-            value={message}
-            onChange={(e:any) => setMessage(e.target.value)}
-            onKeyDown={handleKeyDown}
-          />
-          <ChatSendBtn
-            onClick={handleSendMessage}
-            aria-label="Send message"
-          >
-            Send
-          </ChatSendBtn>
-        </ChatInputBar>
-      </ChatPanel>
-    </ChatContainer>
+          <ChatMessagesPanel>
+            {messages.map(msg => (
+                <CustomChatBubble key={msg.id} you={msg.isUser}>
+                  {msg.text}
+                  <TimeStamp isHuman={msg.isUser}>{formatTime(msg.timestamp)}</TimeStamp>
+                </CustomChatBubble>
+            ))}
+
+            {isThinking && (
+                <CustomChatBubble you={false} style={{ display: 'inline-block', minWidth: 'auto' }}>
+                  <ThinkingDotsComponent />
+                </CustomChatBubble>
+            )}
+
+            {isStreaming && (
+                <CustomChatBubble you={false} isStreaming>
+                  <div className="streaming-text">
+                    {streamedMessage}
+                  </div>
+                </CustomChatBubble>
+            )}
+
+            <div ref={messagesEndRef} />
+          </ChatMessagesPanel>
+
+          <ChatInputBar>
+            <ChatInput
+                type="text"
+                placeholder="Type a message..."
+                value={message}
+                onChange={(e:any) => setMessage(e.target.value)}
+                onKeyDown={handleKeyDown}
+            />
+            <SendButton
+                onClick={handleSendMessage}
+                aria-label="Send message"
+            >
+              <SendIcon />
+            </SendButton>
+          </ChatInputBar>
+        </ChatPanel>
+      </ChatContainer>
   );
 };
 

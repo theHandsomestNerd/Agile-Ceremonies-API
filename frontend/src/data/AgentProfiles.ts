@@ -53,7 +53,7 @@ export const AgentProfiles: { [key: string]: AgentProfile } = {
     id: 'james',
     name: 'James',
     short: 'J',
-    color: '#3b82f6',
+    color: '#00B4D8',
     role: 'Developer',
     description: 'Implements features, writes and fixes code, works with Terrell in pair programming'
   },
@@ -61,7 +61,7 @@ export const AgentProfiles: { [key: string]: AgentProfile } = {
     id: 'terrell',
     name: 'Terrell',
     short: 'T',
-    color: '#2563eb',
+    color: '#7B2CBF',
     role: 'Developer',
     description: 'Performs code reviews, provides feedback, works with James in pair programming'
   },
