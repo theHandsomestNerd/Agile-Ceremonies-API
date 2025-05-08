@@ -111,11 +111,13 @@ const ThinkingDots = styled.div`
     padding: 4px 0;
 `;
 const Dot = styled.span<{ delay: number; agentColor?: string }>`
-    color: ${props => props.agentColor || 'var(--color-accent-josh)'};
+    color: ${props => props.agentColor || 'var(--color-accent-josh)'}; // Requirement #3: Agent's accent color
     font-weight: 700;
     margin: 0 3px;
     animation: ${dotPulse} 1.4s infinite;
     animation-delay: ${props => props.delay}ms;
+    font-size: 1.5rem;
+    font-size: 1.5rem; // Make dots a bit bigger for better visibility
 `;
 const ThinkingDotsComponent = (props:{dotColor:string}) => (
     <ThinkingDots aria-live="polite" aria-atomic="true">
@@ -126,7 +128,7 @@ const ThinkingDotsComponent = (props:{dotColor:string}) => (
 );
 
 interface ChatPanelProps {
-    agentId?: string;
+    agentId?: AgentKey;
 }
 
 // Styled components
@@ -215,7 +217,7 @@ const CloseButton = styled.button`
 
 const TimeStamp = styled.span<{ isHuman?: boolean }>`
     font-size: 0.75rem;
-    color: var(--color-neutral-900);
+    color: var(--color-neutral-600); // Changed from darker to medium gray to differentiate from message text
     margin-top: 4px;
     display: block;
     text-align: right;
@@ -224,9 +226,15 @@ const TimeStamp = styled.span<{ isHuman?: boolean }>`
 // Custom input styling with medium text color
 const ChatInput = styled(StyledChatInput)`
     color: var(--color-neutral-600);
+    border-color: var(--color-neutral-300); // Default border color, will be overridden with agent colors
 
     &::placeholder {
         color: var(--color-neutral-400);
+    }
+    
+    &:focus {
+        outline: none; 
+        border-color: inherit; // Will inherit from inline styles
     }
 `;
 
@@ -271,7 +279,7 @@ const MessageInput = styled.input`
 
 // Custom send button
 const SendButton = styled.button`
-    background: linear-gradient(135deg, #8b5cf6, #7209b7);
+    background: var(--color-primary); // Will be overridden with agent colors via inline styles
     color: white;
     border: none;
     border-radius: 50%;
@@ -287,8 +295,8 @@ const SendButton = styled.button`
 
     &:hover {
         transform: scale(1.08);
-        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
-        background: linear-gradient(135deg, #9461fb, #7f18c9);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        filter: brightness(1.1);
     }
 
     svg {
@@ -298,119 +306,6 @@ const SendButton = styled.button`
 `;
 
 
-const ChatPanel: React.FC<ChatPanelProps> = ({ agentId }) => {
-    const [selectedAgent, setSelectedAgent] = useState<AgentKey>(agentId as AgentKey || 'nat');
-    const [messages, setMessages] = useState<{
-        [key in AgentKey]?: Array<{
-            text: string;
-            isUser: boolean
-        }>
-    }>(agentMessages);
-    const [inputValue, setInputValue] = useState('');
-    const messagesContainerRef = useRef<HTMLDivElement>(null);
-
-    // Get current agent color and data from dictionary
-    const currentAgentData = Agents[selectedAgent] || Agents.nat;
-    const currentAgentColor = currentAgentData.color || 'var(--color-primary)';
-
-    // Update selected agent when prop changes
-    useEffect(() => {
-        if (agentId && Agents[agentId as AgentKey]) {
-            setSelectedAgent(agentId as AgentKey);
-        }
-    }, [agentId]);
-
-    // Scroll to bottom when messages change
-    useEffect(() => {
-        if (messagesContainerRef.current) {
-            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
-        }
-    }, [messages, selectedAgent]);
-
-    const handleAgentChange = (agentKey: AgentKey) => {
-        if (agentKey && agentKey !== selectedAgent && Agents[agentKey]) {
-            setSelectedAgent(agentKey);
-            // You could add other actions here when agent changes
-        }
-    };
-
-    const handleSendMessage = () => {
-        if (inputValue.trim()) {
-            // Update messages for the current agent
-            const currentAgentMessages = messages[selectedAgent] || [];
-            const agentName = Agents[selectedAgent]?.name || selectedAgent;
-            
-            const updatedMessages = {
-                ...messages,
-                [selectedAgent]: [
-                    ...currentAgentMessages,
-                    {text: inputValue, isUser: true},
-                    {
-                        text: `This is a response from ${agentName}`,
-                        isUser: false
-                    }
-                ]
-            };
-
-            setMessages(updatedMessages);
-            setInputValue('');
-        }
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter') {
-            handleSendMessage();
-        }
-    };
-
-    const currentMessages = messages[selectedAgent] || [];
-
-    return (
-        <PanelContainer style={{borderColor: `${currentAgentColor}30`}}>
-            <ChatHeader
-                selectedAgent={selectedAgent}
-                onAgentChange={handleAgentChange}
-            />
-            <MessagesContainer ref={messagesContainerRef}>
-                {currentMessages.map((message, index) => (
-                    <ChatBubble
-                        key={index}
-                        message={message.text}
-                        isUser={message.isUser}
-                        you={message.isUser}
-                        agentKey={message.isUser ? undefined : selectedAgent}
-                    >
-                        {message.text}
-                    </ChatBubble>
-                ))}
-            </MessagesContainer>
-
-            <InputContainer>
-                <MessageInput
-                    type="text"
-                    placeholder={`Message ${Agents[selectedAgent]?.name || selectedAgent}...`}
-                    value={inputValue}
-                    onChange={(e: any) => setInputValue(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    style={{
-                        borderColor: `${currentAgentColor}40`,
-                        boxShadow: `0 0 0 1px ${currentAgentColor}20`
-                    }}
-                />
-                <SendButton
-                    onClick={handleSendMessage}
-                    style={{
-                        background: `linear-gradient(135deg, ${currentAgentColor}, ${currentAgentColor}dd)`
-                    }}
-                >
-                    <SendIcon/>
-                </SendButton>
-            </InputContainer>
-        </PanelContainer>
-    );
-};
-
-
 // Sample message type
 interface Message {
     id: string;
@@ -418,6 +313,7 @@ interface Message {
     isUser: boolean;
     timestamp: Date;
     isStreaming?: boolean;
+    agentKey?: AgentKey; // Add agentKey to track which agent sent the message
 }
 
 // Helper function to get agent color
@@ -444,18 +340,21 @@ interface Message {
 
 const ChatPanelComponent: React.FC<ChatPanelProps> = ({
                                                           agentId = 'compass',
-                                                      }) => {
+                                                      }: {agentId?: AgentKey}) => {
     // Ensure we have a valid agent key
-    const safeAgentId = (agentId && typeof agentId === 'string' && agentId in Agents)
-        ? agentId as AgentKey
+    const safeAgentId = (agentId && agentId in Agents)
+        ? agentId
         : 'compass';
 
-    // Get agent details from dictionary
-    const agentData = Agents[safeAgentId];
-    const agentName = agentData?.name || safeAgentId;
+    // Initialize the selected agent state
+    const [selectedAgent, setSelectedAgent] = useState<AgentKey>(safeAgentId);
+    
+    // Get agent details from dictionary based on selectedAgent (not just safeAgentId)
+    const agentData = Agents[selectedAgent];
+    const agentName = agentData?.name || selectedAgent;
     const agentRole = agentData?.role || 'Agent';
     const agentColor = agentData?.color || 'var(--color-primary)';
-    const agentAccentColor = agentData?.accent || `var(--color-${safeAgentId.toLowerCase()}-secondary)`;
+    const agentAccentColor = agentData?.accent || 'var(--color-primary)';
 
     const [isOpen, setIsOpen] = useState(false);
     const [message, setMessage] = useState('');
@@ -474,17 +373,30 @@ const ChatPanelComponent: React.FC<ChatPanelProps> = ({
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const thinkingRef = useRef<HTMLDivElement>(null);
 
-    // Update greeting when agent changes
+    // Initial setup - update from props
     useEffect(() => {
-        if (safeAgentId && Agents[safeAgentId]) {
+        console.log("ChatPanel received agentId prop:", agentId);
+        if (agentId && agentId in Agents && agentId !== selectedAgent) {
+            setSelectedAgent(agentId);
+        }
+    }, [agentId]);
+    
+    // Update greeting when selected agent changes
+    useEffect(() => {
+        console.log("Selected agent changed to:", selectedAgent);
+        if (selectedAgent && Agents[selectedAgent]) {
+            const agent = Agents[selectedAgent];
+            const name = agent?.name || selectedAgent;
+            const role = agent?.role || 'Agent';
+            
             setMessages([{
                 id: '1',
-                text: `Hello! I'm ${agentName}, your ${agentRole}. How can I help you with your workflows today?`,
+                text: `Hello! I'm ${name}, your ${role}. How can I help you with your workflows today?`,
                 isUser: false,
                 timestamp: new Date()
             }]);
         }
-    }, [safeAgentId, agentName, agentRole]);
+    }, [selectedAgent]);
 
     // Process agent information
 
@@ -579,16 +491,16 @@ const ChatPanelComponent: React.FC<ChatPanelProps> = ({
         }
     };
 
-    const [selectedAgent, setSelectedAgent] = useState<AgentKey>(safeAgentId)
-
     const handleAgentChange = (agentKey: AgentKey) => {
+        console.log("handleAgentChange called with:", agentKey);
+        
         if (agentKey && Agents[agentKey]) {
+            // Update the selected agent state
             setSelectedAgent(agentKey);
-
-            // Since ChatPanelComponent manages its own state separately from the ChatPanel
-            // component, we need to update the agent information here as well
+            
+            // Get the agent information
             const agentInfo = Agents[agentKey];
-
+    
             // Add a message about switching agents
             setMessages(prevMessages => [
                 ...prevMessages,
@@ -596,10 +508,12 @@ const ChatPanelComponent: React.FC<ChatPanelProps> = ({
                     id: Date.now().toString(),
                     text: `Switching to ${agentInfo?.name || agentKey}, your ${agentInfo?.role || 'Agent'}.`,
                     isUser: false,
-                    timestamp: new Date()
+                    timestamp: new Date(),
+                    agentKey: agentKey // Store the agent key with the message
                 }
             ]);
         } else {
+            console.warn("Invalid agent key:", agentKey);
             setSelectedAgent('compass');
         }
     }
@@ -631,29 +545,30 @@ const ChatPanelComponent: React.FC<ChatPanelProps> = ({
                             key={msg.id}
                             message={msg.text}
                             isUser={msg.isUser}
-                            agentKey={msg.isUser ? undefined : safeAgentId}
+                            // Use the message's agent key if available, or the currently selected agent
+                            agentKey={msg.isUser ? undefined : (msg.agentKey || selectedAgent)}
                             isStreaming={msg.isStreaming}>
                             {msg.text}
                             <TimeStamp isHuman={msg.isUser}>{formatTime(msg.timestamp)}</TimeStamp>
                         </ChatBubble>
                     ))}
-
+                
                     {isThinking && (
                         <ChatBubble
                             isUser={false}
                             you={false}
-                            agentKey={safeAgentId}
+                            agentKey={selectedAgent}
                             message="">
-                            <ThinkingDotsComponent dotColor={agentAccentColor}/>
+                            <ThinkingDotsComponent dotColor={agentAccentColor}/> {/* Requirement #3: Agent accent color for thinking dots */}
                         </ChatBubble>
                     )}
-
+                
                     {isStreaming && (
                         <ChatBubble
                             you={false}
                             isStreaming
                             isUser={false}
-                            agentKey={safeAgentId}
+                            agentKey={selectedAgent}
                             message={""}>
                             <div className="streaming-text">
                                 {streamedMessage}
@@ -672,15 +587,15 @@ const ChatPanelComponent: React.FC<ChatPanelProps> = ({
                         onChange={(e: any) => setMessage(e.target.value)}
                         onKeyDown={handleKeyDown}
                         style={{
-                            borderColor: `${agentColor}40`,
-                            boxShadow: `0 0 0 1px ${agentColor}20`
+                            borderColor: agentColor,
+                            boxShadow: `0 0 0 1px ${agentColor}40`
                         }}
                     />
                     <SendButton
                         onClick={handleSendMessage}
                         aria-label="Send message"
                         style={{
-                            background: `linear-gradient(135deg, ${agentColor}, ${agentColor}dd)`
+                            background: agentColor
                         }}
                     >
                         <SendIcon/>

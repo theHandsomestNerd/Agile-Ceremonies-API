@@ -11,17 +11,17 @@ export const ChatMessagesPanel = styled.div`
 `;
 
 // Single chat bubble
-export const ChatBubble = styled.div<{ you: boolean }>`
+export const ChatBubble = styled.div<{ isUser: boolean }>`
     background: ${(p) =>
-    p.you
+    p.isUser
         ? "linear-gradient(90deg, var(--color-josh-primary) 35%, var(--color-josh-secondary) 100%)"
         : "var(--color-neutral-200)"};
-    color: ${(p) => (p.you ? "var(--color-neutral-100)" : "var(--color-neutral-900)")};
+    color: ${(p) => (p.isUser ? "var(--color-neutral-100)" : "var(--color-neutral-900)")};
     border-radius: var(--border-radius-md) var(--border-radius-md) var(--border-radius-md) var(--border-radius-sm);
     padding: var(--spacing-xs) var(--spacing-base) var(--spacing-xs) var(--spacing-base);
     margin: 0 0 var(--spacing-xs) 0;
     font-size: var(--font-size-base);
-    align-self: ${(p) => (p.you ? "flex-end" : "flex-start")};
+    align-self: ${(p) => (p.isUser ? "flex-end" : "flex-start")};
     box-shadow: var(--shadow-sm);
     font-weight: var(--font-weight-medium);
     max-width: 88%;

@@ -1,6 +1,7 @@
 import React, {PropsWithChildren} from 'react';
 import styled, {css, keyframes} from 'styled-components';
 import { AgentKey } from '../types/App.types';
+import { Agents } from '../data/Agents';
 
 // Animation for the typing indicator
 const dotPulse = keyframes`
@@ -46,37 +47,19 @@ const Bubble = styled.div<StyledBubbleProps>`
       : '18px 18px 18px 4px' /* Agent: rounded with sharp bottom-left */
   };
   
-  /* Gradient background for agent messages */
+  /* Background for messages using agent avatarBg */
   background: ${props => {
     if (props.isUser) {
       return 'var(--color-neutral-200)';
     }
     
-    // Use the agent's gradient if an agent key is provided
-    switch(props.agentKey) {
-      case 'nat':
-        return 'var(--color-nat-gradient)';
-      case 'brian':
-        return 'var(--color-brian-gradient)';
-      case 'reqqy':
-        return 'var(--color-reqqy-gradient)';
-      case 'josh':
-        return 'linear-gradient(90deg, var(--color-josh-primary) 35%, var(--color-josh-secondary) 100%)';
-      case 'james':
-        return 'var(--color-james-gradient)';
-      case 'terrell':
-        return 'var(--color-terrell-gradient)';
-      case 'antosh':
-        return 'var(--color-antosh-gradient)';
-      case 'man-man':
-        return 'var(--color-manman-gradient)';
-      case 'lia':
-        return 'var(--color-lia-gradient)';
-      case 'compass':
-        return 'var(--color-compass-gradient)';
-      default:
-        return 'linear-gradient(90deg, var(--color-josh-primary) 35%, var(--color-josh-secondary) 100%)';
+    // Use the agent's avatarBg if available
+    if (props.agentKey && Agents[props.agentKey]) {
+      return Agents[props.agentKey].avatarBg || 'var(--color-primary)';
     }
+    
+    // Default background if no agent or avatarBg is found
+    return 'linear-gradient(90deg, var(--color-josh-primary) 35%, var(--color-josh-secondary) 100%)';
   }};
   
   color: ${props => props.isUser ? 'var(--color-neutral-900)' : 'var(--color-neutral-100)'};
@@ -123,6 +106,13 @@ const ChatBubble: React.FC<PropsWithChildren<ChatBubbleProps>> = ({
 }) => {
   // Support both isUser and you props for compatibility
   const isUserMessage = isUser || you;
+  
+  // For debugging - log when agent key is present
+  if (agentKey) {
+    console.log("ChatBubble rendering with agent key:", agentKey, 
+                "agent exists:", agentKey in Agents, 
+                "agent data:", Agents[agentKey as AgentKey]);
+  }
   
   return (
     <BubbleWrapper isUser={!!isUserMessage}>

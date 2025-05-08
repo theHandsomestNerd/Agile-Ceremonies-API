@@ -52,8 +52,8 @@ const handleWorkflowsRequest = async (req: any, res: any) => {
 
                         const workFlowTrigger:WorkflowTriggerType = {
                             workflowId: parsedData.workflowId,
-                            ownerAgentId: 'compass',
-                            triggeredBy: 'compass',
+                            ownerAgentId: parsedData.agentId || 'compass',
+                            triggeredBy: parsedData.triggeredBy || 'compass',
                             active: true,
                             n8nId: n8nWorkflowId.value(),
                             createdAt: (new Date()).toISOString(),

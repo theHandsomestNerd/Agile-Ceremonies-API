@@ -137,17 +137,24 @@ const ChatHeader: React.FC<PropsWithChildren<ChatHeaderProps>> = ({
     const currentAgentData = Agents[selectedAgent];
     const currentAgentColor = currentAgentData?.color || 'var(--color-primary)';
 
+    // Log the current agent for debugging
+    console.log("ChatHeader rendering with agent:", selectedAgent, currentAgentData);
+
     const handlePrevious = () => {
         if (typeof onAgentChange === 'function') {
             const prevIndex = currentIndex <= 0 ? agentKeys.length - 1 : currentIndex - 1;
-            onAgentChange(agentKeys[prevIndex]);
+            const newAgent = agentKeys[prevIndex];
+            console.log("Changing to previous agent:", newAgent);
+            onAgentChange(newAgent);
         }
     };
 
     const handleNext = () => {
         if (typeof onAgentChange === 'function') {
             const nextIndex = currentIndex >= agentKeys.length - 1 ? 0 : currentIndex + 1;
-            onAgentChange(agentKeys[nextIndex]);
+            const newAgent = agentKeys[nextIndex];
+            console.log("Changing to next agent:", newAgent);
+            onAgentChange(newAgent);
         }
     };
 
