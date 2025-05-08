@@ -13,7 +13,10 @@ export type AgentKey =
     | "Twin"
     | "Terrell"
     | "James"
-    | "Antosh";
+    | "Antosh"
+    | "Compass";
+
+
 export type StatusType = "complete" | "active" | "todo" | "error" | "pending";
 export type Step = {
     id: number;
@@ -37,6 +40,7 @@ export type Step = {
     };
     n8nJson: object;
 };
+
 export type Agent = {
     key: AgentKey;
     name: string;

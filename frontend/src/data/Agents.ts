@@ -83,12 +83,21 @@ export const Agents: Record<AgentKey, Agent> = {
         avatarBg: "var(--color-terrell-gradient)",
     },
     James: {
-        key: "Terrell",
-        name: "Terrell",
-        short: "T",
+        key: "James",
+        name: "James",
+        short: "J",
         role: "Backend Developer",
-        color: "var(--color-terrell-primary)",
-        accent: "var(--color-terrell-secondary)",
-        avatarBg: "var(--color-terrell-gradient)",
+        color: "var(--color-james-primary)",
+        accent: "var(--color-james-secondary)",
+        avatarBg: "var(--color-james-gradient)",
+    },
+    Compass: {
+        key: "Compass",
+        name: "Compass",
+        short: "C",
+        role: "Backend Developer",
+        color: "var(--color-compass-primary)",
+        accent: "var(--color-compass-secondary)",
+        avatarBg: "var(--color-compass-gradient)",
     }
 };

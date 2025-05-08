@@ -9,7 +9,6 @@ const ANIMATION_DURATION = 300; // ms
 const DropdownContainer = styled.div`
   position: relative;
   width: 100%;
-  margin-bottom: 20px;
   user-select: none;
 `;
 

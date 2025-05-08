@@ -400,6 +400,39 @@ export const ChevronRightIcon: React.FC<IconProps> = ({
   </SvgIcon>
 );
 
+export const ChevronLeftIcon: React.FC<IconProps> = ({
+                                                       size = 16,
+                                                       color = "currentColor",
+                                                       hoverColor,
+                                                       strokeWidth = 2,
+                                                       className,
+                                                       title = "Chevron Left",
+                                                       onClick,
+                                                       isInteractive,
+                                                       agentKey
+                                                     }) => (
+    <SvgIcon
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke={agentKey ? getAgentColor(agentKey, color) : color}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+        onClick={onClick}
+        isInteractive={isInteractive || !!onClick}
+        hoverColor={hoverColor}
+        agentKey={agentKey}
+        role="img"
+        aria-labelledby="chevronLeftTitle"
+    >
+      <title id="chevronLeftTitle">{title}</title>
+      <polyline points="15 18 9 12 15 6"></polyline>
+    </SvgIcon>
+);
+
 // Code Icon - For development sections
 export const CodeIcon: React.FC<IconProps> = ({ 
   size = 16, 
