@@ -1,44 +1,31 @@
 import React, {useState} from 'react';
 import {
     ControlButton,
-    MetadataItem,
-    MetadataLabel,
-    MetadataValue,
     WorkflowContainer,
     WorkflowContent,
     WorkflowControls,
     WorkflowDescription,
-    WorkflowDropdown,
     WorkflowHeader,
-    WorkflowInfo,
-    WorkflowMetadata,
     WorkflowSection,
-    WorkflowSelector,
     WorkflowStatusBadge,
     WorkflowTitle
 } from '../styles/Workflow.styled';
-import {
-    ActivityIcon,
-    CalendarIcon,
-    FileTextIcon,
-    PauseIcon,
-    PlayIcon,
-    RefreshIcon,
-    SaveIcon,
-    UserIcon
-} from '../components/WorkflowIcons';
+import {ActivityIcon, PauseIcon, PlayIcon, RefreshIcon, SaveIcon} from '../components/WorkflowIcons';
+import WorkflowDropdownSelect from '../components/WorkflowDropdownSelect';
 import WorkflowStepTable from '../components/WorkflowStepTable';
-import {agilePairTDDWorkflow, helpDeskWorkflow} from "../data/WorkflowsData";
+import ChatPanel from '../components/ChatPanel';
+import {agilePairTDDWorkflow, helpDeskWorkflow, respawnRantsWorkflow} from "../data/WorkflowsData";
 import {StatusType} from '../types/App.types';
-import {PresenceBar, PresenceAgent, AvatarCircle, AgentInitial} from '../styles/App.styled';
-import {AgentProfile, AgentProfiles} from '../data/AgentProfiles';
-import {statusMeta} from '../data/statusMeta';
+import {AgentInitial, AvatarCircle, PresenceAgent, PresenceBar} from "../styles/App.styled";
+import {AgentProfile, AgentProfiles} from "../data/AgentProfiles";
+import {statusMeta} from "../data/statusMeta";
 import {StepStatusDot} from "../styles/Steps.styled";
 
 // Available workflows
 const availableWorkflows = [
     agilePairTDDWorkflow,
-    helpDeskWorkflow
+    helpDeskWorkflow,
+    respawnRantsWorkflow,
 ];
 
 const Workflow: React.FC = () => {
@@ -111,53 +98,84 @@ const Workflow: React.FC = () => {
 
     return (
         <WorkflowContainer>
-            <WorkflowHeader>
-                <div>
-                    <WorkflowSelector>
-                        <WorkflowDropdown
-                            value={selectedWorkflowIndex.toString()}
-                            onChange={handleWorkflowChange}
-                            aria-label="Select workflow"
-                        >
-                            {availableWorkflows.map((wf, index) => (
-                                <option key={wf.id} value={index.toString()}>
-                                    {wf.name}
-                                </option>
-                            ))}
-                        </WorkflowDropdown>
-                    </WorkflowSelector>
-                    <WorkflowTitle>
-                        {workflow.name}
-                        <WorkflowStatusBadge status={workflowStatus}>
-                            <ActivityIcon size={18}/> {workflowStatus.charAt(0).toUpperCase() + workflowStatus.slice(1)}
-                        </WorkflowStatusBadge>
-                    </WorkflowTitle>
-                    <WorkflowDescription>
-                        {workflow.description}
-                    </WorkflowDescription>
-                </div>
-            </WorkflowHeader>
-
             <WorkflowContent>
+                {/* New dropdown-style workflow selector */}
+                <WorkflowDropdownSelect
+                    workflows={availableWorkflows}
+                    selectedWorkflowIndex={selectedWorkflowIndex}
+                    onSelect={(index) => {
+                        setSelectedWorkflowIndex(index);
+                        setWorkflow(availableWorkflows[index]);
+                        setWorkflowStatus('active'); // Reset workflow status
+                    }}
+                    formatDate={formatDate}
+                />
 
-                // TODO: Make the component below a dropdown
-                <WorkflowInfo>
-                    <WorkflowMetadata>
-                        <MetadataItem>
-                            <MetadataLabel><FileTextIcon size={16}/> Workflow ID:</MetadataLabel>
-                            <MetadataValue>{workflow.id}</MetadataValue>
-                        </MetadataItem>
-                        <MetadataItem>
-                            <MetadataLabel><UserIcon size={16}/> Owner:</MetadataLabel>
-                            <MetadataValue>{workflow.ownerAgentId.charAt(0).toUpperCase() + workflow.ownerAgentId.slice(1)}</MetadataValue>
-                        </MetadataItem>
-                        <MetadataItem>
-                            <MetadataLabel><CalendarIcon size={16}/> Created:</MetadataLabel>
-                            <MetadataValue>{formatDate()}</MetadataValue>
-                        </MetadataItem>
-                    </WorkflowMetadata>
-                </WorkflowInfo>
+                <WorkflowHeader>
+                    <div>
+                        <WorkflowTitle>
+                            {workflow.name}
+                            <WorkflowStatusBadge status={workflowStatus}>
+                                <ActivityIcon
+                                    size={18}/> {workflowStatus.charAt(0).toUpperCase() + workflowStatus.slice(1)}
+                            </WorkflowStatusBadge>
+                        </WorkflowTitle>
+                        <WorkflowDescription>
+                            {workflow.description}
+                        </WorkflowDescription>
+                    </div>
+                </WorkflowHeader>
 
+
+
+                <PresenceBar role="region" aria-label="Present Agents">
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginRight: '10px',
+                        position: 'relative',
+                        paddingRight: '15px'
+                    }}>
+                        <div style={{
+                            position: 'absolute',
+                            right: 0,
+                            height: '28px',
+                            width: '1px',
+                            backgroundColor: 'var(--color-border)',
+                            opacity: 0.5
+                        }}/>
+                    </div>
+
+                    {getActiveAgents().map(({ id, status }) => {
+                        // Get agent profile from AgentProfiles or use fallback
+                        const agent:AgentProfile = AgentProfiles[id] || {
+                            name: id,
+                            color: '#666666',
+                            short: id.charAt(0).toUpperCase()
+                        };
+
+                        // Access status metadata with fallback
+                        const statusInfo = statusMeta[status] || statusMeta.todo;
+
+                        return (
+                            <PresenceAgent key={id}>
+                                <AvatarCircle color={agent.color}>
+                                    <AgentInitial>
+                                        {agent.name && agent.name.includes('&')
+                                            ? 'JT'
+                                            : agent.short || agent.name.charAt(0).toUpperCase()}
+                                    </AgentInitial>
+                                </AvatarCircle>
+                                <StepStatusDot
+                                    color={statusInfo.color}
+                                    error={status === "error"}
+                                >
+                                    {statusInfo.icon}
+                                </StepStatusDot>
+                            </PresenceAgent>
+                        );
+                    })}
+                </PresenceBar>
                 <WorkflowControls>
                     <ControlButton onClick={handleStart}
                                    disabled={workflowStatus === 'active' || workflowStatus === 'completed'}>
@@ -173,7 +191,6 @@ const Workflow: React.FC = () => {
                         <SaveIcon size={18}/> Save
                     </ControlButton>
                 </WorkflowControls>
-
                 <WorkflowSection>
                     <WorkflowStepTable
                         steps={workflow.steps}
@@ -181,6 +198,9 @@ const Workflow: React.FC = () => {
                     />
                 </WorkflowSection>
             </WorkflowContent>
+                            
+                            {/* Add the chat panel with the workflow owner as the agent ID */}
+                            <ChatPanel agentId={workflow.ownerAgentId.charAt(0).toUpperCase() + workflow.ownerAgentId.slice(1)} />
         </WorkflowContainer>
     );
 };

@@ -283,3 +283,134 @@ export const helpDeskWorkflow = {
         }
     ]
 };
+
+export const respawnRantsWorkflow = {
+    "id": "RRYT_Content_001",
+    "name": "Content Creation for Respawn Rants",
+    "ownerAgentId": "lia",
+    "description": "This workflow enables Agent Lia to create YouTube content specifically for Respawn Rants by refining the description, title, hashtags, and tags based on SEO and gaming content needs. It is also able to generate specific formatting for titles, descriptions, hashtags, and tags based on user inputs. If the request is not for Respawn Rants, consult the corresponding client workflow.",
+    "steps": [
+        {
+            "id": "RR001-step-1",
+            "ownerAgentId": "lia",
+            "serviceName": "Rework Description",
+            "tools": ["OpenAI"],
+            "actionToTake": "Craft a refined and engaging description in the Respawn Rants format based on the user-inputted description. If the request is from the client, process accordingly.",
+            "expectedIO": {
+                "input": {
+                    "inputType": "json",
+                    "systemPrompt": "{master-system-prompt} + {lia-system-prompt} \n You are AI Agent Lia crafting gaming video descriptions from the perspective of Soldier:76 if it's for Respawn Rants.",
+                    "userPrompt": "Refine the video description using gameplay details and content summary, following the Respawn Rants format."
+                },
+                "output": {
+                    "output": "Reworked Description",
+                    "outputType": "text"
+                }
+            },
+            "prerequisiteSteps": []
+        },
+        {
+            "id": "RR001-step-2",
+            "ownerAgentId": "lia",
+            "serviceName": "Rework Title/New Title Creation",
+            "tools": ["OpenAI"],
+            "actionToTake": "Create a compelling and SEO-friendly title or rework the existing title in the Respawn Rants format based on the user-inputted title.",
+            "expectedIO": {
+                "input": {
+                    "inputType": "json",
+                    "systemPrompt": "{master-system-prompt} + {lia-system-prompt} \n You are AI Agent Lia creating engaging gaming video titles for Respawn Rants.",
+                    "userPrompt": "Create or optimize title using video theme and strategic keywords."
+                },
+                "output": {
+                    "output": "Reworked or New Title",
+                    "outputType": "text"
+                }
+            },
+            "prerequisiteSteps": ["RR001-step-1"]
+        },
+        {
+            "id": "RR001-step-3",
+            "ownerAgentId": "lia",
+            "serviceName": "Generate Hashtags",
+            "tools": ["OpenAI"],
+            "actionToTake": "Create a list of balanced and effective hashtags in Respawn Rants format.",
+            "expectedIO": {
+                "input": {
+                    "inputType": "json",
+                    "systemPrompt": "{master-system-prompt} + {lia-system-prompt}\n You are AI Agent Lia generating gaming-focused hashtags.",
+                    "userPrompt": "Create optimized hashtags based on gaming content and SEO analysis."
+                },
+                "output": {
+                    "output": "List of suitable YouTube Hashtags",
+                    "outputType": "json"
+                }
+            },
+            "prerequisiteSteps": ["RR001-step-2"]
+        },
+        {
+            "id": "RR001-step-4",
+            "ownerAgentId": "lia",
+            "serviceName": "Generate Tags",
+            "tools": ["OpenAI"],
+            "actionToTake": "Transform hashtags into a comma-separated list of tags, ensuring the format is suitable for Respawn Rants.",
+            "expectedIO": {
+                "input": {
+                    "inputType": "json",
+                    "systemPrompt": "{master-system-prompt} + {lia-system-prompt}\nYou are AI Agent Lia converting hashtags to YouTube tags.",
+                    "userPrompt": "Convert hashtags into optimized YouTube tags format."
+                },
+                "output": {
+                    "output": "Comma-delimited YouTube Tags",
+                    "outputType": "text"
+                }
+            },
+            "prerequisiteSteps": ["RR001-step-3"]
+        },
+        {
+            "id": "RR001-step-5",
+            "ownerAgentId": "lia",
+            "serviceName": "Format Response",
+            "tools": ["Response Formatter", "Template Engine", "OpenAI"],
+            "actionToTake": "Format the content into standardized response format with both default template",
+            "expectedIO": {
+                "input": {
+                    "inputType": "json",
+                    "systemPrompt": "{master-system-prompt} + {lia-system-prompt}\nYou are AI Agent Lia formatting the final response with specific templates.",
+                    "userPrompt": `Format the content into the following structure:
+                                   responseFormat: {
+                                       default: {
+                                        title: Soldier:76 Pro Tip – How to handle a Roadhog (And When to Run!) | Overwatch 2,
+                                        description: 🔥 Soldier:76 GOES ON A RAMPAGE – DOUBLE ANA TAKEDOWN & MERCY DENIED AT OASIS | Overwatch 2 🔥
+                                        Sometimes, all it takes is the right angle and a quick trigger finger. In this clip, 
+                                        I get the jump on Ana—no hesitation, burst her down, but that Mercy always wants a 
+                                        save! As soon as Ana goes down, Mercy rushes in for the Res… not on my watch. 
+                                        I pressure her, and right as Ana comes back up, I throw down splash damage 
+                                        and pick them BOTH off in rapid succession. Did Ana realize where the heat 
+                                        was coming from? Doesn’t look like it, because I catch her again sprinting 
+                                        for cover—reminder: keep eyes on the target, folks.
+                                        
+                                        🎯 In this clip: 
+                                            ✅ Perfect off-angle positioning for the opening kill 
+                                            ✅ Mercy swoops in for a clutch Res—but gets caught 
+                                            ✅ Splash damage finishes the job—no escape for Ana 
+                                            ✅ Team secures the point at Oasis
+                                            
+                                        💬 Have you ever denied a Mercy Res at the perfect moment or had a wild double kill on the point? Tell me your best clutch teamfight stories in the comments!
+                                        
+                                        🔔 Subscribe for more Overwatch 2 highlights, tactical breakdowns, and no-BS rants from Soldier:76.
+                                        
+                                        #Overwatch2 #Soldier76 #FPSGaming #OverwatchPlays #OverwatchClips #RespawnRants #GamingHighlights #ShooterGames #Mercy #Ana #ProPlay #Rampage #PointCapture
+                                        
+                                        Youtube Tags: Overwatch 2, Soldier76, FPS Gaming, Overwatch Plays, Overwatch Clips, Respawn Rants, Gaming Highlights, Shooter Games, Mercy, Ana, Pro Play, Rampage, Point Capture
+                                        }
+                                   }`
+                },
+                "output": {
+                    "output": "Formatted response object",
+                    "outputType": "json"
+                }
+            },
+            "prerequisiteSteps": ["RR001-step-1", "RR001-step-2", "RR001-step-3", "RR001-step-4"]
+        }
+    ],
+}

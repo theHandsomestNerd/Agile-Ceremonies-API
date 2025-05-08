@@ -49,6 +49,9 @@ export const GlobalStyles = createGlobalStyle`
     --color-twin-secondary: #2563EB;  /* Electric blue */
     --color-twin-surface: #EDE9FE;    /* Light violet surface */
     --color-twin-gradient: linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%);
+      
+    /* TERRELL - Frontend Dev Agent - */
+    /* JAME - Backend Dev Agent - */
     
     /* ANTOSH - Testing & Analytics - Teal with orange */
     --color-antosh-primary: #14B8A6;  /* Teal */
